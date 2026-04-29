@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Producto - Agroguardati</title>
+  <meta name="description" content="Detalles y especificaciones de maquinaria agrícola.">
+  <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="logo-container">
+        <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="catalogo.html" class="active">Catálogo</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Product Details Container (Injected via JS) -->
+  <div id="product-detail-container">
+    <div style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+      <p style="font-size: 1.25rem; color: var(--brand-gray);">Cargando detalles...</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer id="contacto">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="AgroGuardatiLogo.png" alt="Agroguardati" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+          <p>Potenciando el desarrollo agropecuario con soluciones integrales en maquinaria.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Enlaces Rápidos</h3>
+          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
+            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Contacto</h3>
+          <p>📞 +54 9 3464 123456</p>
+          <p>✉️ ventas@agroguardati.com</p>
+          <p>📍 Ruta 33 Km 716, Casilda, Santa Fe</p>
+        </div>
+        <div class="footer-col">
+          <h3>Síguenos</h3>
+          <div class="social-links">
+            <a href="https://www.facebook.com/profile.php?id=100063607388862" target="_blank" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="https://www.instagram.com/agroguardati/" target="_blank" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://www.google.com/maps/place/AGROGUARDATI/@-32.0368264,-61.2019932,19.54z" target="_blank" aria-label="Google Maps">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Agroguardati. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

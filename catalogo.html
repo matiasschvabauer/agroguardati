@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo - Agroguardati</title>
+  <meta name="description" content="Explora nuestro catálogo completo de maquinaria agrícola nueva y usada.">
+  <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="logo-container">
+        <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="catalogo.html" class="active">Catálogo</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="detail-hero" style="text-align: center; padding: 6rem 0 4rem;">
+    <div class="container">
+      <h1 class="hero-title" style="font-size: 3rem;">Nuestro Catálogo</h1>
+      <p class="hero-subtitle">Encuentra la maquinaria perfecta para tus necesidades.</p>
+    </div>
+  </div>
+
+  <!-- Catalog Section -->
+  <section class="section container" style="padding-top: 0;">
+    
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label for="filter-categoria">Categoría:</label>
+        <select id="filter-categoria" class="filter-select">
+          <option value="todas">Todas</option>
+          <option value="Tractores">Tractores</option>
+          <option value="Cosechadoras">Cosechadoras</option>
+          <option value="Sembradoras">Sembradoras</option>
+          <option value="Pulverizadores">Pulverizadores</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="filter-marca">Marca:</label>
+        <select id="filter-marca" class="filter-select">
+          <option value="todas">Todas</option>
+          <option value="Massey Ferguson">Massey Ferguson</option>
+          <option value="Case IH">Case IH</option>
+          <option value="John Deere">John Deere</option>
+          <option value="Agrometal">Agrometal</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-estado">Estado:</label>
+        <select id="filter-estado" class="filter-select">
+          <option value="todos">Todos</option>
+          <option value="Nuevo">Nuevo</option>
+          <option value="Usado">Usado</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Catalog List (Alternating Layout) -->
+    <div id="catalog-list" class="catalog-list">
+      <!-- Items injected via JS -->
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer id="contacto">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="AgroGuardatiLogo.png" alt="Agroguardati" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+          <p>Potenciando el desarrollo agropecuario con soluciones integrales en maquinaria.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Enlaces Rápidos</h3>
+          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
+            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Contacto</h3>
+          <p>📞 +54 9 3464 123456</p>
+          <p>✉️ ventas@agroguardati.com</p>
+          <p>📍 Ruta 33 Km 716, Casilda, Santa Fe</p>
+        </div>
+        <div class="footer-col">
+          <h3>Síguenos</h3>
+          <div class="social-links">
+            <a href="https://www.facebook.com/profile.php?id=100063607388862" target="_blank" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="https://www.instagram.com/agroguardati/" target="_blank" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://www.google.com/maps/place/AGROGUARDATI/@-32.0368264,-61.2019932,19.54z" target="_blank" aria-label="Google Maps">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Agroguardati. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
