@@ -16,6 +16,9 @@
 
   <link rel="stylesheet" href="css/m_styles.css">
   
+  <!-- Model Viewer 3D -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
   <script>
     if (window.innerWidth > 768) {
         window.location.href = "index.html" + window.location.search + window.location.hash;
@@ -30,7 +33,7 @@
     <div class="container">
       <a href="m_index.html" class="logo-container" style="display: flex; align-items: center; gap: 0.8rem;">
         <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
-        <span style="font-size: 1.2rem; font-weight: 700; color: var(--brand-blue-dark); font-family: 'Inter', sans-serif;">Agro<span style="color: #d32f2f;">guardati</span></span>
+        <span class="logo-text">Agro<span style="color: var(--brand-red);">guardati</span></span>
       </a>
       <div class="menu-toggle" id="menu-toggle">
         <i class="fas fa-bars"></i>
@@ -50,7 +53,7 @@
     <canvas id="gradient-canvas"></canvas>
     <div class="hero-content">
       <h1 class="hero-title">Impulsa tu campo con <span class="text-gradient">tecnología</span></h1>
-      <p class="hero-subtitle">Maquinaria confiable y avanzada para tu cosecha.</p>
+      <p style="color: var(--brand-gray-dark); margin: 1rem 0 2rem;">Maquinaria confiable y avanzada para maximizar tu rendimiento.</p>
       <a href="m_catalogo.html" class="btn btn-primary">Ver Catálogo</a>
       <a href="#contacto" class="btn btn-outline">Contacto</a>
     </div>
@@ -58,12 +61,32 @@
 
   <!-- Featured Section Mobile -->
   <section class="section container">
-    <div style="text-align: center; margin-bottom: 2rem;">
-      <h2>Maquinaria Destacada</h2>
+    <div style="text-align: center;">
+      <span class="section-tag">Destacados</span>
+      <h2>Equipos <span class="text-gradient">Premium</span></h2>
     </div>
     <div id="featured-grid" class="featured-grid"></div>
     <div style="text-align: center; margin-top: 2rem;">
-      <a href="m_catalogo.html" class="btn btn-outline">Explorar todo</a>
+      <a href="m_catalogo.html" class="btn btn-outline">Explorar todo el catálogo</a>
+    </div>
+  </section>
+
+  <!-- 3D Model Section Mobile -->
+  <section class="section container" style="background: white; border-radius: var(--radius-xl); margin: 2rem 1.5rem; width: auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h2>Visualización <span class="text-gradient">3D</span></h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted);">Interactúa con nuestro equipo en tiempo real.</p>
+    </div>
+    <div class="model-container">
+      <model-viewer 
+          src="Tractor.glb" 
+          alt="Tractor Agroguardati"
+          auto-rotate 
+          camera-controls 
+          shadow-intensity="1" 
+          exposure="1"
+          ar>
+      </model-viewer>
     </div>
   </section>
 
@@ -71,25 +94,33 @@
   <section id="nosotros" class="nosotros-section">
     <div class="nosotros-intro container section">
       <div class="nosotros-split">
-        <div class="nosotros-img-wrapper" style="position:relative;">
-          <img src="images/campo_nosotros.png" alt="Campo" class="nosotros-img" style="width:100%; object-fit:cover; border-radius:var(--radius-lg);">
-          <div class="nosotros-img-badge" style="position:absolute; bottom:10px; right:10px; background:white; padding:0.5rem; border-radius:var(--radius-md); text-align:center; box-shadow:var(--shadow-md);">
-            <span class="badge-number" data-target="20" style="display:block; font-weight:700; color:var(--brand-blue);">0</span>
-            <span style="font-size:0.7rem;">Años</span>
+        <div class="nosotros-img-wrapper">
+          <img src="images/campo_nosotros.png" alt="Campo Agroguardati" class="nosotros-img">
+          <div class="nosotros-img-badge">
+            <span class="badge-number" data-target="20" style="font-size: 1.8rem; font-weight: 700; color: var(--brand-blue); display: block;">0</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">AÑOS DE EXPERIENCIA</span>
           </div>
         </div>
+        
         <div class="nosotros-text">
-          <span class="section-tag">Nosotros</span>
-          <h2>Acompañando al <span class="text-gradient">campo</span></h2>
-          <p class="nosotros-desc">Somos una empresa familiar con más de 20 años en la región pampeana.</p>
+          <span class="section-tag">Sobre Nosotros</span>
+          <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">Pasión por el <span class="text-gradient">crecimiento</span></h2>
+          <p class="nosotros-desc" style="color: var(--text-muted); font-size: 1rem;">Somos una empresa familiar dedicada a brindar soluciones integrales al productor agropecuario.</p>
+          
           <div class="valores-grid">
             <div class="valor-card">
-              <i class="fas fa-handshake"></i>
-              <h4>Confianza</h4>
+              <i class="fas fa-check-circle"></i>
+              <div>
+                <h4 style="font-size: 0.95rem;">Confianza</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Trato directo y honesto.</p>
+              </div>
             </div>
             <div class="valor-card">
-              <i class="fas fa-seedling"></i>
-              <h4>Compromiso</h4>
+              <i class="fas fa-certificate"></i>
+              <div>
+                <h4 style="font-size: 0.95rem;">Calidad</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Maquinaria de primer nivel.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -101,37 +132,55 @@
       <div class="container">
         <div class="stats-grid">
           <div class="stat-item">
-            <span class="stat-number" data-target="20">0</span><span>+</span>
-            <span class="stat-label">Años</span>
+            <span class="stat-number" data-target="20">0</span>
+            <span style="font-size: 0.8rem; opacity: 0.8;">Años</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="500">0</span><span>+</span>
-            <span class="stat-label">Equipos</span>
+            <span class="stat-number" data-target="500">0</span>
+            <span style="font-size: 0.8rem; opacity: 0.8;">Equipos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="1200">0</span>
+            <span style="font-size: 0.8rem; opacity: 0.8;">Clientes</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="5">0</span>
+            <span style="font-size: 0.8rem; opacity: 0.8;">Provincias</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Historia Mobile -->
+    <!-- Historia Mobile (Timeline) -->
     <div class="historia-block container section">
       <div style="text-align: center; margin-bottom: 2rem;">
-        <h2>Nuestra Historia</h2>
+        <span class="section-tag">Nuestra Trayectoria</span>
+        <h2>Nuestra <span class="text-gradient">Historia</span></h2>
       </div>
+      
       <div class="timeline">
         <div class="timeline-item">
           <div class="timeline-dot"></div>
           <div class="timeline-card">
             <span class="timeline-year">2004</span>
             <h4>Comienzo</h4>
-            <p>Apertura del primer local.</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Apertura del primer local en Av. Jorge Newbery.</p>
           </div>
         </div>
         <div class="timeline-item">
           <div class="timeline-dot"></div>
           <div class="timeline-card">
+            <span class="timeline-year">2015</span>
+            <h4>Servicio Técnico</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Inauguración de taller propio especializado.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card" style="border-left: 4px solid var(--brand-blue-light);">
             <span class="timeline-year">Hoy</span>
-            <h4>Crecimiento</h4>
-            <p>Líderes en la región.</p>
+            <h4>Actualidad</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Líderes en ventas y soporte en la región.</p>
           </div>
         </div>
       </div>
@@ -141,30 +190,39 @@
   <!-- Contacto Mobile -->
   <section id="contacto" class="section container">
     <div style="text-align: center; margin-bottom: 2rem;">
-      <h2>Contacto</h2>
+      <span class="section-tag">Contacto</span>
+      <h2>Canales de <span class="text-gradient">atención</span></h2>
     </div>
-    <div class="contact-split">
-      <div class="map-container" style="height:250px;">
-        <iframe src="https://maps.google.com/maps?q=Av%20Jorge%20Newbery%20526%20bis&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen=""></iframe>
+    
+    <div class="map-container" style="margin-bottom: 1.5rem;">
+      <iframe src="https://maps.google.com/maps?q=Av%20Jorge%20Newbery%20526%20bis&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen=""></iframe>
+    </div>
+
+    <div class="contact-cards-grid">
+      <a href="https://wa.me/5493404638524" class="contact-card">
+        <i class="fab fa-whatsapp"></i>
+        <h4>WhatsApp</h4>
+      </a>
+      <a href="mailto:ventas@agroguardati.com" class="contact-card">
+        <i class="fas fa-envelope"></i>
+        <h4>Email</h4>
+      </a>
+      <div class="contact-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h4>Dirección</h4>
       </div>
-      <div class="contact-cards-grid">
-        <a href="https://wa.me/5493404638524" class="contact-card">
-          <i class="fab fa-whatsapp"></i>
-          <h4>WhatsApp</h4>
-        </a>
-        <a href="mailto:ventas@agroguardati.com" class="contact-card">
-          <i class="fas fa-envelope"></i>
-          <h4>Email</h4>
-        </a>
+      <div class="contact-card">
+        <i class="fas fa-clock"></i>
+        <h4>Horarios</h4>
       </div>
     </div>
   </section>
 
   <footer>
-    <div class="container" style="text-align: center; padding: 2rem 0; border-top: 1px solid rgba(0,0,0,0.05);">
+    <div class="container" style="text-align: center; padding: 2.5rem 0; border-top: 1px solid rgba(0,0,0,0.05);">
       <p>&copy; 2026 Agroguardati. Todos los derechos reservados.</p>
-      <p style="margin-top: 5px; font-size: 0.85rem; color: #64748b;">
-          Desarrollado por <a href="https://matiasschvabauer.github.io/portafolio/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: 500;">Schvabauer Matías</a>
+      <p style="margin-top: 8px; font-size: 0.85rem; color: var(--text-muted);">
+          Desarrollado por <a href="https://matiasschvabauer.github.io/portafolio/" target="_blank" style="color: var(--brand-red); text-decoration: none; font-weight: 600;">Schvabauer Matías</a>
       </p>
     </div>
   </footer>
