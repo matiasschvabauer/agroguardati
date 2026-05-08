@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Producto (Móvil) - Agroguardati</title>
+  <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/m_styles.css">
+  <script>
+    if (window.innerWidth > 768) {
+        window.location.href = "producto-detalle.html" + window.location.search;
+    }
+  </script>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="m_index.html" class="logo-container">
+        <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
+      </a>
+      <div class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="m_index.html">Inicio</a></li>
+        <li><a href="m_catalogo.html">Catálogo</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div id="product-detail-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/m_app.js"></script>
+</body>
+</html>

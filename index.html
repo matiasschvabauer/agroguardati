@@ -16,6 +16,15 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Model Viewer 3D -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <script>
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768) {
+        window.location.href = "m_index.html" + window.location.search + window.location.hash;
+    }
+  </script>
 </head>
 
 <body>
@@ -29,6 +38,7 @@
       <ul class="nav-links">
         <li><a href="index.html" class="active">Inicio</a></li>
         <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
     </div>
@@ -67,6 +77,161 @@
 
     <div style="text-align: center; margin-top: 3rem;">
       <a href="catalogo.html" class="btn btn-outline">Explorar todo el catálogo</a>
+    </div>
+  </section>
+
+  <!-- ===== SOBRE NOSOTROS / HISTORIA ===== -->
+  <section id="nosotros" class="nosotros-section">
+
+    <!-- Bloque 1: Sobre Nosotros -->
+    <div class="nosotros-intro container">
+      <div class="nosotros-split">
+
+        <!-- Imagen -->
+        <div class="nosotros-img-wrapper">
+          <img src="images/campo_nosotros.png" alt="Campo agrícola Agroguardati al atardecer" class="nosotros-img">
+          <div class="nosotros-img-badge">
+            <span class="badge-number" data-target="20">0</span>
+            <span class="badge-label">Años de experiencia</span>
+          </div>
+        </div>
+
+        <!-- Texto + Tarjetas -->
+        <div class="nosotros-text">
+          <span class="section-tag">Sobre Nosotros</span>
+          <h2 class="nosotros-title">Más de dos décadas<br><span class="text-gradient">acompañando al campo</span></h2>
+          <p class="nosotros-desc">
+            Somos Agroguardati, una empresa familiar fundada en el corazón productivo de la región pampeana. Desde nuestros inicios, nos dedicamos a acercar la mejor maquinaria agrícola a quienes trabajan la tierra: tractores, cosechadoras, sembradoras y mucho más, tanto nuevos como usados, siempre con el respaldo y la garantía que el productor necesita.
+          </p>
+          <p class="nosotros-desc">
+            Creemos que el progreso del campo es el progreso del país. Por eso nos comprometemos con cada cliente a brindar soluciones reales, asesoramiento honesto y posventa de calidad.
+          </p>
+
+          <div class="valores-grid">
+            <div class="valor-card">
+              <div class="valor-icon"><i class="fas fa-handshake"></i></div>
+              <h4>Confianza</h4>
+              <p>Construimos relaciones duraderas basadas en la honestidad y el trato justo.</p>
+            </div>
+            <div class="valor-card">
+              <div class="valor-icon"><i class="fas fa-seedling"></i></div>
+              <h4>Compromiso</h4>
+              <p>Estamos presentes antes, durante y después de cada operación.</p>
+            </div>
+            <div class="valor-card">
+              <div class="valor-icon"><i class="fas fa-cogs"></i></div>
+              <h4>Calidad</h4>
+              <p>Solo trabajamos con maquinaria que cumple los más altos estándares del sector.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Barra de Estadísticas -->
+    <div class="stats-bar">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number" data-target="20">0</span><span class="stat-suffix">+</span>
+            <span class="stat-label">Años en el mercado</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="500">0</span><span class="stat-suffix">+</span>
+            <span class="stat-label">Equipos vendidos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="300">0</span><span class="stat-suffix">+</span>
+            <span class="stat-label">Clientes activos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="5">0</span><span class="stat-suffix"></span>
+            <span class="stat-label">Provincias con cobertura</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 2: Nuestra Historia (Timeline) -->
+    <div class="historia-block container">
+      <div style="text-align: center; margin-bottom: 3.5rem;">
+        <span class="section-tag">Nuestra Trayectoria</span>
+        <h2 style="margin-top: 0.75rem;">Una historia forjada<br><span class="text-gradient">en el campo argentino</span></h2>
+      </div>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2004</span>
+            <h4>El comienzo</h4>
+            <p>La familia Guardati abre las puertas del primer local en Av. Jorge Newbery con el sueño de acercar maquinaria de calidad a los productores de la región.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2009</span>
+            <h4>Primera gran expansión</h4>
+            <p>Incorporamos las primeras marcas internacionales y duplicamos el stock de maquinaria nueva y usada. El boca a boca nos convierte en referentes de la zona.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2015</span>
+            <h4>Posventa y servicio técnico</h4>
+            <p>Creamos nuestro taller especializado propio para brindar mantenimiento y reparaciones a todos los equipos que comercializamos, cerrando el ciclo de servicio.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">2020</span>
+            <h4>Presencia digital</h4>
+            <p>Lanzamos nuestra plataforma online para que productores de todo el país puedan conocer nuestro catálogo y contactarnos desde cualquier lugar.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item timeline-item--last">
+          <div class="timeline-dot timeline-dot--active"></div>
+          <div class="timeline-card timeline-card--active">
+            <span class="timeline-year">Hoy</span>
+            <h4>Más fuertes que nunca</h4>
+            <p>Con más de 20 años de historia, seguimos creciendo junto al campo argentino. Nuevos modelos, nuevas marcas y el mismo compromiso de siempre.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+  <!-- ===== FIN SOBRE NOSOTROS ===== -->
+
+  <!-- 3D Model Section -->
+  <section class="section container tractor-3d-section">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2>Explora nuestra Maquinaria en 3D</h2>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Visualiza en detalle nuestros equipos con nuestro visor interactivo 3D.</p>
+    </div>
+    
+    <div class="model-container">
+      <model-viewer 
+          src="Tractor.glb" 
+          alt="Modelo 3D de un tractor Agroguardati"
+          auto-rotate 
+          camera-controls 
+          shadow-intensity="1" 
+          environment-image="neutral"
+          exposure="1"
+          interaction-prompt="auto"
+          ar>
+      </model-viewer>
     </div>
   </section>
 
@@ -137,6 +302,8 @@
           <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
             <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
             <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
+            <li><a href="#nosotros" style="color: #cbd5e1;">Sobre Nosotros</a></li>
+            <li><a href="#contacto" style="color: #cbd5e1;">Contacto</a></li>
           </ul>
         </div>
         <div class="footer-col">
