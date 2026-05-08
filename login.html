@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Agroguardati</title>
+    <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-blue: #1d5497;
+            --brand-red: #d32f2f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1d5497 0%, #153f71 100%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Decorative circles */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(211, 47, 47, 0.2);
+            filter: blur(80px);
+            z-index: 0;
+        }
+        body::before { top: -100px; left: -100px; }
+        body::after { bottom: -100px; right: -100px; background: rgba(42, 115, 204, 0.3); }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-login {
+            width: 80px;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+
+        h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--brand-red);
+            box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: var(--brand-red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-login:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(211, 47, 47, 0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .alert {
+            background: rgba(211, 47, 47, 0.2);
+            border: 1px solid var(--brand-red);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="AGLOGOCIRC.png" alt="Logo" class="logo-login">
+        <h1>Panel de Gestión</h1>
+        <p>Agro<span style="color: var(--brand-red); font-weight: 700;">guardati</span> &bull; Administración</p>
+        
+        <div id="login-alert" class="alert">Credenciales incorrectas. Intente nuevamente.</div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label>Usuario</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver al sitio público</a>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Placeholder logic for now
+            const alert = document.getElementById('login-alert');
+            alert.style.display = 'block';
+            alert.textContent = 'Acceso restringido. Módulo en configuración.';
+        });
+    </script>
+</body>
+</html>

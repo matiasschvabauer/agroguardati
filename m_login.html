@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Agroguardati</title>
+    <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-blue: #1d5497;
+            --brand-red: #d32f2f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #153f71;
+            padding: 1.5rem;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-login {
+            width: 70px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: var(--brand-red);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .alert {
+            background: rgba(211, 47, 47, 0.2);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="AGLOGOCIRC.png" alt="Logo" class="logo-login">
+        <h1>Acceso</h1>
+        <p>Agro<span style="color: var(--brand-red); font-weight: 700;">guardati</span> &bull; Móvil</p>
+        
+        <div id="login-alert" class="alert">Acceso restringido.</div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+
+        <a href="m_index.html" class="back-link">Volver al inicio</a>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('login-alert').style.display = 'block';
+        });
+        
+        // Redirection logic if screen is large
+        if (window.innerWidth > 768) {
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <link rel="stylesheet" href="css/styles.css">
 
@@ -24,13 +25,16 @@
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
-      <a href="index.html" class="logo-container">
+      <a href="index.html" class="logo-container" style="display: flex; align-items: center; gap: 1rem;">
         <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
+        <span style="font-size: 1.5rem; font-weight: 700; color: var(--brand-blue-dark); font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">Agro<span style="color: #d32f2f;">guardati</span></span>
       </a>
       <ul class="nav-links">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="catalogo.html" class="active">Catálogo</a></li>
+        <li><a href="index.html#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
+        <li><a href="login.html"><i class="fas fa-lock"></i></a></li>
       </ul>
     </div>
   </nav>
@@ -59,9 +63,9 @@
         </div>
         <div class="footer-col">
           <h3>Contacto</h3>
-          <p>📞 +54 9 3464 123456</p>
+          <p>📞 +54 9 3404 63-8524</p>
           <p>✉️ ventas@agroguardati.com</p>
-          <p>📍 Ruta 33 Km 716, Casilda, Santa Fe</p>
+          <p>📍 Av Jorge Newbery 526 bis</p>
         </div>
         <div class="footer-col">
           <h3>Síguenos</h3>
@@ -79,7 +83,10 @@
         </div>
       </div>
       <div class="footer-bottom">
-        &copy; 2026 Agroguardati. Todos los derechos reservados.
+        <p>&copy; 2026 Agroguardati. Todos los derechos reservados.</p>
+        <p style="margin-top: 5px; font-size: 0.85rem; color: #94a3b8;">
+            Desarrollado por <a href="https://matiasschvabauer.github.io/portafolio/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: 500;">Schvabauer Matías</a>
+        </p>
       </div>
     </div>
   </footer>
