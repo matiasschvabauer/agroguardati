@@ -8,8 +8,9 @@ function initGradientBackground() {
   let time = 0;
 
   function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    const parent = canvas.parentElement;
+    width = canvas.width = parent.offsetWidth;
+    height = canvas.height = parent.offsetHeight;
   }
   window.addEventListener('resize', resize);
   resize();
