@@ -56,18 +56,21 @@ function initGradientBackground() {
   animate();
 }
 
-// --- MOBILE MENU ---
+// --- MOBILE MENU (Mariño Slide-out Style) ---
 function initMobileMenu() {
   const menuToggle = document.getElementById('menu-toggle');
   const navLinks = document.getElementById('nav-links');
   if (!menuToggle || !navLinks) return;
 
-  menuToggle.addEventListener('click', () => {
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
     navLinks.classList.toggle('active');
-    const icon = menuToggle.querySelector('i');
-    if (icon) {
-      icon.classList.toggle('fa-bars');
-      icon.classList.toggle('fa-times');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && e.target !== menuToggle) {
+      navLinks.classList.remove('active');
     }
   });
 
@@ -75,11 +78,6 @@ function initMobileMenu() {
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('active');
-      const icon = menuToggle.querySelector('i');
-      if (icon) {
-        icon.classList.add('fa-bars');
-        icon.classList.remove('fa-times');
-      }
     });
   });
 }
