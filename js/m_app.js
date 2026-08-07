@@ -188,6 +188,29 @@ function initProductDetails() {
     specsRows += `<tr><th>${key}</th><td>${value}</td></tr>`;
   }
 
+  // Handle multiple images if they exist
+  let galleryHtml = '';
+  if (product.imagenes && product.imagenes.length > 0) {
+    galleryHtml = `
+      <div class="detail-image-gallery">
+        <img src="${product.imagen}" alt="${product.nombre}" class="main-img" id="main-product-img">
+        <div class="gallery-thumbnails">
+          ${product.imagenes.map((img, index) => `
+            <div class="gallery-thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+              <img src="${img}" alt="${product.nombre} vista ${index + 1}">
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    galleryHtml = `
+      <div class="detail-image-gallery">
+        <img src="${product.imagen}" alt="${product.nombre}" class="main-img">
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <div class="detail-hero">
       <div class="container">
@@ -200,9 +223,7 @@ function initProductDetails() {
     </div>
     <div class="container section">
       <div class="detail-grid">
-        <div class="detail-image-gallery">
-          <img src="${product.imagen}" alt="${product.nombre}" style="border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
-        </div>
+        ${galleryHtml}
         <div class="detail-info">
           <h2>Descripción</h2>
           <p style="color: var(--text-muted); margin-bottom: 2rem;">${product.descripcionLarga}</p>
@@ -222,6 +243,29 @@ function initProductDetails() {
       </div>
     </div>
   `;
+
+  // Set up click listeners for thumbnails
+  const thumbnails = container.querySelectorAll('.gallery-thumbnail');
+  const mainImg = container.querySelector('#main-product-img');
+  
+  if (mainImg && thumbnails.length > 0) {
+    thumbnails.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        if (thumb.classList.contains('active')) return;
+        
+        thumbnails.forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        
+        const newSrc = thumb.querySelector('img').src;
+        mainImg.style.opacity = '0';
+        
+        setTimeout(() => {
+          mainImg.src = newSrc;
+          mainImg.style.opacity = '1';
+        }, 150);
+      });
+    });
+  }
 }
 
 // --- COUNTERS & TIMELINE ---
