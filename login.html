@@ -182,7 +182,12 @@
                 firebase.auth().signInWithPopup(provider).catch(err => {
                     const alertEl = document.getElementById('login-alert');
                     alertEl.style.display = 'block';
-                    alertEl.textContent = 'Error al iniciar sesión: ' + err.message;
+                    if (err.code === 'auth/unauthorized-domain') {
+                        const currentDomain = window.location.hostname;
+                        alertEl.innerHTML = `<strong>Dominio no autorizado:</strong> Debes agregar <code>${currentDomain}</code> en Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains.`;
+                    } else {
+                        alertEl.textContent = 'Error al iniciar sesión: ' + err.message;
+                    }
                 });
             });
         } else {
