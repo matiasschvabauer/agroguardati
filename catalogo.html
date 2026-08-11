@@ -91,7 +91,14 @@
       </div>
     </div>
 
-    <!-- Catalog List (Alternating Layout) -->
+    <!-- View Mode Switcher -->
+    <div class="view-mode-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
+      <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Modo de Vista:</span>
+      <button id="view-mode-list" class="btn-view-mode active" title="Vista Lista"><i class="fas fa-bars"></i> Lista</button>
+      <button id="view-mode-grid" class="btn-view-mode" title="Vista Cuadrícula 2 por fila"><i class="fas fa-th-large"></i> Cuadrícula (2 por fila)</button>
+    </div>
+
+    <!-- Catalog List (Alternating Layout or Grid) -->
     <div id="catalog-list" class="catalog-list">
       <!-- Items injected via JS -->
     </div>

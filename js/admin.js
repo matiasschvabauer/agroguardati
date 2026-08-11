@@ -294,6 +294,16 @@ function initDashboardModal() {
   }
 
   if (form) {
+    // Toggle price fields visibility
+    const chkPrice = document.getElementById('form-prod-mostrar-precio');
+    const priceFields = document.getElementById('price-fields-container');
+
+    if (chkPrice && priceFields) {
+      chkPrice.onchange = () => {
+        priceFields.style.display = chkPrice.checked ? 'grid' : 'none';
+      };
+    }
+
     form.onsubmit = async (e) => {
       e.preventDefault();
       const idVal = document.getElementById('form-prod-id').value;
@@ -301,6 +311,9 @@ function initDashboardModal() {
       const categoria = document.getElementById('form-prod-categoria').value;
       const marca = document.getElementById('form-prod-marca').value;
       const estado = document.getElementById('form-prod-estado').value;
+      const mostrarPrecio = document.getElementById('form-prod-mostrar-precio').checked;
+      const moneda = document.getElementById('form-prod-moneda').value;
+      const precio = document.getElementById('form-prod-precio').value.trim();
       const descCorta = document.getElementById('form-prod-desc-corta').value;
       const descLarga = document.getElementById('form-prod-desc-larga').value;
 
@@ -312,6 +325,7 @@ function initDashboardModal() {
       const prodData = {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
+        mostrarPrecio, moneda, precio,
         imagen: mainImg,
         imagenes: currentFormImages.length > 0 ? currentFormImages : [mainImg],
         descripcionCorta: descCorta,
@@ -339,6 +353,16 @@ window.editDashboardProduct = function(id) {
   document.getElementById('form-prod-categoria').value = prod.categoria;
   document.getElementById('form-prod-marca').value = prod.marca;
   document.getElementById('form-prod-estado').value = prod.estado;
+
+  const chkPrice = document.getElementById('form-prod-mostrar-precio');
+  const priceFields = document.getElementById('price-fields-container');
+  if (chkPrice) {
+    chkPrice.checked = !!prod.mostrarPrecio;
+    if (priceFields) priceFields.style.display = prod.mostrarPrecio ? 'grid' : 'none';
+  }
+  document.getElementById('form-prod-moneda').value = prod.moneda || 'USD';
+  document.getElementById('form-prod-precio').value = prod.precio || '';
+
   document.getElementById('form-prod-desc-corta').value = prod.descripcionCorta;
   document.getElementById('form-prod-desc-larga').value = prod.descripcionLarga;
 

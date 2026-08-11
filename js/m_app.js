@@ -100,13 +100,17 @@ function initCatalog() {
     }
 
     items.forEach(item => {
+      const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
       const html = `
         <article class="catalog-item" data-id="${item.id}">
           <div class="catalog-item-img-wrapper">
             <img src="${item.imagen}" alt="${item.nombre}" class="catalog-item-img">
           </div>
           <div class="catalog-item-content">
-            <span class="product-category">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.3rem;">
+              <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+              ${priceTag}
+            </div>
             <h3 class="product-title">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
             <a href="m_producto-detalle.html?id=${item.id}" class="btn btn-outline">Ver detalles</a>
@@ -140,6 +144,30 @@ function initCatalog() {
   if(filterMarca) filterMarca.addEventListener('change', applyFilters);
   if(filterEstado) filterEstado.addEventListener('change', applyFilters);
 
+  // View Mode Switcher Mobile
+  const btnList = document.getElementById('view-mode-list');
+  const btnGrid = document.getElementById('view-mode-grid');
+
+  function setViewMode(mode) {
+    if (mode === 'grid') {
+      catalogContainer.classList.add('grid-view');
+      if (btnGrid) btnGrid.classList.add('active');
+      if (btnList) btnList.classList.remove('active');
+      localStorage.setItem('agro_catalog_view', 'grid');
+    } else {
+      catalogContainer.classList.remove('grid-view');
+      if (btnList) btnList.classList.add('active');
+      if (btnGrid) btnGrid.classList.remove('active');
+      localStorage.setItem('agro_catalog_view', 'list');
+    }
+  }
+
+  if (btnList) btnList.addEventListener('click', () => setViewMode('list'));
+  if (btnGrid) btnGrid.addEventListener('click', () => setViewMode('grid'));
+
+  const savedView = localStorage.getItem('agro_catalog_view');
+  if (savedView === 'grid') setViewMode('grid');
+
   const activeItems = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
   renderCatalog(activeItems);
 
@@ -159,6 +187,7 @@ function initFeatured() {
     const featured = currentCatalog.slice(0, 3);
     
     featured.forEach(item => {
+      const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
       const html = `
         <a href="m_producto-detalle.html?id=${item.id}" class="product-card" data-id="${item.id}">
           <div class="product-card-img-wrapper">
@@ -166,7 +195,10 @@ function initFeatured() {
             <img src="${item.imagen}" alt="${item.nombre}" class="product-card-img">
           </div>
           <div class="product-card-content">
-            <span class="product-category">${item.categoria}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+              <span class="product-category" style="margin-bottom:0;">${item.categoria}</span>
+              ${priceTag}
+            </div>
             <h3 class="product-title">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
             <div style="color: var(--brand-blue); font-weight: 600;">Ver Detalles &rarr;</div>
@@ -204,11 +236,12 @@ function initProductDetails() {
   document.title = product.nombre + " - Agroguardati";
 
   let specsRows = '';
-  for (const [key, value] of Object.entries(product.especificaciones)) {
-    specsRows += `<tr><th>${key}</th><td>${value}</td></tr>`;
+  if (product.especificaciones) {
+    for (const [key, value] of Object.entries(product.especificaciones)) {
+      specsRows += `<tr><th>${key}</th><td>${value}</td></tr>`;
+    }
   }
 
-  // Handle multiple images if they exist
   let galleryHtml = '';
   if (product.imagenes && product.imagenes.length > 0) {
     galleryHtml = `
@@ -231,14 +264,19 @@ function initProductDetails() {
     `;
   }
 
+  const detailPriceTag = window.formatAgroPrice ? window.formatAgroPrice(product) : '';
+
   container.innerHTML = `
     <div class="detail-hero">
       <div class="container">
         <span class="product-category" style="margin-bottom:1rem; display:block;">
           <a href="m_catalogo.html">Catálogo</a> / ${product.categoria} / ${product.marca}
         </span>
-        <h1>${product.nombre}</h1>
-        <span class="product-badge" style="display:inline-block; margin-top: 1rem;">${product.estado}</span>
+        <h1 class="product-detail-title" style="font-size: 1.8rem;">${product.nombre}</h1>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 0.8rem;">
+          <span class="product-badge" style="display:inline-block;">${product.estado}</span>
+          ${detailPriceTag}
+        </div>
       </div>
     </div>
     <div class="container section">

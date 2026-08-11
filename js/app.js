@@ -83,13 +83,17 @@ function initCatalog() {
     }
 
     items.forEach(item => {
+      const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
       const html = `
         <article class="catalog-item" data-id="${item.id}">
           <div class="catalog-item-img-wrapper">
             <img src="${item.imagen}" alt="${item.nombre}" class="catalog-item-img">
           </div>
           <div class="catalog-item-content">
-            <span class="product-category">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 0.4rem;">
+              <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+              ${priceTag}
+            </div>
             <h3 class="product-title">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
             <a href="producto-detalle.html?id=${item.id}" class="btn btn-outline">Ver detalles</a>
@@ -124,6 +128,30 @@ function initCatalog() {
   if(filterMarca) filterMarca.addEventListener('change', applyFilters);
   if(filterEstado) filterEstado.addEventListener('change', applyFilters);
 
+  // View Mode Switcher (List vs Grid 2 items per row)
+  const btnList = document.getElementById('view-mode-list');
+  const btnGrid = document.getElementById('view-mode-grid');
+
+  function setViewMode(mode) {
+    if (mode === 'grid') {
+      catalogContainer.classList.add('grid-view');
+      if (btnGrid) btnGrid.classList.add('active');
+      if (btnList) btnList.classList.remove('active');
+      localStorage.setItem('agro_catalog_view', 'grid');
+    } else {
+      catalogContainer.classList.remove('grid-view');
+      if (btnList) btnList.classList.add('active');
+      if (btnGrid) btnGrid.classList.remove('active');
+      localStorage.setItem('agro_catalog_view', 'list');
+    }
+  }
+
+  if (btnList) btnList.addEventListener('click', () => setViewMode('list'));
+  if (btnGrid) btnGrid.addEventListener('click', () => setViewMode('grid'));
+
+  const savedView = localStorage.getItem('agro_catalog_view');
+  if (savedView === 'grid') setViewMode('grid');
+
   // Initial render
   const activeItems = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
   renderCatalog(activeItems);
@@ -145,6 +173,7 @@ function initFeatured() {
     const featured = currentCatalog.slice(0, 3);
     
     featured.forEach(item => {
+      const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
       const html = `
         <a href="producto-detalle.html?id=${item.id}" class="product-card" data-id="${item.id}">
           <div class="product-card-img-wrapper">
@@ -152,7 +181,10 @@ function initFeatured() {
             <img src="${item.imagen}" alt="${item.nombre}" class="product-card-img">
           </div>
           <div class="product-card-content">
-            <span class="product-category">${item.categoria}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span class="product-category" style="margin-bottom:0;">${item.categoria}</span>
+              ${priceTag}
+            </div>
             <h3 class="product-title">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
             <div style="color: var(--brand-blue); font-weight: 600; display:flex; align-items:center; gap: 0.5rem; margin-top: auto;">
@@ -176,12 +208,13 @@ function initFeatured() {
 // --- PRODUCT DETAILS ---
 function initProductDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const productId = parseInt(urlParams.get('id'));
+  const productId = urlParams.get('id');
   
   const container = document.getElementById('product-detail-container');
-  if(!container || isNaN(productId) || typeof catalogo === 'undefined') return;
+  if(!container || !productId) return;
 
-  const product = catalogo.find(p => p.id === productId);
+  const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
+  const product = currentCatalog.find(p => String(p.id) === String(productId));
   
   if(!product) {
     container.innerHTML = '<div class="container section"><h2>Producto no encontrado.</h2><a href="catalogo.html" class="btn btn-primary">Volver al catálogo</a></div>';
@@ -192,8 +225,10 @@ function initProductDetails() {
   document.title = product.nombre + " - Agroguardati";
 
   let specsRows = '';
-  for (const [key, value] of Object.entries(product.especificaciones)) {
-    specsRows += `<tr><th>${key}</th><td>${value}</td></tr>`;
+  if (product.especificaciones) {
+    for (const [key, value] of Object.entries(product.especificaciones)) {
+      specsRows += `<tr><th>${key}</th><td>${value}</td></tr>`;
+    }
   }
 
   // Handle multiple images if they exist
@@ -219,14 +254,19 @@ function initProductDetails() {
     `;
   }
 
+  const detailPriceTag = window.formatAgroPrice ? window.formatAgroPrice(product) : '';
+
   container.innerHTML = `
     <div class="detail-hero">
       <div class="container">
         <span class="product-category" style="margin-bottom:1rem; display:block;">
           <a href="catalogo.html">Catálogo</a> / ${product.categoria} / ${product.marca}
         </span>
-        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">${product.nombre}</h1>
-        <span class="product-badge" style="position:static; display:inline-block; margin-bottom: 1rem;">${product.estado}</span>
+        <h1 class="product-detail-title" style="font-size: 2.5rem; margin-bottom: 1rem;">${product.nombre}</h1>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+          <span class="product-badge" style="position:static; display:inline-block;">${product.estado}</span>
+          ${detailPriceTag}
+        </div>
       </div>
     </div>
     <div class="container section">
@@ -245,7 +285,7 @@ function initProductDetails() {
             </tbody>
           </table>
           
-          <div style="margin-top: 3rem; display: flex; gap: 1rem;">
+          <div style="margin-top: 3rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
             <a href="https://wa.me/5493404638524?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20${encodeURIComponent(product.nombre)}" target="_blank" class="btn btn-primary" style="background-color: #25D366; color:white;">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               Consultar por WhatsApp

@@ -567,3 +567,78 @@ footer { background: #f1f5f9; padding: 2rem 16px; text-align: center; border-top
   color: var(--text-primary);
   width: 58%;
 }
+
+/* View Mode Switcher Mobile */
+.btn-view-mode {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-view-mode:hover, .btn-view-mode.active {
+  background: var(--brand-blue);
+  color: #ffffff;
+  border-color: var(--brand-blue);
+}
+
+#catalog-list.grid-view {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+}
+
+#catalog-list.grid-view .catalog-item {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+#catalog-list.grid-view .catalog-item-img-wrapper {
+  height: 130px !important;
+}
+
+#catalog-list.grid-view .catalog-item-content {
+  padding: 0.75rem !important;
+}
+
+#catalog-list.grid-view .product-title {
+  font-size: 0.9rem !important;
+}
+
+#catalog-list.grid-view .product-desc {
+  display: none !important;
+}
+
+/* Price Tags Mobile */
+.price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.price-consultar {
+  background: #eff6ff;
+  color: #1d5497;
+  border: 1px solid #bfdbfe;
+}
+
+.price-value {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  font-size: 0.88rem;
+}

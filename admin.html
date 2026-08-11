@@ -365,10 +365,13 @@
       <img src="AgroGuardatiLogo.png" alt="Agroguardati">
       <span>Agro<span style="color: var(--brand-red);">guardati</span> &bull; Panel Admin</span>
     </a>
-    <div id="user-section" class="user-pill" style="display: none;">
-      <img id="user-photo" src="AGLOGOCIRC.png" alt="Avatar" class="user-avatar">
-      <span id="user-name" style="font-weight: 600; font-size: 0.85rem; color: #334155;"></span>
-      <button id="btn-logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" style="background: #f1f5f9; color: var(--brand-blue); border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;"><i class="fas fa-arrow-left"></i> Volver al sitio público</a>
+      <div id="user-section" class="user-pill" style="display: none;">
+        <img id="user-photo" src="AGLOGOCIRC.png" alt="Avatar" class="user-avatar">
+        <span id="user-name" style="font-weight: 600; font-size: 0.85rem; color: #334155;"></span>
+        <button id="btn-logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</button>
+      </div>
     </div>
   </header>
 
@@ -484,6 +487,30 @@
             <option value="Nuevo">Nuevo</option>
             <option value="Usado">Usado</option>
           </select>
+        </div>
+
+        <!-- Control de Precio -->
+        <div class="form-group" style="background: #eff6ff; padding: 1.2rem; border-radius: 12px; border: 1px solid #bfdbfe;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+            <input type="checkbox" id="form-prod-mostrar-precio" style="width: 18px; height: 18px; cursor: pointer;">
+            <label for="form-prod-mostrar-precio" style="font-weight: 700; color: var(--brand-blue-dark); cursor: pointer; margin: 0; font-size: 0.92rem;">
+              Habilitar Precio Público (Si no se activa, dirá "Consultar")
+            </label>
+          </div>
+
+          <div id="price-fields-container" style="display: none; grid-template-columns: 1fr 2fr; gap: 1rem; margin-top: 0.8rem;">
+            <div>
+              <label>Moneda</label>
+              <select id="form-prod-moneda" class="form-control">
+                <option value="USD">USD (Dólares)</option>
+                <option value="ARS">ARS (Pesos)</option>
+              </select>
+            </div>
+            <div>
+              <label>Monto del Precio</label>
+              <input type="text" id="form-prod-precio" class="form-control" placeholder="Ej: 120.000 o 85.000.000">
+            </div>
+          </div>
         </div>
 
         <!-- Image Manager with individual deletion buttons -->

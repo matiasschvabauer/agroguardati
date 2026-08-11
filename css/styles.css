@@ -1062,3 +1062,90 @@ footer {
     font-size: 2.2rem;
   }
 }
+
+/* =========================================
+   CATALOG VIEW MODE SWITCHER (LIST vs GRID 2)
+   ========================================= */
+.btn-view-mode {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-view-mode:hover, .btn-view-mode.active {
+  background: var(--brand-blue);
+  color: #ffffff;
+  border-color: var(--brand-blue);
+  box-shadow: 0 4px 10px rgba(29,84,151,0.2);
+}
+
+/* Grid View: 2 items per row */
+#catalog-list.grid-view {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.5rem !important;
+}
+
+#catalog-list.grid-view .catalog-item {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+#catalog-list.grid-view .catalog-item-img-wrapper {
+  width: 100% !important;
+  height: 240px !important;
+  flex-shrink: 0;
+}
+
+#catalog-list.grid-view .catalog-item-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-grow: 1 !important;
+  padding: 1.5rem !important;
+}
+
+#catalog-list.grid-view .catalog-item-content .btn {
+  margin-top: auto !important;
+}
+
+@media (max-width: 768px) {
+  #catalog-list.grid-view {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Price Tags (Consultar vs USD/ARS) */
+.price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.price-consultar {
+  background: #eff6ff;
+  color: #1d5497;
+  border: 1px solid #bfdbfe;
+}
+
+.price-value {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  font-size: 0.95rem;
+}

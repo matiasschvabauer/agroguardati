@@ -30,7 +30,6 @@ window.saveAgroProduct = async function(productData) {
   let catalog = window.getAgroCatalog();
 
   if (productData.id) {
-    // Editar existente
     const index = catalog.findIndex(p => String(p.id) === String(productData.id));
     if (index !== -1) {
       catalog[index] = { ...catalog[index], ...productData };
@@ -38,16 +37,13 @@ window.saveAgroProduct = async function(productData) {
       catalog.unshift(productData);
     }
   } else {
-    // Nuevo producto
     const newId = Date.now();
     productData.id = newId;
     catalog.unshift(productData);
   }
 
-  // Guardar en localStorage inmediatamente
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
-  // Guardar en Firestore si está conectado y autenticado
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
     try {
       const db = firebase.firestore();
@@ -57,7 +53,6 @@ window.saveAgroProduct = async function(productData) {
     }
   }
 
-  // Notificar cambios a la app
   window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
   return productData;
 };
@@ -67,10 +62,8 @@ window.deleteAgroProduct = async function(id) {
   let catalog = window.getAgroCatalog();
   catalog = catalog.filter(p => String(p.id) !== String(id));
 
-  // Guardar cambio en localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
-  // Eliminar en Firestore si está activo
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
     try {
       const db = firebase.firestore();
@@ -80,7 +73,6 @@ window.deleteAgroProduct = async function(id) {
     }
   }
 
-  // Notificar cambios a la app
   window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
   return true;
 };
@@ -93,9 +85,20 @@ window.isAgroAdmin = function() {
       return true;
     }
   }
-  // Check local session token fallback
   const session = localStorage.getItem('agro_admin_session');
   return session === 'true';
+};
+
+// 5. Formateador de precios (Consultar vs USD / ARS)
+window.formatAgroPrice = function(prod) {
+  if (!prod || !prod.mostrarPrecio || !prod.precio) {
+    return `<span class="price-tag price-consultar"><i class="fas fa-comments"></i> Consultar</span>`;
+  }
+  const moneda = prod.moneda || 'USD';
+  const raw = String(prod.precio).replaceAll('.', '').replaceAll(',', '').trim();
+  const val = Number(raw);
+  const formatted = isNaN(val) ? prod.precio : val.toLocaleString('es-AR');
+  return `<span class="price-tag price-value"><strong>${moneda}</strong> ${formatted}</span>`;
 };
 
 // Sincronizar catálogo inicial desde Firestore si está disponible
