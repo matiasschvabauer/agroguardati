@@ -1,7 +1,7 @@
 // --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
 
 const STORAGE_KEY = 'agroguardati_catalog_v2';
-const ADMIN_EMAIL = 'matiasschvabauer@gmail.com';
+const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
 window.getAgroCatalog = function() {
@@ -81,7 +81,7 @@ window.deleteAgroProduct = async function(id) {
 window.isAgroAdmin = function() {
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     const user = firebase.auth().currentUser;
-    if (user && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
       return true;
     }
   }

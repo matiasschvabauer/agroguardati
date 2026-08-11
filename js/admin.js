@@ -3,6 +3,8 @@
 let currentFormImages = [];
 let currentFormSpecs = {};
 
+const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+
 // Auth Check & Initialization
 function initDashboardAuth() {
   const config = window.AGRO_CONFIG?.firebase;
@@ -18,8 +20,7 @@ function initDashboardAuth() {
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        const allowedEmail = window.AGRO_CONFIG?.adminEmail || "matiasschvabauer@gmail.com";
-        if (user.email.toLowerCase() === allowedEmail.toLowerCase()) {
+        if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
           localStorage.setItem('agro_admin_session', 'true');
           showDashboard(user);
         } else {

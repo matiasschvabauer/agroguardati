@@ -3,13 +3,15 @@
 let currentModalImages = [];
 let currentModalSpecs = {};
 
+const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+
 function initAdminBar() {
   const config = window.AGRO_CONFIG?.firebase;
   if (config && config.apiKey && typeof firebase !== 'undefined') {
     if (!firebase.apps.length) firebase.initializeApp(config);
     
     firebase.auth().onAuthStateChanged(user => {
-      if (user && user.email.toLowerCase() === (window.AGRO_CONFIG?.adminEmail || 'matiasschvabauer@gmail.com').toLowerCase()) {
+      if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
         localStorage.setItem('agro_admin_session', 'true');
         renderAdminUI(user);
       } else {
@@ -49,6 +51,7 @@ function renderAdminUI(user) {
         <span>Modo Admin: <strong style="color: #60a5fa;">${user.email}</strong></span>
       </div>
       <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="btn-admin-story" style="background: #e11d48; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-camera"></i> Subir Historia</button>
         <button id="btn-admin-add" style="background: #1d5497; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-plus"></i> Agregar Equipo</button>
         <a href="admin.html" style="background: #334155; color: white; text-decoration: none; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-cog"></i> Panel</a>
         <button id="btn-admin-logout" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> Salir</button>
@@ -63,6 +66,7 @@ function renderAdminUI(user) {
     }
     document.body.style.paddingTop = '124px';
 
+    document.getElementById('btn-admin-story').addEventListener('click', () => openStoryUploaderModal());
     document.getElementById('btn-admin-add').addEventListener('click', () => openAdminModal());
     document.getElementById('btn-admin-logout').addEventListener('click', () => {
       if (typeof firebase !== 'undefined' && firebase.auth) firebase.auth().signOut();
@@ -487,3 +491,95 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminBar();
   setTimeout(attachCardAdminControls, 300);
 });
+
+// Modal Uploader para Historias 24hs
+window.openStoryUploaderModal = function() {
+  let modal = document.getElementById('agro-story-uploader-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'agro-story-uploader-modal';
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(6px);
+      z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 1rem;
+    `;
+    modal.innerHTML = `
+      <div style="background: white; width: 100%; max-width: 480px; border-radius: 20px; padding: 1.8rem; font-family: 'Inter', sans-serif;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="margin: 0; font-size: 1.2rem; color: #1e293b;"><i class="fas fa-camera" style="color:#e11d48;"></i> Subir Historia (24h)</h3>
+          <button id="close-story-uploader" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.2rem;">Sube una foto o video. Permanecerá visible en la web por 24 horas.</p>
+
+        <div id="story-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 1rem;">
+          <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #e11d48; margin-bottom: 0.4rem;"></i>
+          <p id="story-upload-status" style="font-size: 0.88rem; font-weight: 600; color: #334155; margin: 0;">Selecciona una foto o video MP4</p>
+          <input type="file" id="story-file-input" accept="image/*,video/*" style="display: none;">
+        </div>
+
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Texto / Pie de Foto (Opcional)</label>
+          <input type="text" id="story-caption-input" placeholder="Ej: ¡Ingresó hoy! Excelente estado" style="width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button id="cancel-story-uploader" style="padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #e2e8f0; font-weight: 600; cursor: pointer;">Cancelar</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('close-story-uploader').onclick = () => modal.style.display = 'none';
+    document.getElementById('cancel-story-uploader').onclick = () => modal.style.display = 'none';
+
+    const dropzone = document.getElementById('story-dropzone');
+    const fileInput = document.getElementById('story-file-input');
+    const statusText = document.getElementById('story-upload-status');
+
+    dropzone.onclick = () => fileInput.click();
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+      const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+      const isVideo = file.type.startsWith('video');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+
+      const endpoint = isVideo 
+        ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
+        : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+      try {
+        statusText.textContent = 'Subiendo a la nube...';
+        const res = await fetch(endpoint, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.secure_url) {
+          const caption = document.getElementById('story-caption-input').value.trim();
+          await window.saveAgroStory({
+            tipo: isVideo ? 'video' : 'image',
+            url: data.secure_url,
+            caption
+          });
+
+          alert("¡Historia publicada con éxito en la web!");
+          modal.style.display = 'none';
+        } else {
+          alert("Error subiendo archivo: " + (data.error?.message || 'Error desconocido'));
+        }
+      } catch (err) {
+        alert("Error de subida: " + err.message);
+      } finally {
+        statusText.textContent = 'Selecciona una foto o video MP4';
+      }
+    };
+  }
+
+  modal.style.display = 'flex';
+};
