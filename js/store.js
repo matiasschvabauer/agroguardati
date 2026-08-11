@@ -1,0 +1,120 @@
+// --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
+
+const STORAGE_KEY = 'agroguardati_catalog_v2';
+const ADMIN_EMAIL = 'matiasschvabauer@gmail.com';
+
+// 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
+window.getAgroCatalog = function() {
+  const localData = localStorage.getItem(STORAGE_KEY);
+  if (localData) {
+    try {
+      const parsed = JSON.parse(localData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error("Error leyendo catálogo local:", e);
+    }
+  }
+
+  // Si no hay datos guardados aún, inicializar con catalogo de data.js
+  const initial = typeof catalogo !== 'undefined' ? catalogo : [];
+  if (initial.length > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  }
+  return initial;
+};
+
+// 2. Guardar o actualizar un producto
+window.saveAgroProduct = async function(productData) {
+  let catalog = window.getAgroCatalog();
+
+  if (productData.id) {
+    // Editar existente
+    const index = catalog.findIndex(p => String(p.id) === String(productData.id));
+    if (index !== -1) {
+      catalog[index] = { ...catalog[index], ...productData };
+    } else {
+      catalog.unshift(productData);
+    }
+  } else {
+    // Nuevo producto
+    const newId = Date.now();
+    productData.id = newId;
+    catalog.unshift(productData);
+  }
+
+  // Guardar en localStorage inmediatamente
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+
+  // Guardar en Firestore si está conectado y autenticado
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
+    try {
+      const db = firebase.firestore();
+      await db.collection('productos').doc(String(productData.id)).set(productData, { merge: true });
+    } catch (err) {
+      console.warn("Firestore save fallback:", err.message);
+    }
+  }
+
+  // Notificar cambios a la app
+  window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
+  return productData;
+};
+
+// 3. Eliminar producto
+window.deleteAgroProduct = async function(id) {
+  let catalog = window.getAgroCatalog();
+  catalog = catalog.filter(p => String(p.id) !== String(id));
+
+  // Guardar cambio en localStorage
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+
+  // Eliminar en Firestore si está activo
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
+    try {
+      const db = firebase.firestore();
+      await db.collection('productos').doc(String(id)).delete();
+    } catch (err) {
+      console.warn("Firestore delete fallback:", err.message);
+    }
+  }
+
+  // Notificar cambios a la app
+  window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
+  return true;
+};
+
+// 4. Verificar si hay sesión admin iniciada
+window.isAgroAdmin = function() {
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    const user = firebase.auth().currentUser;
+    if (user && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      return true;
+    }
+  }
+  // Check local session token fallback
+  const session = localStorage.getItem('agro_admin_session');
+  return session === 'true';
+};
+
+// Sincronizar catálogo inicial desde Firestore si está disponible
+document.addEventListener('DOMContentLoaded', () => {
+  const config = window.AGRO_CONFIG?.firebase;
+  if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) firebase.initializeApp(config);
+    
+    firebase.firestore().collection('productos').onSnapshot(snapshot => {
+      if (!snapshot.empty) {
+        const items = [];
+        snapshot.forEach(doc => {
+          items.push({ id: doc.id, ...doc.data() });
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: items }));
+      }
+    }, err => {
+      console.warn("Snapshot listener offline/unauthorized, using local catalog.");
+    });
+  }
+});

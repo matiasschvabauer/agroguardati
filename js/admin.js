@@ -1,52 +1,11 @@
-// --- AGROGUARDATI - LÓGICA DE PANEL ADMINISTRADOR (FIREBASE + CLOUDINARY) ---
+// --- AGROGUARDATI - PANEL ADMINISTRADOR DASHBOARD (ESTILO CASA DRUETTO) ---
 
-let currentUser = null;
-let currentProductImages = [];
-let localProducts = [...(typeof catalogo !== 'undefined' ? catalogo : [])];
-let isFirestoreActive = false;
+let currentFormImages = [];
+let currentFormSpecs = {};
 
-// Initial Firebase Check & Setup
-function initFirebaseApp() {
+// Auth Check & Initialization
+function initDashboardAuth() {
   const config = window.AGRO_CONFIG?.firebase;
-  if (!config || !config.apiKey || config.apiKey.includes('TU_API_KEY')) {
-    console.warn('Firebase no configurado aún. Operando en modo local/demostración.');
-    return false;
-  }
-  if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-  }
-  return true;
-}
-
-// Sync with Firestore Database
-function syncWithFirestore() {
-  if (!isFirestoreActive) return;
-  const db = firebase.firestore();
-  
-  db.collection('productos').onSnapshot(snapshot => {
-    if (!snapshot.empty) {
-      const items = [];
-      snapshot.forEach(doc => {
-        items.push({ id: doc.id, ...doc.data() });
-      });
-      localProducts = items;
-      renderProductsTable();
-    } else {
-      // Populate initial products to Firestore if empty
-      if (typeof catalogo !== 'undefined' && catalogo.length > 0) {
-        catalogo.forEach(item => {
-          db.collection('productos').doc(String(item.id)).set(item);
-        });
-      }
-    }
-  }, err => {
-    console.warn('Operando con catálogo local (esperando reglas de Firestore):', err.message);
-  });
-}
-
-// Google Auth Handler
-function initAuth() {
-  const isFirebaseReady = initFirebaseApp();
   const btnGoogle = document.getElementById('btn-google-login');
   const btnLogout = document.getElementById('btn-logout');
   const authScreen = document.getElementById('auth-screen');
@@ -54,22 +13,25 @@ function initAuth() {
   const userSection = document.getElementById('user-section');
   const authAlert = document.getElementById('auth-alert');
 
-  if (isFirebaseReady) {
-    isFirestoreActive = true;
+  if (config && config.apiKey && typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) firebase.initializeApp(config);
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         const allowedEmail = window.AGRO_CONFIG?.adminEmail || "matiasschvabauer@gmail.com";
         if (user.email.toLowerCase() === allowedEmail.toLowerCase()) {
-          currentUser = user;
+          localStorage.setItem('agro_admin_session', 'true');
           showDashboard(user);
-          syncWithFirestore();
         } else {
           firebase.auth().signOut();
-          authAlert.style.display = 'block';
-          authAlert.textContent = `Acceso denegado. La cuenta ${user.email} no tiene permisos de administrador.`;
+          localStorage.removeItem('agro_admin_session');
+          if (authAlert) {
+            authAlert.style.display = 'block';
+            authAlert.textContent = `Acceso denegado a ${user.email}.`;
+          }
         }
       } else {
-        currentUser = null;
+        localStorage.removeItem('agro_admin_session');
         showAuthScreen();
       }
     });
@@ -78,8 +40,10 @@ function initAuth() {
       btnGoogle.addEventListener('click', () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider).catch(err => {
-          authAlert.style.display = 'block';
-          authAlert.textContent = "Error al iniciar sesión con Google: " + err.message;
+          if (authAlert) {
+            authAlert.style.display = 'block';
+            authAlert.textContent = "Error de inicio de sesión: " + err.message;
+          }
         });
       });
     }
@@ -90,22 +54,21 @@ function initAuth() {
       });
     }
   } else {
-    // Mode fallback: Demo Login for matiasschvabauer@gmail.com
+    // Local session fallback
     if (btnGoogle) {
       btnGoogle.addEventListener('click', () => {
-        currentUser = {
-          displayName: "Matías Schvabauer",
-          email: "matiasschvabauer@gmail.com",
-          photoURL: "AGLOGOCIRC.png"
-        };
-        showDashboard(currentUser);
+        localStorage.setItem('agro_admin_session', 'true');
+        showDashboard({ displayName: 'Matías Schvabauer', email: 'matiasschvabauer@gmail.com' });
       });
     }
     if (btnLogout) {
       btnLogout.addEventListener('click', () => {
-        currentUser = null;
+        localStorage.removeItem('agro_admin_session');
         showAuthScreen();
       });
+    }
+    if (localStorage.getItem('agro_admin_session') === 'true') {
+      showDashboard({ displayName: 'Matías Schvabauer', email: 'matiasschvabauer@gmail.com' });
     }
   }
 
@@ -115,9 +78,8 @@ function initAuth() {
     if (userSection) {
       userSection.style.display = 'flex';
       document.getElementById('user-name').textContent = user.displayName || user.email;
-      document.getElementById('user-photo').src = user.photoURL || 'AGLOGOCIRC.png';
     }
-    renderProductsTable();
+    renderDashboardTable();
   }
 
   function showAuthScreen() {
@@ -127,53 +89,71 @@ function initAuth() {
   }
 }
 
-// Render Table
-function renderProductsTable() {
-  const tableBody = document.getElementById('products-table-body');
+// Render Table View with Live Search and Filtering
+function renderDashboardTable() {
+  const tableBody = document.getElementById('admin-products-table-body');
+  const countText = document.getElementById('product-count-text');
+  const searchVal = (document.getElementById('admin-search-input')?.value || '').toLowerCase().trim();
+  const filterCat = document.getElementById('admin-filter-categoria')?.value || 'todas';
+
   if (!tableBody) return;
 
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  
+  const filtered = catalog.filter(p => {
+    const matchesSearch = !searchVal || (p.nombre && p.nombre.toLowerCase().includes(searchVal)) || (p.marca && p.marca.toLowerCase().includes(searchVal));
+    const matchesCat = filterCat === 'todas' || p.categoria === filterCat;
+    return matchesSearch && matchesCat;
+  });
+
+  if (countText) {
+    countText.textContent = `${filtered.length} de ${catalog.length} equipos mostrados`;
+  }
+
   tableBody.innerHTML = '';
-  if (localProducts.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem;">No hay maquinaria en el catálogo.</td></tr>';
+
+  if (filtered.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2.5rem; color: #64748b;">No se encontraron productos con estos criterios.</td></tr>';
     return;
   }
 
-  localProducts.forEach(item => {
+  filtered.forEach(item => {
     const tr = document.createElement('tr');
+    const badgeClass = item.estado === 'Nuevo' ? 'badge-nuevo' : 'badge-usado';
+
     tr.innerHTML = `
-      <td><img src="${item.imagen}" class="table-img" alt="${item.nombre}"></td>
+      <td><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
       <td><strong>${item.nombre}</strong></td>
       <td>${item.categoria}</td>
       <td>${item.marca}</td>
-      <td><span style="background: #eef2ff; color: var(--brand-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">${item.estado}</span></td>
+      <td><span class="badge-status ${badgeClass}">${item.estado}</span></td>
       <td style="text-align: right;">
-        <button class="btn-action btn-edit" onclick="editProduct('${item.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn-action btn-delete" onclick="deleteProduct('${item.id}')"><i class="fas fa-trash-alt"></i></button>
+        <button class="btn-icon btn-icon-edit" onclick="editDashboardProduct('${item.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="btn-icon btn-icon-delete" onclick="deleteDashboardProduct('${item.id}')" title="Borrar"><i class="fas fa-trash-alt"></i></button>
       </td>
     `;
     tableBody.appendChild(tr);
   });
 }
 
-// Cloudinary Uploader Integration
-function initCloudinaryUpload() {
+// Cloudinary & Image Manager with Individual Delete Buttons
+function initDashboardImageManager() {
   const dropzone = document.getElementById('cloudinary-dropzone');
   const fileInput = document.getElementById('file-input');
-  const previewContainer = document.getElementById('preview-container');
+  const btnAddManual = document.getElementById('btn-add-manual-url');
+  const manualUrlInput = document.getElementById('manual-url-input');
 
-  if (!dropzone || !fileInput) return;
+  if (dropzone && fileInput) {
+    dropzone.onclick = () => fileInput.click();
 
-  dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.onchange = async (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
 
-  fileInput.addEventListener('change', async (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+      const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+      const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
 
-    const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName;
-    const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset;
-
-    for (const file of files) {
-      if (cloudName && uploadPreset) {
+      for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', uploadPreset);
@@ -186,164 +166,213 @@ function initCloudinaryUpload() {
           });
           const data = await res.json();
           if (data.secure_url) {
-            currentProductImages.push(data.secure_url);
-            renderPreviews();
+            currentFormImages.push(data.secure_url);
+            renderFormImageThumbnails();
           } else if (data.error) {
             alert('Error Cloudinary: ' + data.error.message);
           }
         } catch (err) {
-          alert('Error al subir imagen a Cloudinary: ' + err.message);
+          alert('Error al subir foto: ' + err.message);
         } finally {
-          dropzone.querySelector('p').textContent = 'Haz clic o arrastra fotos aquí';
+          dropzone.querySelector('p').textContent = 'Arrastrá o selecciona fotos para subir a Cloudinary';
         }
-      } else {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          currentProductImages.push(evt.target.result);
-          renderPreviews();
-        };
-        reader.readAsDataURL(file);
       }
-    }
-  });
+    };
+  }
 
-  function renderPreviews() {
-    if (!previewContainer) return;
-    previewContainer.innerHTML = '';
-    currentProductImages.forEach((url, i) => {
-      const img = document.createElement('img');
-      img.src = url;
-      img.className = 'preview-thumb';
-      img.title = 'Haga clic para eliminar';
-      img.onclick = () => {
-        currentProductImages.splice(i, 1);
-        renderPreviews();
-      };
-      previewContainer.appendChild(img);
-    });
+  if (btnAddManual && manualUrlInput) {
+    btnAddManual.onclick = () => {
+      const url = manualUrlInput.value.trim();
+      if (url) {
+        currentFormImages.push(url);
+        manualUrlInput.value = '';
+        renderFormImageThumbnails();
+      }
+    };
   }
 }
 
-// Modal & Form Functions
-function initModalLogic() {
-  const modal = document.getElementById('product-modal');
+function renderFormImageThumbnails() {
+  const container = document.getElementById('image-thumbnails-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  currentFormImages.forEach((url, index) => {
+    const card = document.createElement('div');
+    card.className = 'image-item-card';
+    card.innerHTML = `
+      <img src="${url}" alt="Foto ${index + 1}">
+      <button type="button" class="btn-delete-image" title="Eliminar esta foto">&times;</button>
+    `;
+    card.querySelector('.btn-delete-image').onclick = () => {
+      currentFormImages.splice(index, 1);
+      renderFormImageThumbnails();
+    };
+    container.appendChild(card);
+  });
+}
+
+// Dynamic Specifications Editor (Key-Value pairs)
+function renderFormSpecsRows() {
+  const container = document.getElementById('specs-rows-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const entries = Object.entries(currentFormSpecs);
+  if (entries.length === 0) {
+    container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Sin especificaciones adicionales.</p>';
+    return;
+  }
+
+  entries.forEach(([key, val], idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 6px; align-items: center;';
+    div.innerHTML = `
+      <input type="text" value="${key}" placeholder="Característica (ej: Potencia)" class="form-control spec-key" style="font-size:0.85rem; padding: 0.5rem 0.8rem;">
+      <input type="text" value="${val}" placeholder="Valor (ej: 200 CV)" class="form-control spec-val" style="font-size:0.85rem; padding: 0.5rem 0.8rem;">
+      <button type="button" style="background:#fee2e2; color:#dc2626; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:bold;">&times;</button>
+    `;
+    
+    div.querySelector('button').onclick = () => {
+      delete currentFormSpecs[key];
+      renderFormSpecsRows();
+    };
+
+    div.querySelector('.spec-key').onchange = (e) => {
+      const newKey = e.target.value.trim();
+      if (newKey && newKey !== key) {
+        currentFormSpecs[newKey] = currentFormSpecs[key];
+        delete currentFormSpecs[key];
+      }
+    };
+
+    div.querySelector('.spec-val').onchange = (e) => {
+      currentFormSpecs[key] = e.target.value.trim();
+    };
+
+    container.appendChild(div);
+  });
+}
+
+// Modal Handlers
+function initDashboardModal() {
+  const modal = document.getElementById('admin-form-modal');
   const btnAdd = document.getElementById('btn-add-product');
   const btnClose = document.getElementById('btn-close-modal');
-  const btnCancel = document.getElementById('btn-cancel');
-  const form = document.getElementById('product-form');
+  const btnCancel = document.getElementById('btn-cancel-modal');
+  const btnAddSpec = document.getElementById('btn-add-spec-row');
+  const form = document.getElementById('admin-product-form');
 
   if (btnAdd) {
-    btnAdd.addEventListener('click', () => {
-      form.reset();
-      document.getElementById('prod-id').value = '';
-      document.getElementById('modal-title').textContent = 'Agregar Maquinaria';
-      currentProductImages = [];
-      document.getElementById('preview-container').innerHTML = '';
+    btnAdd.onclick = () => {
+      document.getElementById('modal-form-title').textContent = 'Agregar Maquinaria';
+      document.getElementById('form-prod-id').value = '';
+      document.getElementById('form-prod-nombre').value = '';
+      document.getElementById('form-prod-marca').value = '';
+      document.getElementById('form-prod-desc-corta').value = '';
+      document.getElementById('form-prod-desc-larga').value = '';
+      currentFormImages = [];
+      currentFormSpecs = { "Marca": "", "Estado": "Nuevo" };
+      renderFormImageThumbnails();
+      renderFormSpecsRows();
       modal.style.display = 'flex';
-    });
+    };
   }
 
   const closeModal = () => modal.style.display = 'none';
-  if (btnClose) btnClose.addEventListener('click', closeModal);
-  if (btnCancel) btnCancel.addEventListener('click', closeModal);
+  if (btnClose) btnClose.onclick = closeModal;
+  if (btnCancel) btnCancel.onclick = closeModal;
+
+  if (btnAddSpec) {
+    btnAddSpec.onclick = () => {
+      const newKey = 'Nueva característica ' + (Object.keys(currentFormSpecs).length + 1);
+      currentFormSpecs[newKey] = '';
+      renderFormSpecsRows();
+    };
+  }
 
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
-      const idVal = document.getElementById('prod-id').value;
-      const nombre = document.getElementById('prod-nombre').value;
-      const categoria = document.getElementById('prod-categoria').value;
-      const marca = document.getElementById('prod-marca').value;
-      const estado = document.getElementById('prod-estado').value;
-      const descCorta = document.getElementById('prod-desc-corta').value;
-      const descLarga = document.getElementById('prod-desc-larga').value;
+      const idVal = document.getElementById('form-prod-id').value;
+      const nombre = document.getElementById('form-prod-nombre').value;
+      const categoria = document.getElementById('form-prod-categoria').value;
+      const marca = document.getElementById('form-prod-marca').value;
+      const estado = document.getElementById('form-prod-estado').value;
+      const descCorta = document.getElementById('form-prod-desc-corta').value;
+      const descLarga = document.getElementById('form-prod-desc-larga').value;
 
-      const mainImg = currentProductImages.length > 0 ? currentProductImages[0] : 'AGLOGOCIRC.png';
+      const mainImg = currentFormImages.length > 0 ? currentFormImages[0] : 'AGLOGOCIRC.png';
+
+      currentFormSpecs["Marca"] = marca;
+      currentFormSpecs["Estado"] = estado;
 
       const prodData = {
+        id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
         imagen: mainImg,
-        imagenes: currentProductImages.length > 0 ? currentProductImages : [mainImg],
+        imagenes: currentFormImages.length > 0 ? currentFormImages : [mainImg],
         descripcionCorta: descCorta,
         descripcionLarga: descLarga,
-        especificaciones: { "Marca": marca, "Estado": estado }
+        especificaciones: currentFormSpecs
       };
 
-      if (isFirestoreActive && firebase.auth().currentUser) {
-        const db = firebase.firestore();
-        if (idVal) {
-          await db.collection('productos').doc(String(idVal)).set(prodData, { merge: true });
-        } else {
-          const docRef = await db.collection('productos').add(prodData);
-          await docRef.update({ id: docRef.id });
-        }
-      } else {
-        if (idVal) {
-          const index = localProducts.findIndex(p => p.id == idVal);
-          if (index !== -1) {
-            localProducts[index] = { ...localProducts[index], ...prodData };
-          }
-        } else {
-          const newId = localProducts.length > 0 ? Math.max(...localProducts.map(p => Number(p.id) || 0)) + 1 : 1;
-          localProducts.unshift({ id: newId, ...prodData });
-        }
-        renderProductsTable();
-      }
-
+      await window.saveAgroProduct(prodData);
+      renderDashboardTable();
       closeModal();
-    });
+    };
   }
 }
 
-// Global actions
-window.editProduct = function(id) {
-  const prod = localProducts.find(p => p.id == id);
+// Edit Product Handler
+window.editDashboardProduct = function(id) {
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const prod = catalog.find(p => String(p.id) === String(id));
   if (!prod) return;
 
-  const modal = document.getElementById('product-modal');
-  document.getElementById('prod-id').value = prod.id;
-  document.getElementById('modal-title').textContent = 'Editar Maquinaria';
-  document.getElementById('prod-nombre').value = prod.nombre;
-  document.getElementById('prod-categoria').value = prod.categoria;
-  document.getElementById('prod-marca').value = prod.marca;
-  document.getElementById('prod-estado').value = prod.estado;
-  document.getElementById('prod-desc-corta').value = prod.descripcionCorta;
-  document.getElementById('prod-desc-larga').value = prod.descripcionLarga;
+  const modal = document.getElementById('admin-form-modal');
+  document.getElementById('modal-form-title').textContent = 'Editar Maquinaria';
+  document.getElementById('form-prod-id').value = prod.id;
+  document.getElementById('form-prod-nombre').value = prod.nombre;
+  document.getElementById('form-prod-categoria').value = prod.categoria;
+  document.getElementById('form-prod-marca').value = prod.marca;
+  document.getElementById('form-prod-estado').value = prod.estado;
+  document.getElementById('form-prod-desc-corta').value = prod.descripcionCorta;
+  document.getElementById('form-prod-desc-larga').value = prod.descripcionLarga;
 
-  currentProductImages = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
-  
-  const previewContainer = document.getElementById('preview-container');
-  if (previewContainer) {
-    previewContainer.innerHTML = '';
-    currentProductImages.forEach((url, i) => {
-      const img = document.createElement('img');
-      img.src = url;
-      img.className = 'preview-thumb';
-      img.onclick = () => {
-        currentProductImages.splice(i, 1);
-        img.remove();
-      };
-      previewContainer.appendChild(img);
-    });
-  }
+  currentFormImages = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
+  currentFormSpecs = prod.especificaciones ? { ...prod.especificaciones } : { "Marca": prod.marca, "Estado": prod.estado };
 
+  renderFormImageThumbnails();
+  renderFormSpecsRows();
   modal.style.display = 'flex';
 };
 
-window.deleteProduct = async function(id) {
-  if (confirm('¿Estás seguro de que deseas eliminar este equipo del catálogo?')) {
-    if (isFirestoreActive && firebase.auth().currentUser) {
-      await firebase.firestore().collection('productos').doc(String(id)).delete();
-    } else {
-      localProducts = localProducts.filter(p => p.id != id);
-      renderProductsTable();
-    }
+// Instant Delete Product Handler
+window.deleteDashboardProduct = async function(id) {
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const prod = catalog.find(p => String(p.id) === String(id));
+  const name = prod ? prod.nombre : 'este equipo';
+
+  if (confirm(`¿Estás seguro de que deseas eliminar "${name}" del catálogo?`)) {
+    await window.deleteAgroProduct(id);
+    renderDashboardTable();
   }
 };
 
-// Document Loaded Initialization
+// Event Listeners for Filters
 document.addEventListener('DOMContentLoaded', () => {
-  initAuth();
-  initCloudinaryUpload();
-  initModalLogic();
+  initDashboardAuth();
+  initDashboardImageManager();
+  initDashboardModal();
+
+  const searchInput = document.getElementById('admin-search-input');
+  const catSelect = document.getElementById('admin-filter-categoria');
+
+  if (searchInput) searchInput.addEventListener('input', renderDashboardTable);
+  if (catSelect) catSelect.addEventListener('change', renderDashboardTable);
+
+  window.addEventListener('agroCatalogUpdated', renderDashboardTable);
 });

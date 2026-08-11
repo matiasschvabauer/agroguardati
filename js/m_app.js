@@ -101,7 +101,7 @@ function initCatalog() {
 
     items.forEach(item => {
       const html = `
-        <article class="catalog-item">
+        <article class="catalog-item" data-id="${item.id}">
           <div class="catalog-item-img-wrapper">
             <img src="${item.imagen}" alt="${item.nombre}" class="catalog-item-img">
           </div>
@@ -115,14 +115,19 @@ function initCatalog() {
       `;
       catalogContainer.innerHTML += html;
     });
+
+    if (window.attachCardAdminControls) {
+      window.attachCardAdminControls();
+    }
   }
 
   function applyFilters() {
+    const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
     const valCat = filterCat.value;
     const valMarca = filterMarca.value;
     const valEstado = filterEstado.value;
 
-    const filtered = catalogo.filter(item => {
+    const filtered = currentCatalog.filter(item => {
       return (valCat === 'todas' || item.categoria === valCat) &&
              (valMarca === 'todas' || item.marca === valMarca) &&
              (valEstado === 'todos' || item.estado === valEstado);
@@ -135,46 +140,61 @@ function initCatalog() {
   if(filterMarca) filterMarca.addEventListener('change', applyFilters);
   if(filterEstado) filterEstado.addEventListener('change', applyFilters);
 
-  if (typeof catalogo !== 'undefined') {
-    renderCatalog(catalogo);
-  }
+  const activeItems = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
+  renderCatalog(activeItems);
+
+  window.addEventListener('agroCatalogUpdated', (e) => {
+    renderCatalog(e.detail || window.getAgroCatalog());
+  });
 }
 
 // --- FEATURED PRODUCTS ---
 function initFeatured() {
   const featuredContainer = document.getElementById('featured-grid');
-  if(!featuredContainer || typeof catalogo === 'undefined') return;
+  if(!featuredContainer) return;
 
-  const featured = catalogo.slice(0, 3);
-  
-  featured.forEach(item => {
-    const html = `
-      <a href="m_producto-detalle.html?id=${item.id}" class="product-card">
-        <div class="product-card-img-wrapper">
-          <span class="product-badge">${item.estado}</span>
-          <img src="${item.imagen}" alt="${item.nombre}" class="product-card-img">
-        </div>
-        <div class="product-card-content">
-          <span class="product-category">${item.categoria}</span>
-          <h3 class="product-title">${item.nombre}</h3>
-          <p class="product-desc">${item.descripcionCorta}</p>
-          <div style="color: var(--brand-blue); font-weight: 600;">Ver Detalles &rarr;</div>
-        </div>
-      </a>
-    `;
-    featuredContainer.innerHTML += html;
-  });
+  function renderFeatured() {
+    const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
+    featuredContainer.innerHTML = '';
+    const featured = currentCatalog.slice(0, 3);
+    
+    featured.forEach(item => {
+      const html = `
+        <a href="m_producto-detalle.html?id=${item.id}" class="product-card" data-id="${item.id}">
+          <div class="product-card-img-wrapper">
+            <span class="product-badge">${item.estado}</span>
+            <img src="${item.imagen}" alt="${item.nombre}" class="product-card-img">
+          </div>
+          <div class="product-card-content">
+            <span class="product-category">${item.categoria}</span>
+            <h3 class="product-title">${item.nombre}</h3>
+            <p class="product-desc">${item.descripcionCorta}</p>
+            <div style="color: var(--brand-blue); font-weight: 600;">Ver Detalles &rarr;</div>
+          </div>
+        </a>
+      `;
+      featuredContainer.innerHTML += html;
+    });
+
+    if (window.attachCardAdminControls) {
+      window.attachCardAdminControls();
+    }
+  }
+
+  renderFeatured();
+  window.addEventListener('agroCatalogUpdated', renderFeatured);
 }
 
 // --- PRODUCT DETAILS ---
 function initProductDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const productId = parseInt(urlParams.get('id'));
+  const productId = urlParams.get('id');
   
   const container = document.getElementById('product-detail-container');
-  if(!container || isNaN(productId) || typeof catalogo === 'undefined') return;
+  if(!container || !productId) return;
 
-  const product = catalogo.find(p => p.id === productId);
+  const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
+  const product = currentCatalog.find(p => String(p.id) === String(productId));
   
   if(!product) {
     container.innerHTML = '<div class="container section"><h2>Producto no encontrado.</h2><a href="m_catalogo.html" class="btn btn-primary">Volver al catálogo</a></div>';
