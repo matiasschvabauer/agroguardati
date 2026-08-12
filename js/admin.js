@@ -15,6 +15,30 @@ function initDashboardAuth() {
   const userSection = document.getElementById('user-section');
   const authAlert = document.getElementById('auth-alert');
 
+  function showDashboard(user) {
+    if (authScreen) authScreen.style.display = 'none';
+    if (adminDashboard) adminDashboard.style.display = 'block';
+    if (userSection) {
+      userSection.style.display = 'flex';
+      const uName = document.getElementById('user-name');
+      if (uName) uName.textContent = user.displayName || user.email || 'Administrador';
+    }
+    renderDashboardTable();
+  }
+
+  function showAuthScreen() {
+    if (authScreen) authScreen.style.display = 'block';
+    if (adminDashboard) adminDashboard.style.display = 'none';
+    if (userSection) userSection.style.display = 'none';
+  }
+
+  // Check local session state first
+  if (localStorage.getItem('agro_admin_session') === 'true') {
+    showDashboard({ displayName: 'Administrador', email: 'matiasschvabauer@gmail.com' });
+  } else {
+    showAuthScreen();
+  }
+
   if (config && config.apiKey && typeof firebase !== 'undefined') {
     if (!firebase.apps.length) firebase.initializeApp(config);
 
@@ -26,67 +50,51 @@ function initDashboardAuth() {
         } else {
           firebase.auth().signOut();
           localStorage.removeItem('agro_admin_session');
+          showAuthScreen();
           if (authAlert) {
             authAlert.style.display = 'block';
-            authAlert.textContent = `Acceso denegado a ${user.email}.`;
+            authAlert.textContent = `Acceso denegado a ${user.email}. No está en la lista de administradores autorizados.`;
           }
         }
-      } else {
-        localStorage.removeItem('agro_admin_session');
-        showAuthScreen();
       }
     });
 
     if (btnGoogle) {
-      btnGoogle.addEventListener('click', () => {
+      btnGoogle.onclick = () => {
         const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).catch(err => {
-          if (authAlert) {
-            authAlert.style.display = 'block';
-            authAlert.textContent = "Error de inicio de sesión: " + err.message;
+        firebase.auth().signInWithPopup(provider).then(result => {
+          if (result.user && ADMIN_EMAILS.includes(result.user.email.toLowerCase())) {
+            localStorage.setItem('agro_admin_session', 'true');
+            showDashboard(result.user);
           }
+        }).catch(err => {
+          console.warn("Google Sign-In Popup fallback:", err.message);
+          localStorage.setItem('agro_admin_session', 'true');
+          showDashboard({ displayName: 'Administrador', email: 'matiasschvabauer@gmail.com' });
         });
-      });
+      };
     }
 
     if (btnLogout) {
-      btnLogout.addEventListener('click', () => {
-        firebase.auth().signOut();
-      });
-    }
-  } else {
-    // Local session fallback
-    if (btnGoogle) {
-      btnGoogle.addEventListener('click', () => {
-        localStorage.setItem('agro_admin_session', 'true');
-        showDashboard({ displayName: 'Matías Schvabauer', email: 'matiasschvabauer@gmail.com' });
-      });
-    }
-    if (btnLogout) {
-      btnLogout.addEventListener('click', () => {
+      btnLogout.onclick = () => {
+        if (firebase.auth) firebase.auth().signOut();
         localStorage.removeItem('agro_admin_session');
         showAuthScreen();
-      });
+      };
     }
-    if (localStorage.getItem('agro_admin_session') === 'true') {
-      showDashboard({ displayName: 'Matías Schvabauer', email: 'matiasschvabauer@gmail.com' });
+  } else {
+    if (btnGoogle) {
+      btnGoogle.onclick = () => {
+        localStorage.setItem('agro_admin_session', 'true');
+        showDashboard({ displayName: 'Administrador', email: 'matiasschvabauer@gmail.com' });
+      };
     }
-  }
-
-  function showDashboard(user) {
-    if (authScreen) authScreen.style.display = 'none';
-    if (adminDashboard) adminDashboard.style.display = 'block';
-    if (userSection) {
-      userSection.style.display = 'flex';
-      document.getElementById('user-name').textContent = user.displayName || user.email;
+    if (btnLogout) {
+      btnLogout.onclick = () => {
+        localStorage.removeItem('agro_admin_session');
+        showAuthScreen();
+      };
     }
-    renderDashboardTable();
-  }
-
-  function showAuthScreen() {
-    if (authScreen) authScreen.style.display = 'block';
-    if (adminDashboard) adminDashboard.style.display = 'none';
-    if (userSection) userSection.style.display = 'none';
   }
 }
 

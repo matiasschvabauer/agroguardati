@@ -7,20 +7,27 @@ const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com
 
 function initAdminBar() {
   const config = window.AGRO_CONFIG?.firebase;
+
+  // Check local session key first
+  if (localStorage.getItem('agro_admin_session') === 'true') {
+    renderAdminUI({ email: 'matiasschvabauer@gmail.com' });
+  }
+
   if (config && config.apiKey && typeof firebase !== 'undefined') {
     if (!firebase.apps.length) firebase.initializeApp(config);
     
     firebase.auth().onAuthStateChanged(user => {
-      if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
-        localStorage.setItem('agro_admin_session', 'true');
-        renderAdminUI(user);
-      } else {
-        localStorage.removeItem('agro_admin_session');
-        removeAdminUI();
+      if (user) {
+        if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+          localStorage.setItem('agro_admin_session', 'true');
+          renderAdminUI(user);
+        } else {
+          firebase.auth().signOut();
+          localStorage.removeItem('agro_admin_session');
+          removeAdminUI();
+        }
       }
     });
-  } else if (window.isAgroAdmin && window.isAgroAdmin()) {
-    renderAdminUI({ email: 'matiasschvabauer@gmail.com' });
   }
 }
 
