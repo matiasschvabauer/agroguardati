@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 // CONFIGURACIÓN DE CLOUDINARY Y WHATSAPP META
 const CONFIG = {
   // Números autorizados (Tu celular + Guillermo)
-  authorizedPhones: ['5493404534477', '3404534477', '5493404638524'],
+  authorizedPhones: ['3404534477', '3404638524', '5493404534477', '5493404638524'],
   cloudinaryCloud: 'pfskomq5',
   cloudinaryPreset: 'nwrslkmw',
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || 'TU_CLOUDINARY_API_KEY',
@@ -28,7 +28,6 @@ const CONFIG = {
   whatsappAccessToken: process.env.WHATSAPP_TOKEN || 'EAAeNBduRSmkBSMNvU50oQldR6GlnTQcI7Q8WmRgTFZCZCGJmxBDRSrjVy5oZAxtqZCAB77Dp9yZBUHZC3fTXFlSw0cKiAsj7LtC1JwYtPqSNJDXCc7ykzo9AcD6Bmb4QUbYKi8ZBo1v9dPVEZAZAnwfZBqkHrtE2jgtKjUS7wFk1SvdzdwkeZAP0CjBEIml5WOBi265W6WghRYxWseBexGeeKZCUnven9k1UmJCVqoEGLsXEqj1myZAcmRf5PYFu9YEnFGP3NDYON0OohWG7QZA40ssAZDZD'
 };
 
-// Configurar cliente de Cloudinary para borrado automático de espacio
 cloudinary.config({
   cloud_name: CONFIG.cloudinaryCloud,
   api_key: CONFIG.cloudinaryApiKey,
@@ -46,6 +45,32 @@ try {
   }
 } catch (e) {
   console.log("Firebase Admin no inicializado localmente.");
+}
+
+// FUNCIÓN AUXILIAR PARA GUARDAR EN FIRESTORE VÍA REST API (FALLBACK SI NO HAY ADMIN KEY)
+async function saveStoryToFirestoreREST(storyPayload) {
+  if (db) {
+    await db.collection('historias').doc(storyPayload.id).set(storyPayload);
+    return;
+  }
+
+  try {
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/agroguardati/databases/(default)/documents/historias?documentId=${storyPayload.id}`;
+    await axios.post(firestoreUrl, {
+      fields: {
+        id: { stringValue: storyPayload.id },
+        tipo: { stringValue: storyPayload.tipo },
+        url: { stringValue: storyPayload.url },
+        public_id: { stringValue: storyPayload.public_id || '' },
+        caption: { stringValue: storyPayload.caption || '' },
+        fecha: { integerValue: String(storyPayload.fecha) },
+        expira: { integerValue: String(storyPayload.expira) }
+      }
+    });
+    console.log('[FIREBASE REST ÉXITO] Historia guardada en Firestore en la nube.');
+  } catch (err) {
+    console.error('Error guardando en Firestore REST API:', err.response?.data || err.message);
+  }
 }
 
 // 1. VERIFICACIÓN DE WEBHOOK META (GET)
@@ -75,7 +100,7 @@ app.post('/webhook', async (req, res) => {
         const type = msg.type;   // 'image', 'video', etc.
 
         // FILTRO 1: Verificar si el número está autorizado (Tu celular o Guillermo)
-        const isAuthorized = CONFIG.authorizedPhones.some(phone => sender.includes(phone.replace('+', '')));
+        const isAuthorized = CONFIG.authorizedPhones.some(phone => sender.includes(phone) || phone.includes(sender));
         if (!isAuthorized) {
           console.log(`[IGNORADO] Mensaje de número no autorizado: ${sender}`);
           continue;
@@ -119,7 +144,7 @@ app.post('/webhook', async (req, res) => {
         const publicId = uploadRes.data.public_id;
         console.log(`[ÉXITO] Archivo subido a Cloudinary (${publicId}): ${publicUrl}`);
 
-        // Paso D: Guardar Historia en Firebase con su publicId de Cloudinary
+        // Paso D: Guardar Historia en Firestore (usando Admin o REST API)
         const storyPayload = {
           id: 'story_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
           tipo: type,
@@ -130,15 +155,11 @@ app.post('/webhook', async (req, res) => {
           expira: Date.now() + (24 * 60 * 60 * 1000) // 24 horas exactas
         };
 
-        if (db) {
-          await db.collection('historias').doc(storyPayload.id).set(storyPayload);
-        } else {
-          console.log('[HISTORIA CREADA EN FIREBASE]', storyPayload);
-        }
+        await saveStoryToFirestoreREST(storyPayload);
       }
     }
   } catch (err) {
-    console.error('Error procesando webhook de WhatsApp:', err.message);
+    console.error('Error procesando webhook de WhatsApp:', err.response?.data || err.message);
   }
 
   res.sendStatus(200);
