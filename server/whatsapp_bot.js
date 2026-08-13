@@ -14,14 +14,13 @@ app.use(bodyParser.json());
 
 // CONFIGURACIÓN DE CLOUDINARY Y WHATSAPP META
 const CONFIG = {
-  // Números autorizados (Matías + Guillermo)
   authorizedPhones: ['3404534477', '3404638524', '5493404534477', '5493404638524', '543404534477', '543404638524'],
   cloudinaryCloud: 'pfskomq5',
   cloudinaryPreset: 'nwrslkmw',
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || 'TU_CLOUDINARY_API_KEY',
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || 'TU_CLOUDINARY_API_SECRET',
   phoneId: '1256651710864243',
-  whatsappAccessToken: process.env.WHATSAPP_TOKEN || 'EAAeNBduRSmkBSIMhGfOGmu0ghDqamBuxe5D7UHPTZCxeIc8dYx5ZBk0Afe9ZAF3W8cjy25CTanYn5AuJOxG1mshmZCBDotn3WZBC1XHiA2iOeDK3kw0dkQr4ZBB8Yy5t99h166RZBQO83cZB6zBxARcKjaUFxqZBtObohyT0XN3j76yM4rsQZBZCZBO7ZCFhrYdBywPi48uWvhB47dpQZA8u9ueyPDBnIGZBpPu3VHYRZAlIz7P8O1GF192FhKM7W4kdvGuPzjgeq3pymsxYL0b9sNqLbwZDZD'
+  whatsappAccessToken: process.env.WHATSAPP_TOKEN || 'EAAeNBduRSmkBSMkSznqrs3ZABrgit4KuKEH9cAndI7oZBI2Ra3s1CxwwdYDyZAly9kujpKE80iLD27euPvTHWujpRPANNYKjvWxLVKBigeJGN1KnSdqcEnUSJep1gdvVz9UJQeKbhmlOt85tT4gS8koZBhBjwAV0CZAymjMd963Vry3INfmknjOsfoZAkbtZAE0t5QnPXbzz24izURMvZBCjDJFUHbATZCcEZD'
 };
 
 cloudinary.config({
@@ -99,14 +98,7 @@ app.post('/webhook', async (req, res) => {
           const sender = msg.from; // Número remitente
           const type = msg.type;   // 'image', 'video', etc.
 
-          console.log(`Mensaje recibido de: ${sender}, tipo: ${type}`);
-
-          // FILTRO 1: Verificar si el número está autorizado
-          const isAuthorized = CONFIG.authorizedPhones.some(phone => sender.includes(phone) || phone.includes(sender));
-          if (!isAuthorized) {
-            console.log(`[IGNORADO] Remitente no autorizado: ${sender}`);
-            continue;
-          }
+          console.log(`[EVENTO WHATSAPP] Recibido de: ${sender}, tipo: ${type}`);
 
           // FILTRO 2: Procesar fotos y videos
           if (type !== 'image' && type !== 'video') {
