@@ -2,6 +2,17 @@
 
 const STORIES_KEY = 'agroguardati_stories_v1';
 
+const DEFAULT_STORIES = [
+  {
+    id: 'story_init_1',
+    tipo: 'image',
+    url: 'https://res.cloudinary.com/pfskomq5/image/upload/v1786402390/ppkewsxmkf0uwqi1tn7g.jpg',
+    caption: '¡Nuevos ingresos de maquinarias en Agroguardati! Consultá disponibilidad.',
+    fecha: Date.now(),
+    expira: Date.now() + (24 * 60 * 60 * 1000)
+  }
+];
+
 // 1. Obtener historias activas (menos de 24hs de antigüedad)
 window.getAgroStories = function() {
   const localData = localStorage.getItem(STORIES_KEY);
@@ -15,9 +26,12 @@ window.getAgroStories = function() {
   }
 
   const now = Date.now();
-  const active = stories.filter(s => s.expira > now);
+  let active = stories.filter(s => s && s.expira > now);
 
-  if (active.length !== stories.length) {
+  if (active.length === 0) {
+    active = DEFAULT_STORIES;
+    localStorage.setItem(STORIES_KEY, JSON.stringify(active));
+  } else if (active.length !== stories.length) {
     localStorage.setItem(STORIES_KEY, JSON.stringify(active));
   }
 
