@@ -3,10 +3,9 @@
 let currentModalImages = [];
 let currentModalSpecs = {};
 
-const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
-
 function initAdminBar() {
   const config = window.AGRO_CONFIG?.firebase;
+  const emails = window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
 
   // Check local session key first
   if (localStorage.getItem('agro_admin_session') === 'true') {
@@ -18,7 +17,7 @@ function initAdminBar() {
     
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        if (emails.includes(user.email.toLowerCase())) {
           localStorage.setItem('agro_admin_session', 'true');
           renderAdminUI(user);
         } else {

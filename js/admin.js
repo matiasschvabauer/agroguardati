@@ -3,11 +3,10 @@
 let currentFormImages = [];
 let currentFormSpecs = {};
 
-const ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
-
 // Auth Check & Initialization
 function initDashboardAuth() {
   const config = window.AGRO_CONFIG?.firebase;
+  const emails = window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
   const btnGoogle = document.getElementById('btn-google-login');
   const btnLogout = document.getElementById('btn-logout');
   const authScreen = document.getElementById('auth-screen');
@@ -44,7 +43,7 @@ function initDashboardAuth() {
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        if (emails.includes(user.email.toLowerCase())) {
           localStorage.setItem('agro_admin_session', 'true');
           showDashboard(user);
         } else {
@@ -63,7 +62,7 @@ function initDashboardAuth() {
       btnGoogle.onclick = () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider).then(result => {
-          if (result.user && ADMIN_EMAILS.includes(result.user.email.toLowerCase())) {
+          if (result.user && emails.includes(result.user.email.toLowerCase())) {
             localStorage.setItem('agro_admin_session', 'true');
             showDashboard(result.user);
           }
