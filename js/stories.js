@@ -40,30 +40,44 @@ window.getAgroStories = function() {
 
 // 2. Guardar nueva historia (Foto o Video)
 window.saveAgroStory = async function(storyData) {
-  let stories = window.getAgroStories();
-  const newStory = {
-    id: storyData.id || 'story_' + Date.now(),
-    tipo: storyData.tipo || 'image', // 'image' o 'video'
-    url: storyData.url,
-    caption: storyData.caption || '',
-    fecha: Date.now(),
-    expira: Date.now() + (24 * 60 * 60 * 1000) // 24 horas
-  };
+  return await window.saveAgroStoriesBatch([storyData]);
+};
 
-  stories.unshift(newStory);
+// 2b. Guardar lote de historias (Subida Masiva)
+window.saveAgroStoriesBatch = async function(storiesArray) {
+  if (!Array.isArray(storiesArray) || storiesArray.length === 0) return [];
+
+  let stories = window.getAgroStories();
+  const now = Date.now();
+  const formattedNewStories = storiesArray.map((st, idx) => ({
+    id: st.id || 'story_' + (now + idx) + '_' + Math.floor(Math.random() * 1000),
+    tipo: st.tipo || 'image',
+    url: st.url,
+    public_id: st.public_id || '',
+    caption: st.caption || '',
+    fecha: now,
+    expira: now + (24 * 60 * 60 * 1000)
+  }));
+
+  stories = [...formattedNewStories, ...stories];
   localStorage.setItem(STORIES_KEY, JSON.stringify(stories));
 
-  // Guardar en Firestore si está conectado
+  // Guardar en Firestore si está disponible
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     try {
-      await firebase.firestore().collection('historias').doc(newStory.id).set(newStory);
+      const batch = firebase.firestore().batch();
+      formattedNewStories.forEach(st => {
+        const ref = firebase.firestore().collection('historias').doc(st.id);
+        batch.set(ref, st);
+      });
+      await batch.commit();
     } catch (err) {
-      console.warn("Firestore story save fallback:", err.message);
+      console.warn("Firestore stories batch save fallback:", err.message);
     }
   }
 
   window.dispatchEvent(new CustomEvent('agroStoriesUpdated', { detail: stories }));
-  return newStory;
+  return formattedNewStories;
 };
 
 // 3. Renderizar barra de historias en la web

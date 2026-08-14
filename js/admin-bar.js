@@ -498,91 +498,227 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(attachCardAdminControls, 300);
 });
 
-// Modal Uploader para Historias 24hs
+// Modal Uploader Masivo para Historias 24hs (Estilo Instagram/WhatsApp Web)
 window.openStoryUploaderModal = function() {
   let modal = document.getElementById('agro-story-uploader-modal');
+  let selectedFiles = [];
+
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'agro-story-uploader-modal';
     modal.style.cssText = `
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(6px);
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
       z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 1rem;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     `;
     modal.innerHTML = `
-      <div style="background: white; width: 100%; max-width: 480px; border-radius: 20px; padding: 1.8rem; font-family: 'Inter', sans-serif;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="margin: 0; font-size: 1.2rem; color: #1e293b;"><i class="fas fa-camera" style="color:#e11d48;"></i> Subir Historia (24h)</h3>
-          <button id="close-story-uploader" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">&times;</button>
+      <div style="background: white; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 1.8rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-camera" style="color: #e11d48;"></i> Subida Masiva de Historias (24h)
+          </h3>
+          <button id="close-story-uploader" style="background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; font-weight: 700;">&times;</button>
         </div>
 
-        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.2rem;">Sube una foto o video. Permanecerá visible en la web por 24 horas.</p>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0; margin-bottom: 1.2rem; line-height: 1.4;">
+          Selecciona varias fotos o videos a la vez. Se publicarán en la web por 24 horas y se auto-eliminarán liberando espacio.
+        </p>
 
-        <div id="story-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 1rem;">
-          <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #e11d48; margin-bottom: 0.4rem;"></i>
-          <p id="story-upload-status" style="font-size: 0.88rem; font-weight: 600; color: #334155; margin: 0;">Selecciona una foto o video MP4</p>
-          <input type="file" id="story-file-input" accept="image/*,video/*" style="display: none;">
+        <!-- Reglas / Límites Claros -->
+        <div style="background: #fff1f2; border-left: 4px solid #e11d48; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.8rem; color: #9f1239;">
+          <strong><i class="fas fa-info-circle"></i> Límites de Subida:</strong>
+          <ul style="margin: 4px 0 0 0; padding-left: 1.2rem;">
+            <li><strong>Fotos:</strong> JPG, PNG, WEBP (hasta 15 MB c/u).</li>
+            <li><strong>Videos:</strong> MP4, MOV, WEBM (hasta 60 seg / 100 MB c/u).</li>
+            <li><strong>Capacidad:</strong> Hasta 20 archivos por envío.</li>
+          </ul>
         </div>
 
-        <div style="margin-bottom: 1.2rem;">
-          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Texto / Pie de Foto (Opcional)</label>
-          <input type="text" id="story-caption-input" placeholder="Ej: ¡Ingresó hoy! Excelente estado" style="width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem;">
+        <!-- Zona de Carga / Drag & Drop -->
+        <div id="story-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.8rem 1rem; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;">
+          <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: #e11d48; margin-bottom: 0.5rem;"></i>
+          <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0;">Haz clic o arrastra fotos/videos aquí</p>
+          <span style="font-size: 0.8rem; color: #94a3b8; display: block; margin-top: 4px;">Puedes seleccionar múltiples archivos juntos</span>
+          <input type="file" id="story-file-input" accept="image/*,video/*" multiple style="display: none;">
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button id="cancel-story-uploader" style="padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #e2e8f0; font-weight: 600; cursor: pointer;">Cancelar</button>
+        <!-- Previsualización de Archivos Seleccionados -->
+        <div id="story-previews-container" style="margin-top: 1.2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-height: 160px; overflow-y: auto;"></div>
+
+        <!-- Campo Pie de Foto Global / Opcional -->
+        <div id="caption-wrapper" style="margin-top: 1.2rem;">
+          <label style="display: block; font-weight: 700; font-size: 0.85rem; color: #334155; margin-bottom: 0.4rem;">Texto / Pie de Foto (Opcional)</label>
+          <input type="text" id="story-caption-input" placeholder="Ej: ¡Ingresó hoy! Excelente estado y financiación" style="width: 100%; padding: 0.75rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.9rem; outline: none;">
         </div>
+
+        <!-- Barra de Progreso de Subida -->
+        <div id="story-progress-wrapper" style="display: none; margin-top: 1.2rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 6px;">
+            <span id="story-progress-text">Subiendo historias...</span>
+            <span id="story-progress-percent">0%</span>
+          </div>
+          <div style="background: #e2e8f0; border-radius: 999px; height: 10px; overflow: hidden;">
+            <div id="story-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #e11d48, #1d5497); border-radius: 999px; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem;">
+          <button id="cancel-story-uploader" style="padding: 0.75rem 1.3rem; border-radius: 10px; border: none; background: #f1f5f9; color: #475569; font-weight: 700; cursor: pointer;">Cancelar</button>
+          <button id="btn-submit-stories" style="padding: 0.75rem 1.5rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #e11d48, #be123c); color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paper-plane"></i> Publicar Historias
+          </button>
+        </div>
+
       </div>
     `;
     document.body.appendChild(modal);
 
-    document.getElementById('close-story-uploader').onclick = () => modal.style.display = 'none';
-    document.getElementById('cancel-story-uploader').onclick = () => modal.style.display = 'none';
-
+    const closeBtn = document.getElementById('close-story-uploader');
+    const cancelBtn = document.getElementById('cancel-story-uploader');
     const dropzone = document.getElementById('story-dropzone');
     const fileInput = document.getElementById('story-file-input');
-    const statusText = document.getElementById('story-upload-status');
+    const previewsContainer = document.getElementById('story-previews-container');
+    const btnSubmit = document.getElementById('btn-submit-stories');
+    const progressWrapper = document.getElementById('story-progress-wrapper');
+    const progressBar = document.getElementById('story-progress-bar');
+    const progressText = document.getElementById('story-progress-text');
+    const progressPercent = document.getElementById('story-progress-percent');
+
+    closeBtn.onclick = () => resetAndCloseModal();
+    cancelBtn.onclick = () => resetAndCloseModal();
+
+    function resetAndCloseModal() {
+      selectedFiles = [];
+      previewsContainer.innerHTML = '';
+      fileInput.value = '';
+      document.getElementById('story-caption-input').value = '';
+      progressWrapper.style.display = 'none';
+      btnSubmit.disabled = false;
+      modal.style.display = 'none';
+    }
 
     dropzone.onclick = () => fileInput.click();
 
-    fileInput.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    fileInput.onchange = (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+
+      if (selectedFiles.length + files.length > 20) {
+        alert("Puedes seleccionar un máximo de 20 archivos por envío.");
+        return;
+      }
+
+      files.forEach(file => {
+        // Validar tamaño de foto (15MB) y video (100MB)
+        const isVideo = file.type.startsWith('video');
+        const maxSize = isVideo ? 100 * 1024 * 1024 : 15 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+          alert(`El archivo "${file.name}" supera el tamaño máximo permitido (${isVideo ? '100MB para videos' : '15MB para fotos'}).`);
+          return;
+        }
+
+        selectedFiles.push(file);
+      });
+
+      renderPreviews();
+    };
+
+    function renderPreviews() {
+      previewsContainer.innerHTML = '';
+      selectedFiles.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'position: relative; width: 100%; height: 80px; border-radius: 10px; overflow: hidden; background: #000; border: 1px solid #cbd5e1;';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '&times;';
+        removeBtn.style.cssText = 'position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;';
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          selectedFiles.splice(index, 1);
+          renderPreviews();
+        };
+
+        if (file.type.startsWith('video')) {
+          item.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.2rem;"><i class="fas fa-video"></i></div>`;
+        } else {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+          item.appendChild(img);
+        }
+
+        item.appendChild(removeBtn);
+        previewsContainer.appendChild(item);
+      });
+    }
+
+    btnSubmit.onclick = async () => {
+      if (selectedFiles.length === 0) {
+        alert("Por favor selecciona al menos una foto o video para publicar.");
+        return;
+      }
 
       const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
       const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
-      const isVideo = file.type.startsWith('video');
+      const globalCaption = document.getElementById('story-caption-input').value.trim();
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', uploadPreset);
+      progressWrapper.style.display = 'block';
+      btnSubmit.disabled = true;
 
-      const endpoint = isVideo 
-        ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
-        : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+      const uploadedStories = [];
+      const total = selectedFiles.length;
 
-      try {
-        statusText.textContent = 'Subiendo a la nube...';
-        const res = await fetch(endpoint, { method: 'POST', body: formData });
-        const data = await res.json();
+      for (let i = 0; i < total; i++) {
+        const file = selectedFiles[i];
+        const isVideo = file.type.startsWith('video');
 
-        if (data.secure_url) {
-          const caption = document.getElementById('story-caption-input').value.trim();
-          await window.saveAgroStory({
-            tipo: isVideo ? 'video' : 'image',
-            url: data.secure_url,
-            caption
-          });
+        progressText.textContent = `Subiendo ${i + 1} de ${total}: ${file.name}...`;
+        const pct = Math.round(((i) / total) * 100);
+        progressBar.style.width = pct + '%';
+        progressPercent.textContent = pct + '%';
 
-          alert("¡Historia publicada con éxito en la web!");
-          modal.style.display = 'none';
-        } else {
-          alert("Error subiendo archivo: " + (data.error?.message || 'Error desconocido'));
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+
+        const endpoint = isVideo 
+          ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
+          : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+        try {
+          const res = await fetch(endpoint, { method: 'POST', body: formData });
+          const data = await res.json();
+
+          if (data.secure_url) {
+            uploadedStories.push({
+              tipo: isVideo ? 'video' : 'image',
+              url: data.secure_url,
+              public_id: data.public_id || '',
+              caption: globalCaption
+            });
+          } else {
+            console.error("Error en subida de " + file.name, data);
+          }
+        } catch (err) {
+          console.error("Error subiendo " + file.name, err);
         }
-      } catch (err) {
-        alert("Error de subida: " + err.message);
-      } finally {
-        statusText.textContent = 'Selecciona una foto o video MP4';
+      }
+
+      progressBar.style.width = '100%';
+      progressPercent.textContent = '100%';
+
+      if (uploadedStories.length > 0) {
+        await window.saveAgroStoriesBatch(uploadedStories);
+        alert(`¡${uploadedStories.length} historias publicadas con éxito en la web!`);
+        resetAndCloseModal();
+      } else {
+        alert("No se pudo publicar ninguna historia. Revisa tu conexión.");
+        btnSubmit.disabled = false;
       }
     };
   }
