@@ -50,7 +50,7 @@ async function saveStoryToFirestoreREST(storyPayload) {
   }
 
   try {
-    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/agroguardati/databases/(default)/documents/historias?documentId=${storyPayload.id}`;
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/agroguardati/databases/(default)/documents/historias?documentId=${storyPayload.id}&key=AIzaSyA92iepzPYW09tQoHDbRhsPGlyp9GQh46w`;
     await axios.post(firestoreUrl, {
       fields: {
         id: { stringValue: storyPayload.id },
