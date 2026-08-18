@@ -130,14 +130,14 @@ function renderDashboardTable() {
     const badgeClass = item.estado === 'Nuevo' ? 'badge-nuevo' : 'badge-usado';
 
     tr.innerHTML = `
-      <td><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
-      <td><strong>${item.nombre}</strong></td>
-      <td>${item.categoria}</td>
-      <td>${item.marca}</td>
-      <td><span class="badge-status ${badgeClass}">${item.estado}</span></td>
-      <td style="text-align: right;">
-        <button class="btn-icon btn-icon-edit" onclick="editDashboardProduct('${item.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon btn-icon-delete" onclick="deleteDashboardProduct('${item.id}')" title="Borrar"><i class="fas fa-trash-alt"></i></button>
+      <td class="col-thumb"><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
+      <td class="col-nombre"><strong>${item.nombre}</strong></td>
+      <td class="col-cat">${item.categoria}</td>
+      <td class="col-marca">${item.marca}</td>
+      <td class="col-estado"><span class="badge-status ${badgeClass}">${item.estado}</span></td>
+      <td class="col-acciones">
+        <button class="btn-icon btn-icon-edit" onclick="editDashboardProduct('${item.id}')" title="Editar"><i class="fas fa-edit"></i> <span>Editar</span></button>
+        <button class="btn-icon btn-icon-delete" onclick="deleteDashboardProduct('${item.id}')" title="Borrar"><i class="fas fa-trash-alt"></i> <span>Borrar</span></button>
       </td>
     `;
     tableBody.appendChild(tr);

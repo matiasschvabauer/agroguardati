@@ -31,36 +31,66 @@ function initAdminBar() {
 }
 
 function renderAdminUI(user) {
+  if (!document.getElementById('agro-admin-bar-styles')) {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'agro-admin-bar-styles';
+    styleEl.textContent = `
+      #agro-admin-topbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        min-height: 44px;
+        background: #0f172a;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 1.25rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        z-index: 99999;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        font-family: 'Inter', sans-serif;
+      }
+      @media (max-width: 768px) {
+        #agro-admin-topbar {
+          padding: 6px 0.5rem;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+        .bar-user-email { font-size: 0.75rem; }
+        .bar-actions { width: 100%; justify-content: space-between; gap: 4px !important; }
+        .bar-actions button, .bar-actions a {
+          font-size: 0.72rem !important;
+          padding: 4px 8px !important;
+        }
+        .agro-modal-inner {
+          padding: 1.25rem 1rem !important;
+          max-height: 94vh !important;
+          border-radius: 16px !important;
+        }
+        .agro-modal-inner .form-row {
+          grid-template-columns: 1fr !important;
+          gap: 0.8rem !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
   // 1. Inject Top Admin Bar if not present
   if (!document.getElementById('agro-admin-topbar')) {
     const bar = document.createElement('div');
     bar.id = 'agro-admin-topbar';
-    bar.style.cssText = `
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 44px;
-      background: #0f172a;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1.25rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      z-index: 99999;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      font-family: 'Inter', sans-serif;
-    `;
     bar.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%;"></span>
+      <div class="bar-user-email" style="display: flex; align-items: center; gap: 6px;">
+        <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
         <span>Modo Admin: <strong style="color: #60a5fa;">${user.email}</strong></span>
       </div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <button id="btn-admin-story" style="background: #e11d48; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-camera"></i> Subir Historia</button>
-        <button id="btn-admin-add" style="background: #1d5497; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-plus"></i> Agregar Equipo</button>
-        <a href="admin.html" style="background: #334155; color: white; text-decoration: none; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-cog"></i> Panel</a>
-        <button id="btn-admin-logout" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> Salir</button>
+      <div class="bar-actions" style="display: flex; align-items: center; gap: 8px;">
+        <button id="btn-admin-story" style="background: #e11d48; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 4px;"><i class="fas fa-camera"></i> Historia</button>
+        <button id="btn-admin-add" style="background: #1d5497; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 4px;"><i class="fas fa-plus"></i> + Equipo</button>
+        <a href="admin.html" style="background: #334155; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 600;"><i class="fas fa-cog"></i> Panel</a>
+        <button id="btn-admin-logout" style="background: #ef4444; color: white; border: none; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> Salir</button>
       </div>
     `;
     document.body.prepend(bar);
@@ -163,7 +193,7 @@ window.openAdminModal = function(id = null) {
       padding: 1rem;
     `;
     modal.innerHTML = `
-      <div style="background: white; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
+      <div class="agro-modal-inner" style="background: white; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem;">
           <h2 id="agro-modal-title" style="font-size: 1.4rem; color: #1e293b;">Agregar Equipo</h2>
           <button id="agro-modal-close" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
@@ -177,7 +207,7 @@ window.openAdminModal = function(id = null) {
             <input type="text" id="modal-prod-nombre" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem;">
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem;">
             <div>
               <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Categoría</label>
               <select id="modal-prod-categoria" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
