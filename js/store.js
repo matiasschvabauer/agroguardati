@@ -25,7 +25,7 @@ window.getAgroCatalog = function() {
   return initial;
 };
 
-// Función auxiliar para fusionar Firestore con el catálogo base (data.js)
+// Función auxiliar para fusionar Firestore con el catálogo base (data.js) y auto-sincronizar creados en local
 window.mergeCatalogData = function(firestoreItems) {
   const initial = typeof catalogo !== 'undefined' ? catalogo : [];
   const fsMap = new Map();
@@ -34,13 +34,51 @@ window.mergeCatalogData = function(firestoreItems) {
     fsMap.set(String(item.id), item);
   });
 
-  // Productos nuevos agregados por admin en Firestore que no existen en data.js
+  // Detectar productos creados previamente en localStorage que aún no llegaron a Firestore
+  const localData = localStorage.getItem(STORAGE_KEY);
+  let unsyncedLocalItems = [];
+  if (localData) {
+    try {
+      const parsed = JSON.parse(localData);
+      if (Array.isArray(parsed)) {
+        unsyncedLocalItems = parsed.filter(item => {
+          const idStr = String(item.id);
+          const isBase = initial.some(b => String(b.id) === idStr);
+          const isFs = fsMap.has(idStr);
+          return !isBase && !isFs && !item._deleted;
+        });
+      }
+    } catch (e) {}
+  }
+
+  // Auto-subir a Firestore los productos locales pendientes
+  if (unsyncedLocalItems.length > 0 && typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    const db = firebase.firestore();
+    unsyncedLocalItems.forEach(async (item) => {
+      try {
+        await db.collection('productos').doc(String(item.id)).set(item, { merge: true });
+        console.log("✔ Auto-sincronizado producto local a la nube Firestore:", item.id);
+      } catch (err) {
+        console.warn("Auto-sync Firestore fallback:", err.message);
+      }
+    });
+  }
+
+  // Productos nuevos en Firestore que no son de data.js
   const newFirestoreItems = firestoreItems.filter(item => {
     const isBase = initial.some(b => String(b.id) === String(item.id));
     return !isBase && !item._deleted;
   });
 
-  // Productos base de data.js, aplicando modificaciones o eliminaciones de Firestore
+  // Combinar los pendientes locales + los nuevos de Firestore
+  const combinedNewItems = [...unsyncedLocalItems];
+  newFirestoreItems.forEach(newItem => {
+    if (!combinedNewItems.some(c => String(c.id) === String(newItem.id))) {
+      combinedNewItems.push(newItem);
+    }
+  });
+
+  // Productos base de data.js con sus modificaciones o borrados
   const mergedBase = initial.filter(baseItem => {
     const fsItem = fsMap.get(String(baseItem.id));
     return !fsItem || !fsItem._deleted;
@@ -49,7 +87,7 @@ window.mergeCatalogData = function(firestoreItems) {
     return fsItem ? { ...baseItem, ...fsItem } : baseItem;
   });
 
-  return [...newFirestoreItems, ...mergedBase];
+  return [...combinedNewItems, ...mergedBase];
 };
 
 // 2. Guardar o actualizar un producto (Ediciones o Nuevos)
