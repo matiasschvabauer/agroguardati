@@ -1,7 +1,7 @@
 // --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
 
 const STORAGE_KEY = 'agroguardati_catalog_v2';
-window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com'];
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
 window.getAgroCatalog = function() {
@@ -25,31 +25,67 @@ window.getAgroCatalog = function() {
   return initial;
 };
 
-// 2. Guardar o actualizar un producto
+// Función auxiliar para fusionar Firestore con el catálogo base (data.js)
+window.mergeCatalogData = function(firestoreItems) {
+  const initial = typeof catalogo !== 'undefined' ? catalogo : [];
+  const fsMap = new Map();
+
+  firestoreItems.forEach(item => {
+    fsMap.set(String(item.id), item);
+  });
+
+  // Productos nuevos agregados por admin en Firestore que no existen en data.js
+  const newFirestoreItems = firestoreItems.filter(item => {
+    const isBase = initial.some(b => String(b.id) === String(item.id));
+    return !isBase && !item._deleted;
+  });
+
+  // Productos base de data.js, aplicando modificaciones o eliminaciones de Firestore
+  const mergedBase = initial.filter(baseItem => {
+    const fsItem = fsMap.get(String(baseItem.id));
+    return !fsItem || !fsItem._deleted;
+  }).map(baseItem => {
+    const fsItem = fsMap.get(String(baseItem.id));
+    return fsItem ? { ...baseItem, ...fsItem } : baseItem;
+  });
+
+  return [...newFirestoreItems, ...mergedBase];
+};
+
+// 2. Guardar o actualizar un producto (Ediciones o Nuevos)
 window.saveAgroProduct = async function(productData) {
   let catalog = window.getAgroCatalog();
 
-  if (productData.id) {
-    const index = catalog.findIndex(p => String(p.id) === String(productData.id));
-    if (index !== -1) {
-      catalog[index] = { ...catalog[index], ...productData };
-    } else {
-      catalog.unshift(productData);
-    }
+  if (!productData.id) {
+    productData.id = Date.now();
+  }
+
+  // Eliminar marca de borrado si existía
+  delete productData._deleted;
+
+  const index = catalog.findIndex(p => String(p.id) === String(productData.id));
+  if (index !== -1) {
+    catalog[index] = { ...catalog[index], ...productData };
   } else {
-    const newId = Date.now();
-    productData.id = newId;
     catalog.unshift(productData);
   }
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
-  if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
-    try {
-      const db = firebase.firestore();
-      await db.collection('productos').doc(String(productData.id)).set(productData, { merge: true });
-    } catch (err) {
-      console.warn("Firestore save fallback:", err.message);
+  if (typeof firebase !== 'undefined') {
+    const config = window.AGRO_CONFIG?.firebase;
+    if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && !firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    if (firebase.apps.length > 0) {
+      try {
+        const db = firebase.firestore();
+        await db.collection('productos').doc(String(productData.id)).set(productData, { merge: true });
+        console.log("✔ Producto guardado/editado exitosamente en Firestore:", productData.id);
+      } catch (err) {
+        console.error("❌ Error guardando en Firestore:", err.message);
+        alert("⚠️ Atención: El producto se guardó localmente en este navegador, pero NO se pudo sincronizar en la nube (Firestore).\n\nDetalle: " + err.message + "\n\nAsegúrate de haber iniciado sesión con Google en la sección de administración.");
+      }
     }
   }
 
@@ -64,12 +100,20 @@ window.deleteAgroProduct = async function(id) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
-  if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
-    try {
-      const db = firebase.firestore();
-      await db.collection('productos').doc(String(id)).delete();
-    } catch (err) {
-      console.warn("Firestore delete fallback:", err.message);
+  if (typeof firebase !== 'undefined') {
+    const config = window.AGRO_CONFIG?.firebase;
+    if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && !firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    if (firebase.apps.length > 0) {
+      try {
+        const db = firebase.firestore();
+        await db.collection('productos').doc(String(id)).set({ id: String(id), _deleted: true }, { merge: true });
+        console.log("✔ Producto marcado como eliminado en Firestore:", id);
+      } catch (err) {
+        console.error("❌ Error eliminando de Firestore:", err.message);
+        alert("⚠️ Atención: El producto se eliminó localmente, pero ocurrió un error al eliminarlo en la nube (Firestore): " + err.message);
+      }
     }
   }
 
@@ -79,10 +123,10 @@ window.deleteAgroProduct = async function(id) {
 
 // 4. Verificar si hay sesión admin iniciada
 window.isAgroAdmin = function() {
-  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com'];
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     const user = firebase.auth().currentUser;
-    if (user && emails.includes(user.email.toLowerCase())) {
+    if (user && user.email && emails.some(e => e.toLowerCase() === user.email.toLowerCase())) {
       return true;
     }
   }
@@ -102,23 +146,24 @@ window.formatAgroPrice = function(prod) {
   return `<span class="price-tag price-value"><strong>${moneda}</strong> ${formatted}</span>`;
 };
 
-// Sincronizar catálogo inicial desde Firestore si está disponible
+// Sincronizar catálogo inicial desde Firestore si está disponible (con fusión inteligente)
 document.addEventListener('DOMContentLoaded', () => {
   const config = window.AGRO_CONFIG?.firebase;
   if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && typeof firebase !== 'undefined') {
     if (!firebase.apps.length) firebase.initializeApp(config);
     
     firebase.firestore().collection('productos').onSnapshot(snapshot => {
+      const fsItems = [];
       if (!snapshot.empty) {
-        const items = [];
         snapshot.forEach(doc => {
-          items.push({ id: doc.id, ...doc.data() });
+          fsItems.push({ id: doc.id, ...doc.data() });
         });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-        window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: items }));
       }
+      const mergedCatalog = window.mergeCatalogData(fsItems);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedCatalog));
+      window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: mergedCatalog }));
     }, err => {
-      console.warn("Snapshot listener offline/unauthorized, using local catalog.");
+      console.warn("Snapshot listener offline/unauthorized, usando catálogo local.");
     });
   }
 });
