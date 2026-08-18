@@ -1,7 +1,7 @@
 // --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
 
 const STORAGE_KEY = 'agroguardati_catalog_v2';
-window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com'];
+window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
 window.getAgroCatalog = function() {
@@ -161,7 +161,7 @@ window.deleteAgroProduct = async function(id) {
 
 // 4. Verificar si hay sesión admin iniciada
 window.isAgroAdmin = function() {
-  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com'];
+  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     const user = firebase.auth().currentUser;
     if (user && user.email && emails.some(e => e.toLowerCase() === user.email.toLowerCase())) {

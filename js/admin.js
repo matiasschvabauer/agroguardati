@@ -6,7 +6,7 @@ let currentFormSpecs = {};
 // Auth Check & Initialization
 function initDashboardAuth() {
   const config = window.AGRO_CONFIG?.firebase;
-  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com'];
+  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];
   const btnGoogle = document.getElementById('btn-google-login');
   const btnLogout = document.getElementById('btn-logout');
   const authScreen = document.getElementById('auth-screen');

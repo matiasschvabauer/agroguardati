@@ -127,7 +127,7 @@
 
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
-                    const allowedEmails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ["matiasschvabauer@gmail.com", "guillermoguardati@gmail.com", "Lucioguardati1@gmail.com"];
+                    const allowedEmails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ["matiasschvabauer@gmail.com", "guillermoguardati@gmail.com", "Lucioguardati1@gmail.com", "lucioguardati1@gmail.com"];
                     if (allowedEmails.some(e => e.toLowerCase() === user.email.toLowerCase())) {
                         window.location.href = "admin.html";
                     } else {
