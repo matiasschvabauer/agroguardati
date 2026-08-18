@@ -5,7 +5,7 @@ let currentModalSpecs = {};
 
 function initAdminBar() {
   const config = window.AGRO_CONFIG?.firebase;
-  const emails = window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
 
   // Check local session key first
   if (localStorage.getItem('agro_admin_session') === 'true') {

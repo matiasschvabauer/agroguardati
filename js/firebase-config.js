@@ -18,5 +18,6 @@ window.AGRO_CONFIG = {
   },
 
   // Email de Administrador Autorizado
-  adminEmail: "matiasschvabauer@gmail.com"
+  adminEmail: "matiasschvabauer@gmail.com",
+  adminEmails: ["matiasschvabauer@gmail.com", "guillermoguardati@gmail.com"]
 };

@@ -114,7 +114,7 @@
             Iniciar Sesión con Google
         </button>
 
-        <p style="font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-top: 1.25rem; margin-bottom: 0;">Acceso para matiasschvabauer@gmail.com</p>
+        <p style="font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-top: 1.25rem; margin-bottom: 0;">Acceso para administradores autorizados</p>
 
         <a href="m_index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
     </div>
@@ -127,8 +127,8 @@
 
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
-                    const allowedEmail = window.AGRO_CONFIG?.adminEmail || "matiasschvabauer@gmail.com";
-                    if (user.email.toLowerCase() === allowedEmail.toLowerCase()) {
+                    const allowedEmails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ["matiasschvabauer@gmail.com", "guillermoguardati@gmail.com"];
+                    if (allowedEmails.some(e => e.toLowerCase() === user.email.toLowerCase())) {
                         window.location.href = "admin.html";
                     } else {
                         firebase.auth().signOut();

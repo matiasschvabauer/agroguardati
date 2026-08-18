@@ -79,7 +79,7 @@ window.deleteAgroProduct = async function(id) {
 
 // 4. Verificar si hay sesión admin iniciada
 window.isAgroAdmin = function() {
-  const emails = window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
+  const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com'];
   if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     const user = firebase.auth().currentUser;
     if (user && emails.includes(user.email.toLowerCase())) {
