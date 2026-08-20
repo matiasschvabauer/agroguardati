@@ -358,13 +358,25 @@
       }
     }
 
+    .mobile-only-meta {
+      display: none;
+    }
+
     /* Adaptación para pantallas de Celulares */
     @media (max-width: 768px) {
+      .mobile-only-meta {
+        display: block !important;
+        font-size: 0.8rem !important;
+        color: #64748b !important;
+        margin-top: 2px !important;
+        font-weight: 500 !important;
+      }
+
       .admin-header {
-        padding: 0.75rem 1rem;
+        padding: 0.8rem 1rem;
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
       }
 
       .admin-header > div {
@@ -404,16 +416,18 @@
         width: 100%;
       }
 
+      .admin-search-filter-wrapper {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+
       .search-filter-bar {
-        max-width: 100%;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        padding: 0.8rem;
+        max-width: 100% !important;
+        width: 100% !important;
       }
 
       .filter-select {
-        width: 100%;
+        width: 100% !important;
       }
 
       .btn-primary {
@@ -423,7 +437,7 @@
         font-size: 0.95rem;
       }
 
-      /* Transformación de tabla a Tarjetas Móviles */
+      /* Transformación de tabla a Tarjetas Móviles sin solapamiento */
       .table-card {
         background: transparent;
         border: none;
@@ -443,108 +457,106 @@
       tbody {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
         width: 100%;
       }
 
       tr {
-        display: grid;
-        grid-template-columns: 75px 1fr;
-        grid-template-areas:
-          "thumb info"
-          "actions actions";
-        gap: 10px;
-        background: white;
-        padding: 1rem;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-        position: relative;
-        width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        background: white !important;
+        padding: 1.1rem !important;
+        border-radius: 16px !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.04) !important;
+        gap: 12px !important;
+        width: 100% !important;
+        position: relative !important;
       }
 
       .col-thumb {
-        grid-area: thumb;
         padding: 0 !important;
         border: none !important;
+        float: left;
+        margin-right: 12px;
       }
 
       .col-thumb .table-thumb {
-        width: 75px;
-        height: 75px;
-        border-radius: 12px;
-      }
-
-      .col-nombre, .col-cat, .col-marca, .col-estado {
-        grid-area: info;
-        padding: 0 !important;
-        border: none !important;
+        width: 75px !important;
+        height: 75px !important;
+        border-radius: 12px !important;
+        object-fit: cover !important;
       }
 
       .col-nombre {
-        font-size: 0.98rem;
-        color: #0f172a;
-        margin-bottom: 4px;
+        padding: 0 !important;
+        border: none !important;
+        font-size: 0.98rem !important;
+        color: #0f172a !important;
+        line-height: 1.35 !important;
       }
 
       .col-cat, .col-marca {
-        display: inline-block;
-        font-size: 0.82rem;
-        color: #64748b;
-        margin-right: 6px;
+        display: none !important;
       }
 
       .col-estado {
-        margin-top: 6px;
+        padding: 0 !important;
+        border: none !important;
+        margin-top: 2px !important;
       }
 
       /* Botones de Editar y Borrar destacados en celular */
       .col-acciones {
-        grid-area: actions;
         display: flex !important;
         justify-content: space-between !important;
         gap: 10px !important;
-        padding-top: 10px !important;
+        padding-top: 12px !important;
         border-top: 1px dashed #e2e8f0 !important;
         border-bottom: none !important;
-        width: 100%;
+        width: 100% !important;
       }
 
       .col-acciones .btn-icon {
-        flex: 1;
-        height: 42px;
-        border-radius: 10px;
-        font-size: 0.88rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
+        flex: 1 !important;
+        height: 44px !important;
+        border-radius: 10px !important;
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
         margin: 0 !important;
-        width: auto;
       }
 
       .col-acciones .btn-icon-edit {
-        background: #eff6ff;
-        color: #1d5497;
-        border: 1.5px solid #bfdbfe;
+        background: #eff6ff !important;
+        color: #1d5497 !important;
+        border: 1.5px solid #bfdbfe !important;
       }
 
       .col-acciones .btn-icon-delete {
-        background: #fef2f2;
-        color: #dc2626;
-        border: 1.5px solid #fecaca;
+        background: #fef2f2 !important;
+        color: #dc2626 !important;
+        border: 1.5px solid #fecaca !important;
       }
 
       .modal-card {
-        padding: 1.25rem 1rem;
-        max-height: 94vh;
-        border-radius: 16px;
+        padding: 1.25rem 1rem !important;
+        max-height: 92vh !important;
+        border-radius: 16px !important;
+        width: 95% !important;
       }
 
       .form-row {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+      }
+
+      #price-fields-container {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
       }
     }
   </style>
@@ -601,7 +613,7 @@
       </div>
 
       <!-- Search & Filters -->
-      <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+      <div class="admin-search-filter-wrapper" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
         <div class="search-filter-bar">
           <i class="fas fa-search" style="color: #94a3b8;"></i>
           <input type="text" id="admin-search-input" class="search-input" placeholder="Buscar por nombre o marca...">

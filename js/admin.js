@@ -131,7 +131,12 @@ function renderDashboardTable() {
 
     tr.innerHTML = `
       <td class="col-thumb"><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
-      <td class="col-nombre"><strong>${item.nombre}</strong></td>
+      <td class="col-nombre">
+        <strong>${item.nombre}</strong>
+        <div class="mobile-only-meta">
+          <span>${item.categoria} &bull; ${item.marca}</span>
+        </div>
+      </td>
       <td class="col-cat">${item.categoria}</td>
       <td class="col-marca">${item.marca}</td>
       <td class="col-estado"><span class="badge-status ${badgeClass}">${item.estado}</span></td>

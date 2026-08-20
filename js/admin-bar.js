@@ -53,22 +53,41 @@ function renderAdminUI(user) {
       }
       @media (max-width: 768px) {
         #agro-admin-topbar {
-          padding: 6px 0.5rem;
-          flex-wrap: wrap;
-          gap: 4px;
+          padding: 6px 0.6rem !important;
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 6px !important;
+          min-height: auto !important;
         }
-        .bar-user-email { font-size: 0.75rem; }
-        .bar-actions { width: 100%; justify-content: space-between; gap: 4px !important; }
+        .bar-user-email {
+          font-size: 0.76rem !important;
+          justify-content: center !important;
+        }
+        .bar-actions {
+          width: 100% !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          gap: 4px !important;
+        }
         .bar-actions button, .bar-actions a {
+          flex: 1 !important;
           font-size: 0.72rem !important;
-          padding: 4px 8px !important;
+          padding: 6px 2px !important;
+          justify-content: center !important;
+          text-align: center !important;
+          white-space: nowrap !important;
         }
         .agro-modal-inner {
           padding: 1.25rem 1rem !important;
-          max-height: 94vh !important;
+          max-height: 92vh !important;
           border-radius: 16px !important;
+          width: 95% !important;
         }
         .agro-modal-inner .form-row {
+          grid-template-columns: 1fr !important;
+          gap: 0.8rem !important;
+        }
+        #modal-price-fields-container {
           grid-template-columns: 1fr !important;
           gap: 0.8rem !important;
         }
