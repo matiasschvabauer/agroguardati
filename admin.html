@@ -709,9 +709,12 @@
           </div>
         </div>
 
-        <!-- Image Manager with individual deletion buttons -->
+        <!-- Image Manager with individual deletion & reordering buttons -->
         <div class="form-group" style="background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1px solid #e2e8f0;">
-          <label style="font-weight: 700; color: #1e293b;">Galería de Imágenes (Hacé clic en ❌ para borrar una foto individual)</label>
+          <label style="font-weight: 700; color: #1e293b; display: flex; align-items: center; justify-content: space-between;">
+            <span>Galería de Imágenes</span>
+            <span style="font-weight: 500; font-size: 0.78rem; color: #64748b;">Usá ⬅ ➡ para ordenar &bull; ❌ para borrar</span>
+          </label>
           
           <div id="image-thumbnails-container" class="image-manager-grid" style="margin-top: 0.8rem;"></div>
 
@@ -725,6 +728,17 @@
             <input type="url" id="manual-url-input" class="form-control" placeholder="O pega una URL de imagen directa aquí...">
             <button type="button" id="btn-add-manual-url" style="background: #334155; color: white; border: none; padding: 0 1rem; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap;">+ Agregar URL</button>
           </div>
+        </div>
+
+        <!-- Modelo 3D (.glb) Opcional -->
+        <div class="form-group" style="background: #f1f5f9; padding: 1.2rem; border-radius: 12px; border: 1px solid #cbd5e1;">
+          <label style="font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-cube" style="color: var(--brand-blue);"></i> Modelo 3D Interactivo (.glb) (Opcional)
+          </label>
+          <p style="font-size: 0.82rem; color: #64748b; margin-top: 4px; margin-bottom: 0.6rem;">
+            Nombre del archivo .glb guardado en el servidor (ej: <code>Tractor.glb</code>) o URL directa a internet.
+          </p>
+          <input type="text" id="form-prod-modelo3d" class="form-control" placeholder="Ej: Tractor.glb o https://misitio.com/modelos/cosechadora.glb">
         </div>
 
         <div class="form-group">

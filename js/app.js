@@ -295,6 +295,28 @@ function initProductDetails() {
         </div>
       </div>
     </div>
+
+    ${product.modelo3d ? `
+      <div class="container" style="margin-top: 1rem; margin-bottom: 3rem;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.6rem; color: var(--brand-blue-dark); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-cube" style="color: var(--brand-blue);"></i> Modelo <span class="text-gradient">3D Interactivo</span>
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Explorá e interactuá con el equipo en 360&deg;</p>
+        </div>
+        <div class="model-container" style="height: 480px; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-md); border: 1px solid var(--border-color, #cbd5e1);">
+          <model-viewer 
+              src="${product.modelo3d}" 
+              alt="Modelo 3D de ${product.nombre}"
+              auto-rotate 
+              camera-controls 
+              shadow-intensity="1" 
+              exposure="1"
+              ar>
+          </model-viewer>
+        </div>
+      </div>
+    ` : ''}
   `;
 
   // Set up click listeners for thumbnails

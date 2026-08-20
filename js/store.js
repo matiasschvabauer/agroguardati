@@ -184,6 +184,81 @@ window.formatAgroPrice = function(prod) {
   return `<span class="price-tag price-value"><strong>${moneda}</strong> ${formatted}</span>`;
 };
 
+// 6. Modal Global de Carga y Protección contra Abandono de Página
+window.setAgroUploadLock = function(locked, customMessage) {
+  if (locked) {
+    window.onbeforeunload = function(e) {
+      const msg = customMessage || "Se están subiendo archivos e información a la nube. Si salís ahora de la página, la carga se cancelará y los cambios no se guardarán.";
+      e.returnValue = msg;
+      return msg;
+    };
+  } else {
+    window.onbeforeunload = null;
+  }
+};
+
+window.showAgroUploadProgress = function(titleText, statusText, percent) {
+  let modal = document.getElementById('agro-global-upload-progress-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'agro-global-upload-progress-modal';
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px);
+      z-index: 9999999; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    `;
+    modal.innerHTML = `
+      <div style="background: white; width: 100%; max-width: 480px; border-radius: 24px; padding: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.35); text-align: center; border: 1px solid #cbd5e1;">
+        <div style="margin-bottom: 1.2rem;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 3.2rem; color: #1d5497;"></i>
+        </div>
+        <h3 id="agro-progress-modal-title" style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 0.6rem;">
+          Guardando y Publicando en la Nube
+        </h3>
+        
+        <div style="background: #fffbebf; border-left: 4px solid #f59e0b; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #92400e; text-align: left; line-height: 1.45;">
+          <strong style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+            <i class="fas fa-exclamation-triangle"></i> ¡Atención! No cierres esta pestaña:
+          </strong>
+          Por favor esperá a que la barra complete el 100%. Si salís o cerrás la web ahora, la carga se cancelará.
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 8px;">
+          <span id="agro-progress-modal-status">Cargando...</span>
+          <span id="agro-progress-modal-percent">0%</span>
+        </div>
+
+        <div style="background: #e2e8f0; border-radius: 999px; height: 12px; overflow: hidden;">
+          <div id="agro-progress-modal-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1d5497, #22c55e); border-radius: 999px; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  const titleEl = document.getElementById('agro-progress-modal-title');
+  const statusEl = document.getElementById('agro-progress-modal-status');
+  const percentEl = document.getElementById('agro-progress-modal-percent');
+  const barEl = document.getElementById('agro-progress-modal-bar');
+
+  if (titleText && titleEl) titleEl.textContent = titleText;
+  if (statusText && statusEl) statusEl.textContent = statusText;
+  
+  const pct = Math.min(100, Math.max(0, percent || 0));
+  if (percentEl) percentEl.textContent = pct + '%';
+  if (barEl) barEl.style.width = pct + '%';
+
+  modal.style.display = 'flex';
+  window.setAgroUploadLock(true);
+};
+
+window.hideAgroUploadProgress = function() {
+  const modal = document.getElementById('agro-global-upload-progress-modal');
+  if (modal) modal.style.display = 'none';
+  window.setAgroUploadLock(false);
+};
+
 // Sincronizar catálogo inicial desde Firestore si está disponible (con fusión inteligente)
 document.addEventListener('DOMContentLoaded', () => {
   const config = window.AGRO_CONFIG?.firebase;
@@ -205,3 +280,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+

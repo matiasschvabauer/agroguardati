@@ -642,3 +642,22 @@ footer { background: #f1f5f9; padding: 2rem 16px; text-align: center; border-top
   border: 1px solid #86efac;
   font-size: 0.88rem;
 }
+
+/* Stories Mobile Centered */
+.stories-bar-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.story-avatar-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+

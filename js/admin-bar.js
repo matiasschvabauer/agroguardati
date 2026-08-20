@@ -260,7 +260,10 @@ window.openAdminModal = function(id = null) {
 
           <!-- Gestor de Imágenes -->
           <div style="margin-bottom: 1.2rem; background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.6rem; color: #1e293b;">Fotos del Producto (Hacé clic en ❌ para borrar individualmente)</label>
+            <label style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.6rem; color: #1e293b;">
+              <span>Fotos del Producto</span>
+              <span style="font-size: 0.78rem; font-weight: 500; color: #64748b;">Usá ⬅ ➡ para ordenar &bull; ❌ para borrar</span>
+            </label>
             <div id="modal-images-grid" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;"></div>
 
             <div id="modal-cloudinary-upload" style="border: 2px dashed #cbd5e1; border-radius: 10px; padding: 1rem; text-align: center; background: white; cursor: pointer;">
@@ -268,6 +271,17 @@ window.openAdminModal = function(id = null) {
               <p style="font-size: 0.85rem; font-weight: 600; color: #334155; margin: 0;">Subir foto a Cloudinary</p>
               <input type="file" id="modal-file-input" multiple accept="image/*" style="display: none;">
             </div>
+          </div>
+
+          <!-- Modelo 3D (.glb) Opcional -->
+          <div style="margin-bottom: 1.2rem; background: #f1f5f9; padding: 1.2rem; border-radius: 12px; border: 1px solid #cbd5e1;">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 0.3rem;">
+              <i class="fas fa-cube" style="color: #1d5497;"></i> Modelo 3D Interactivo (.glb) (Opcional)
+            </label>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px; margin-bottom: 0.5rem;">
+              Nombre del archivo .glb local (ej: <code>Tractor.glb</code>) o URL directa a internet.
+            </p>
+            <input type="text" id="modal-prod-modelo3d" placeholder="Ej: Tractor.glb o https://.../cosechadora.glb" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
           </div>
 
           <div style="margin-bottom: 1.2rem;">
@@ -313,16 +327,29 @@ window.openAdminModal = function(id = null) {
 
     fileInput.onchange = async (e) => {
       const files = Array.from(e.target.files);
+      if (!files.length) return;
+
       const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
       const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+      const total = files.length;
 
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', uploadPreset);
+      try {
+        for (let i = 0; i < total; i++) {
+          const file = files[i];
+          const pct = Math.round(((i + 1) / total) * 90);
+          if (window.showAgroUploadProgress) {
+            window.showAgroUploadProgress(
+              'Subiendo Foto a la Nube',
+              `Subiendo foto ${i + 1} de ${total}: ${file.name}...`,
+              pct
+            );
+          }
 
-        try {
-          uploadBox.querySelector('p').textContent = 'Subiendo foto...';
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', uploadPreset);
+
+          uploadBox.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
           const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST', body: formData
           });
@@ -330,12 +357,18 @@ window.openAdminModal = function(id = null) {
           if (data.secure_url) {
             currentModalImages.push(data.secure_url);
             renderModalThumbnails();
+          } else if (data.error) {
+            alert('Error Cloudinary: ' + data.error.message);
           }
-        } catch (err) {
-          alert("Error subiendo foto: " + err.message);
-        } finally {
-          uploadBox.querySelector('p').textContent = 'Subir foto a Cloudinary';
         }
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Subiendo Foto a la Nube', '¡Fotos subidas con éxito!', 100);
+        }
+      } catch (err) {
+        alert("Error subiendo foto: " + err.message);
+      } finally {
+        uploadBox.querySelector('p').textContent = 'Subir foto a Cloudinary';
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
       }
     };
 
@@ -357,6 +390,7 @@ window.openAdminModal = function(id = null) {
       const mostrarPrecio = document.getElementById('modal-prod-mostrar-precio').checked;
       const moneda = document.getElementById('modal-prod-moneda').value;
       const precio = document.getElementById('modal-prod-precio').value.trim();
+      const modelo3d = document.getElementById('modal-prod-modelo3d')?.value.trim() || '';
       const descCorta = document.getElementById('modal-prod-desc-corta').value;
       const descLarga = document.getElementById('modal-prod-desc-larga').value;
 
@@ -369,6 +403,7 @@ window.openAdminModal = function(id = null) {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
         mostrarPrecio, moneda, precio,
+        modelo3d,
         imagen: mainImg,
         imagenes: currentModalImages.length > 0 ? currentModalImages : [mainImg],
         descripcionCorta: descCorta,
@@ -376,10 +411,22 @@ window.openAdminModal = function(id = null) {
         especificaciones: currentModalSpecs
       };
 
-      await window.saveAgroProduct(prodData);
-      modal.style.display = 'none';
-      if (window.initCatalog) window.initCatalog();
-      if (window.initFeatured) window.initFeatured();
+      try {
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Producto', 'Guardando producto y subiendo a la nube (Firestore)...', 60);
+        }
+        await window.saveAgroProduct(prodData);
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Producto', '¡Producto guardado y sincronizado exitosamente!', 100);
+        }
+        modal.style.display = 'none';
+        if (window.initCatalog) window.initCatalog();
+        if (window.initFeatured) window.initFeatured();
+      } catch (err) {
+        alert("Error guardando producto: " + err.message);
+      } finally {
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 700);
+      }
     };
   }
 
@@ -393,6 +440,9 @@ window.openAdminModal = function(id = null) {
       document.getElementById('modal-prod-categoria').value = prod.categoria;
       document.getElementById('modal-prod-marca').value = prod.marca;
       document.getElementById('modal-prod-estado').value = prod.estado;
+
+      const m3d = document.getElementById('modal-prod-modelo3d');
+      if (m3d) m3d.value = prod.modelo3d || '';
 
       const chkPrice = document.getElementById('modal-prod-mostrar-precio');
       const priceFields = document.getElementById('modal-price-fields-container');
@@ -412,6 +462,8 @@ window.openAdminModal = function(id = null) {
     document.getElementById('agro-modal-title').textContent = 'Agregar Nuevo Equipo';
     document.getElementById('modal-prod-id').value = '';
     document.getElementById('modal-prod-nombre').value = '';
+    const m3d = document.getElementById('modal-prod-modelo3d');
+    if (m3d) m3d.value = '';
     document.getElementById('modal-prod-desc-corta').value = '';
     document.getElementById('modal-prod-desc-larga').value = '';
 
@@ -432,6 +484,13 @@ window.openAdminModal = function(id = null) {
   modal.style.display = 'flex';
 };
 
+function moveModalImage(fromIndex, toIndex) {
+  if (toIndex < 0 || toIndex >= currentModalImages.length) return;
+  const item = currentModalImages.splice(fromIndex, 1)[0];
+  currentModalImages.splice(toIndex, 0, item);
+  renderModalThumbnails();
+}
+
 function renderModalThumbnails() {
   const container = document.getElementById('modal-images-grid');
   if (!container) return;
@@ -440,21 +499,40 @@ function renderModalThumbnails() {
   currentModalImages.forEach((url, i) => {
     const wrapper = document.createElement('div');
     wrapper.style.cssText = `
-      position: relative; width: 75px; height: 75px;
+      position: relative; width: 85px; height: 85px;
       border-radius: 10px; overflow: hidden; border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
     `;
+
+    const isCover = i === 0;
+
     wrapper.innerHTML = `
       <img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">
-      <button type="button" style="
-        position: absolute; top: 2px; right: 2px;
+
+      ${isCover ? `<span style="position: absolute; top: 3px; left: 3px; background: #22c55e; color: white; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform: uppercase;">Portada</span>` : ''}
+
+      <div style="position: absolute; bottom: 3px; left: 3px; right: 3px; display: flex; justify-content: space-between; gap: 2px; z-index: 10;">
+        ${i > 0 ? `<button type="button" class="btn-move-left" title="Mover a la izquierda" style="background: rgba(15, 23, 42, 0.85); color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-left"></i></button>` : '<div></div>'}
+        ${i < currentModalImages.length - 1 ? `<button type="button" class="btn-move-right" title="Mover a la derecha" style="background: rgba(15, 23, 42, 0.85); color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-right"></i></button>` : '<div></div>'}
+      </div>
+
+      <button type="button" class="btn-delete-img" style="
+        position: absolute; top: 3px; right: 3px;
         background: rgba(220, 38, 38, 0.9); color: white; border: none;
-        width: 22px; height: 22px; border-radius: 50%;
-        font-size: 11px; font-weight: 900; cursor: pointer;
+        width: 20px; height: 20px; border-radius: 50%;
+        font-size: 10px; font-weight: 900; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 10;
       ">&times;</button>
     `;
-    wrapper.querySelector('button').onclick = () => {
+
+    const btnLeft = wrapper.querySelector('.btn-move-left');
+    if (btnLeft) btnLeft.onclick = () => moveModalImage(i, i - 1);
+
+    const btnRight = wrapper.querySelector('.btn-move-right');
+    if (btnRight) btnRight.onclick = () => moveModalImage(i, i + 1);
+
+    wrapper.querySelector('.btn-delete-img').onclick = () => {
       currentModalImages.splice(i, 1);
       renderModalThumbnails();
     };
@@ -693,6 +771,8 @@ window.openStoryUploaderModal = function() {
         return;
       }
 
+      if (window.setAgroUploadLock) window.setAgroUploadLock(true, "Se están subiendo historias a la nube. Si salís ahora, se cancelará la publicación.");
+
       const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
       const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
       const globalCaption = document.getElementById('story-caption-input').value.trim();
@@ -703,52 +783,56 @@ window.openStoryUploaderModal = function() {
       const uploadedStories = [];
       const total = selectedFiles.length;
 
-      for (let i = 0; i < total; i++) {
-        const file = selectedFiles[i];
-        const isVideo = file.type.startsWith('video');
+      try {
+        for (let i = 0; i < total; i++) {
+          const file = selectedFiles[i];
+          const isVideo = file.type.startsWith('video');
 
-        progressText.textContent = `Subiendo ${i + 1} de ${total}: ${file.name}...`;
-        const pct = Math.round(((i) / total) * 100);
-        progressBar.style.width = pct + '%';
-        progressPercent.textContent = pct + '%';
+          progressText.textContent = `Subiendo ${i + 1} de ${total}: ${file.name}...`;
+          const pct = Math.round(((i) / total) * 100);
+          progressBar.style.width = pct + '%';
+          progressPercent.textContent = pct + '%';
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', uploadPreset);
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', uploadPreset);
 
-        const endpoint = isVideo 
-          ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
-          : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+          const endpoint = isVideo 
+            ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
+            : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-        try {
-          const res = await fetch(endpoint, { method: 'POST', body: formData });
-          const data = await res.json();
+          try {
+            const res = await fetch(endpoint, { method: 'POST', body: formData });
+            const data = await res.json();
 
-          if (data.secure_url) {
-            uploadedStories.push({
-              tipo: isVideo ? 'video' : 'image',
-              url: data.secure_url,
-              public_id: data.public_id || '',
-              caption: globalCaption
-            });
-          } else {
-            console.error("Error en subida de " + file.name, data);
+            if (data.secure_url) {
+              uploadedStories.push({
+                tipo: isVideo ? 'video' : 'image',
+                url: data.secure_url,
+                public_id: data.public_id || '',
+                caption: globalCaption
+              });
+            } else {
+              console.error("Error en subida de " + file.name, data);
+            }
+          } catch (err) {
+            console.error("Error subiendo " + file.name, err);
           }
-        } catch (err) {
-          console.error("Error subiendo " + file.name, err);
         }
-      }
 
-      progressBar.style.width = '100%';
-      progressPercent.textContent = '100%';
+        progressBar.style.width = '100%';
+        progressPercent.textContent = '100%';
 
-      if (uploadedStories.length > 0) {
-        await window.saveAgroStoriesBatch(uploadedStories);
-        alert(`¡${uploadedStories.length} historias publicadas con éxito en la web!`);
-        resetAndCloseModal();
-      } else {
-        alert("No se pudo publicar ninguna historia. Revisa tu conexión.");
-        btnSubmit.disabled = false;
+        if (uploadedStories.length > 0) {
+          await window.saveAgroStoriesBatch(uploadedStories);
+          alert(`¡${uploadedStories.length} historias publicadas con éxito en la web!`);
+          resetAndCloseModal();
+        } else {
+          alert("No se pudo publicar ninguna historia. Revisa tu conexión.");
+          btnSubmit.disabled = false;
+        }
+      } finally {
+        if (window.setAgroUploadLock) window.setAgroUploadLock(false);
       }
     };
   }

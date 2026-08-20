@@ -26,12 +26,9 @@ window.getAgroStories = function() {
   }
 
   const now = Date.now();
-  let active = stories.filter(s => s && s.expira > now);
+  let active = Array.isArray(stories) ? stories.filter(s => s && s.expira > now) : [];
 
-  if (active.length === 0) {
-    active = DEFAULT_STORIES;
-    localStorage.setItem(STORIES_KEY, JSON.stringify(active));
-  } else if (active.length !== stories.length) {
+  if (active.length !== stories.length) {
     localStorage.setItem(STORIES_KEY, JSON.stringify(active));
   }
 
@@ -80,7 +77,11 @@ window.saveAgroStoriesBatch = async function(storiesArray) {
   return formattedNewStories;
 };
 
-// 3. Renderizar barra de historias en la web
+// 3. Renderizar barra de historias en la web (Globo en el centro, Desplegable en Desktop, Modal en Mobile)
+let desktopStoryIndex = 0;
+let desktopStoryTimer = null;
+let isDesktopDropdownOpen = false;
+
 function renderStoriesBar() {
   const container = document.getElementById('stories-container');
   if (!container) return;
@@ -94,10 +95,13 @@ function renderStoriesBar() {
   }
 
   container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.justifyContent = 'center';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'story-avatar-wrapper';
-  wrapper.onclick = () => openStoryViewer(0);
+  wrapper.style.cssText = 'cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: auto;';
 
   const thumbUrl = stories[0].tipo === 'video' ? 'AGLOGOCIRC.png' : stories[0].url;
 
@@ -105,13 +109,143 @@ function renderStoriesBar() {
     <div class="story-ring">
       <img src="${thumbUrl}" class="story-avatar-img">
     </div>
-    <span class="story-avatar-label">Novedades (24h)</span>
+    <span class="story-avatar-label" style="display: flex; align-items: center; gap: 6px;">
+      Novedades (24h) 
+      <i class="fas fa-chevron-down story-dropdown-arrow" style="font-size: 0.75rem; transition: transform 0.3s ease;"></i>
+    </span>
   `;
 
+  wrapper.onclick = (e) => {
+    e.stopPropagation();
+    if (window.innerWidth <= 768) {
+      openStoryViewer(0);
+    } else {
+      toggleDesktopStoryDropdown();
+    }
+  };
+
   container.appendChild(wrapper);
+
+  // Dropdown container para Escritorio
+  const dropdown = document.createElement('div');
+  dropdown.id = 'stories-desktop-dropdown';
+  dropdown.className = 'stories-desktop-dropdown';
+  dropdown.style.display = 'none';
+  container.appendChild(dropdown);
+
+  // Si estaba desplegado, restablecer la vista
+  if (isDesktopDropdownOpen && window.innerWidth > 768) {
+    dropdown.style.display = 'block';
+    showDesktopStorySlide(desktopStoryIndex);
+  }
 }
 
-// 4. Visor interactivo a pantalla completa
+// Control del Desplegable en Desktop
+window.toggleDesktopStoryDropdown = function() {
+  const dropdown = document.getElementById('stories-desktop-dropdown');
+  const arrow = document.querySelector('.story-dropdown-arrow');
+  if (!dropdown) return;
+
+  if (isDesktopDropdownOpen) {
+    closeDesktopStoryDropdown();
+  } else {
+    isDesktopDropdownOpen = true;
+    dropdown.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+    showDesktopStorySlide(0);
+  }
+};
+
+window.closeDesktopStoryDropdown = function() {
+  const dropdown = document.getElementById('stories-desktop-dropdown');
+  const arrow = document.querySelector('.story-dropdown-arrow');
+  if (desktopStoryTimer) clearTimeout(desktopStoryTimer);
+  isDesktopDropdownOpen = false;
+  if (dropdown) dropdown.style.display = 'none';
+  if (arrow) arrow.style.transform = 'rotate(0deg)';
+};
+
+window.showDesktopStorySlide = function(index) {
+  const stories = window.getAgroStories();
+  const dropdown = document.getElementById('stories-desktop-dropdown');
+  if (!dropdown || stories.length === 0) return;
+
+  if (index < 0) index = stories.length - 1;
+  if (index >= stories.length) index = 0;
+
+  desktopStoryIndex = index;
+  const item = stories[index];
+
+  dropdown.innerHTML = `
+    <div class="story-dropdown-card">
+      <!-- Barras de Progreso -->
+      <div class="story-dropdown-progress">
+        ${stories.map((_, i) => `
+          <div class="story-dropdown-progress-bar ${i < index ? 'completed' : i === index ? 'active' : ''}"></div>
+        `).join('')}
+      </div>
+
+      <!-- Encabezado -->
+      <div class="story-dropdown-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <img src="AGLOGOCIRC.png" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3);">
+          <span style="font-weight: 700; font-size: 0.9rem; color: white;">Agroguardati Novedades</span>
+          <span style="font-size: 0.78rem; color: #94a3b8; margin-left: 6px;">${index + 1} de ${stories.length}</span>
+        </div>
+        <button class="story-dropdown-close-btn" onclick="closeDesktopStoryDropdown()" title="Cerrar desplegable">&times;</button>
+      </div>
+
+      <!-- Contenedor Multimedia + Botones de Navegación -->
+      <div class="story-dropdown-media-container">
+        <button class="story-dropdown-nav-btn prev-btn" onclick="prevDesktopStory()" title="Anterior"><i class="fas fa-chevron-left"></i></button>
+        
+        <div class="story-dropdown-media-box">
+          ${(item.tipo === 'video' || item.url.includes('.mp4') || item.url.includes('.mov'))
+            ? `<video src="${item.url}" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain;" onended="nextDesktopStory()"></video>`
+            : `<img src="${item.url}" style="width: 100%; height: 100%; object-fit: contain;">`
+          }
+        </div>
+
+        <button class="story-dropdown-nav-btn next-btn" onclick="nextDesktopStory()" title="Siguiente"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      ${item.caption ? `<div class="story-dropdown-caption">${item.caption}</div>` : ''}
+
+      <!-- Tira de Miniaturas -->
+      ${stories.length > 1 ? `
+        <div class="story-dropdown-thumbs">
+          ${stories.map((st, i) => `
+            <div class="story-thumb-item ${i === index ? 'active' : ''}" onclick="showDesktopStorySlide(${i})" title="Ver historia ${i + 1}">
+              <img src="${st.tipo === 'video' ? 'AGLOGOCIRC.png' : st.url}">
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+
+  if (desktopStoryTimer) clearTimeout(desktopStoryTimer);
+  if (item.tipo !== 'video' && !item.url.includes('.mp4') && !item.url.includes('.mov')) {
+    desktopStoryTimer = setTimeout(() => {
+      nextDesktopStory();
+    }, 5000);
+  }
+};
+
+window.nextDesktopStory = function() {
+  const stories = window.getAgroStories();
+  if (desktopStoryIndex + 1 < stories.length) {
+    showDesktopStorySlide(desktopStoryIndex + 1);
+  } else {
+    showDesktopStorySlide(0);
+  }
+};
+
+window.prevDesktopStory = function() {
+  showDesktopStorySlide(desktopStoryIndex - 1);
+};
+
+// 4. Visor interactivo a pantalla completa (Para celulares)
 let currentStoryIndex = 0;
 let storyTimer = null;
 
@@ -250,3 +384,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('agroStoriesUpdated', renderStoriesBar);
+

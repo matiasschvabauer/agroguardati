@@ -1155,10 +1155,11 @@ footer {
    ========================================= */
 .stories-bar-container {
   display: flex;
-  gap: 15px;
-  padding: 1rem 0;
-  overflow-x: auto;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  width: 100%;
 }
 
 .story-avatar-wrapper {
@@ -1167,22 +1168,25 @@ footer {
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  margin: 0 auto;
 }
 
 .story-ring {
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   padding: 3px;
   background: linear-gradient(45deg, #1d5497, #22c55e, #e11d48);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.25 ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 15px rgba(29, 84, 151, 0.25);
 }
 
 .story-avatar-wrapper:hover .story-ring {
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.35);
 }
 
 .story-avatar-img {
@@ -1194,9 +1198,175 @@ footer {
 }
 
 .story-avatar-label {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-main, #334155);
+}
+
+/* Desktop Story Dropdown Unfolded Card */
+.stories-desktop-dropdown {
+  width: 100%;
+  max-width: 650px;
+  margin-top: 1.25rem;
+  animation: slideDownStories 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownStories {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.story-dropdown-card {
+  position: relative;
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+  border: 1px solid #1e293b;
+  overflow: hidden;
+  color: white;
+}
+
+.story-dropdown-progress {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 0.9rem;
+}
+
+.story-dropdown-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.story-dropdown-progress-bar.completed {
+  background: white;
+}
+
+.story-dropdown-progress-bar.active {
+  background: white;
+  animation: storyProgress 5s linear forwards;
+}
+
+.story-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+  padding: 0 4px;
+}
+
+.story-dropdown-close-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.story-dropdown-close-btn:hover {
+  background: #e11d48;
+  transform: scale(1.1);
+}
+
+.story-dropdown-media-container {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: #020617;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-dropdown-media-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-dropdown-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.75);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.story-dropdown-nav-btn:hover {
+  background: var(--brand-blue, #1d5497);
+  border-color: white;
+  transform: translateY(-50%) scale(1.12);
+}
+
+.story-dropdown-nav-btn.prev-btn { left: 12px; }
+.story-dropdown-nav-btn.next-btn { right: 12px; }
+
+.story-dropdown-caption {
+  margin-top: 0.9rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.45;
+  color: #f1f5f9;
+}
+
+.story-dropdown-thumbs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 0.9rem;
+}
+
+.story-thumb-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.5;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.story-thumb-item.active {
+  opacity: 1;
+  border-color: #e11d48;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(225, 29, 72, 0.4);
+}
+
+.story-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Story Viewer Modal */

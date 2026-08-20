@@ -160,14 +160,25 @@ function initDashboardImageManager() {
 
       const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
       const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+      const total = files.length;
 
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', uploadPreset);
+      try {
+        for (let i = 0; i < total; i++) {
+          const file = files[i];
+          const pct = Math.round(((i + 1) / total) * 90);
+          if (window.showAgroUploadProgress) {
+            window.showAgroUploadProgress(
+              'Subiendo Imágenes a la Nube',
+              `Subiendo foto ${i + 1} de ${total}: ${file.name}...`,
+              pct
+            );
+          }
 
-        try {
-          dropzone.querySelector('p').textContent = 'Subiendo a Cloudinary...';
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', uploadPreset);
+
+          dropzone.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
           const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST',
             body: formData
@@ -179,11 +190,15 @@ function initDashboardImageManager() {
           } else if (data.error) {
             alert('Error Cloudinary: ' + data.error.message);
           }
-        } catch (err) {
-          alert('Error al subir foto: ' + err.message);
-        } finally {
-          dropzone.querySelector('p').textContent = 'Arrastrá o selecciona fotos para subir a Cloudinary';
         }
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Subiendo Imágenes a la Nube', '¡Fotos subidas con éxito!', 100);
+        }
+      } catch (err) {
+        alert('Error al subir foto: ' + err.message);
+      } finally {
+        dropzone.querySelector('p').textContent = 'Arrastrá o selecciona fotos para subir a Cloudinary';
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
       }
     };
   }
@@ -200,6 +215,13 @@ function initDashboardImageManager() {
   }
 }
 
+function moveFormImage(fromIndex, toIndex) {
+  if (toIndex < 0 || toIndex >= currentFormImages.length) return;
+  const item = currentFormImages.splice(fromIndex, 1)[0];
+  currentFormImages.splice(toIndex, 0, item);
+  renderFormImageThumbnails();
+}
+
 function renderFormImageThumbnails() {
   const container = document.getElementById('image-thumbnails-container');
   if (!container) return;
@@ -209,14 +231,34 @@ function renderFormImageThumbnails() {
   currentFormImages.forEach((url, index) => {
     const card = document.createElement('div');
     card.className = 'image-item-card';
+    card.style.cssText = 'position: relative; width: 85px; height: 85px; border-radius: 10px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.06);';
+    
+    const isCover = index === 0;
+
     card.innerHTML = `
-      <img src="${url}" alt="Foto ${index + 1}">
-      <button type="button" class="btn-delete-image" title="Eliminar esta foto">&times;</button>
+      <img src="${url}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+      
+      ${isCover ? `<span style="position: absolute; top: 3px; left: 3px; background: #22c55e; color: white; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform: uppercase;">Portada</span>` : ''}
+
+      <div style="position: absolute; bottom: 3px; left: 3px; right: 3px; display: flex; justify-content: space-between; gap: 2px; z-index: 10;">
+        ${index > 0 ? `<button type="button" class="btn-move-left" title="Mover a la izquierda" style="background: rgba(15, 23, 42, 0.85); color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-left"></i></button>` : '<div></div>'}
+        ${index < currentFormImages.length - 1 ? `<button type="button" class="btn-move-right" title="Mover a la derecha" style="background: rgba(15, 23, 42, 0.85); color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-right"></i></button>` : '<div></div>'}
+      </div>
+
+      <button type="button" class="btn-delete-image" title="Eliminar esta foto" style="position: absolute; top: 3px; right: 3px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">&times;</button>
     `;
+
+    const btnLeft = card.querySelector('.btn-move-left');
+    if (btnLeft) btnLeft.onclick = () => moveFormImage(index, index - 1);
+
+    const btnRight = card.querySelector('.btn-move-right');
+    if (btnRight) btnRight.onclick = () => moveFormImage(index, index + 1);
+
     card.querySelector('.btn-delete-image').onclick = () => {
       currentFormImages.splice(index, 1);
       renderFormImageThumbnails();
     };
+
     container.appendChild(card);
   });
 }
@@ -279,6 +321,8 @@ function initDashboardModal() {
       document.getElementById('form-prod-id').value = '';
       document.getElementById('form-prod-nombre').value = '';
       document.getElementById('form-prod-marca').value = '';
+      const m3d = document.getElementById('form-prod-modelo3d');
+      if (m3d) m3d.value = '';
       document.getElementById('form-prod-desc-corta').value = '';
       document.getElementById('form-prod-desc-larga').value = '';
       currentFormImages = [];
@@ -322,6 +366,7 @@ function initDashboardModal() {
       const mostrarPrecio = document.getElementById('form-prod-mostrar-precio').checked;
       const moneda = document.getElementById('form-prod-moneda').value;
       const precio = document.getElementById('form-prod-precio').value.trim();
+      const modelo3d = document.getElementById('form-prod-modelo3d')?.value.trim() || '';
       const descCorta = document.getElementById('form-prod-desc-corta').value;
       const descLarga = document.getElementById('form-prod-desc-larga').value;
 
@@ -334,6 +379,7 @@ function initDashboardModal() {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
         mostrarPrecio, moneda, precio,
+        modelo3d,
         imagen: mainImg,
         imagenes: currentFormImages.length > 0 ? currentFormImages : [mainImg],
         descripcionCorta: descCorta,
@@ -341,9 +387,21 @@ function initDashboardModal() {
         especificaciones: currentFormSpecs
       };
 
-      await window.saveAgroProduct(prodData);
-      renderDashboardTable();
-      closeModal();
+      try {
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Maquinaria', 'Guardando producto y subiendo a la nube...', 60);
+        }
+        await window.saveAgroProduct(prodData);
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Maquinaria', '¡Producto guardado y sincronizado exitosamente!', 100);
+        }
+        renderDashboardTable();
+        closeModal();
+      } catch (err) {
+        alert("Error guardando producto: " + err.message);
+      } finally {
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 700);
+      }
     };
   }
 }
@@ -361,6 +419,9 @@ window.editDashboardProduct = function(id) {
   document.getElementById('form-prod-categoria').value = prod.categoria;
   document.getElementById('form-prod-marca').value = prod.marca;
   document.getElementById('form-prod-estado').value = prod.estado;
+
+  const m3d = document.getElementById('form-prod-modelo3d');
+  if (m3d) m3d.value = prod.modelo3d || '';
 
   const chkPrice = document.getElementById('form-prod-mostrar-precio');
   const priceFields = document.getElementById('price-fields-container');

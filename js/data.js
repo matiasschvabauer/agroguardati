@@ -5,6 +5,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "John Deere",
     estado: "Nuevo",
+    modelo3d: "Tractor.glb",
     imagen: "https://www.deere.com.ar/assets/images/region-3/products/tractors/mid/6j-series/6115j/trator_6115j_campo_plantadeira_large_464239a53c1bef87af7b588dd43573de619ac4e3.jpg",
     descripcionCorta: "Versatilidad y durabilidad comprobada para tareas agrícolas y ganaderas.",
     descripcionLarga: "La Serie 6J representa la unión de la tecnología con la confiabilidad. Cuenta con un sistema hidráulico eficiente y transmisión versátil que lo hace perfecto para labores que requieren agilidad y robustez en el día a día del campo.",
