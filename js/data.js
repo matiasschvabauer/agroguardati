@@ -5,7 +5,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "John Deere",
     estado: "Nuevo",
-    modelo3d: "Tractor.glb",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787352709/odfk5npmskuhczywryzv.glb",
     imagen: "https://www.deere.com.ar/assets/images/region-3/products/tractors/mid/6j-series/6115j/trator_6115j_campo_plantadeira_large_464239a53c1bef87af7b588dd43573de619ac4e3.jpg",
     descripcionCorta: "Versatilidad y durabilidad comprobada para tareas agrícolas y ganaderas.",
     descripcionLarga: "La Serie 6J representa la unión de la tecnología con la confiabilidad. Cuenta con un sistema hidráulico eficiente y transmisión versátil que lo hace perfecto para labores que requieren agilidad y robustez en el día a día del campo.",
@@ -149,6 +149,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "Agroguardati",
     estado: "Usado",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353219/fn6lx7qbofuvqezrfqho.glb",
     imagen: "https://res.cloudinary.com/pfskomq5/image/upload/v1786401866/qwfs3tmxa9azriapv6dc.jpg",
     imagenes: [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786401866/qwfs3tmxa9azriapv6dc.jpg",
@@ -171,6 +172,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "Case IH",
     estado: "Usado",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353231/xzgsimscwz3y4gxgvxfv.glb",
     imagen: "https://res.cloudinary.com/pfskomq5/image/upload/v1786401902/anvojddt5zt762sa9fyi.jpg",
     imagenes: [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786401902/anvojddt5zt762sa9fyi.jpg",
@@ -249,7 +251,7 @@ const catalogo = [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786402037/u0cmhtdpptablia2exkq.jpg"
     ],
     descripcionCorta: "Desmalezadora Bernardin con 3 metros de ancho de corte, año 2026. Unidad totalmente nueva.",
-    descripcionLarga: "Desmalezadora Bernardin 0km con ancho de trabajo de 3 metros. Robusta estructura diseñada para desmalezado de alta exigencia, chasis reforzado y caja multiplicadora de alta durabilidad.",
+    descripcionLarga: "Desmalezadora Bernardin 0km con ancho de trabajo de 3 metros. Robusta estructura diseñada para desmalezado de alta exigencia, chasis reinforced y caja multiplicadora de alta durabilidad.",
     especificaciones: {
       "Marca": "Bernardin",
       "Ancho de corte": "3.00 metros",
@@ -333,6 +335,7 @@ const catalogo = [
     categoria: "Embarcaciones",
     marca: "Guadalupe",
     estado: "Usado",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353064/xpbgd1xkumzy43qnai9d.glb",
     imagen: "https://res.cloudinary.com/pfskomq5/image/upload/v1786402161/qnwi8kqll7iansypluys.jpg",
     imagenes: [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786402161/qnwi8kqll7iansypluys.jpg",
