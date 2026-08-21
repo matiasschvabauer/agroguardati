@@ -149,7 +149,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "Agroguardati",
     estado: "Usado",
-    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353219/fn6lx7qbofuvqezrfqho.glb",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787354980/jxjwld9mj6mh4rttvdh3.glb",
     imagen: "https://res.cloudinary.com/pfskomq5/image/upload/v1786401866/qwfs3tmxa9azriapv6dc.jpg",
     imagenes: [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786401866/qwfs3tmxa9azriapv6dc.jpg",
@@ -172,7 +172,7 @@ const catalogo = [
     categoria: "Tractores",
     marca: "Case IH",
     estado: "Usado",
-    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353231/xzgsimscwz3y4gxgvxfv.glb",
+    modelo3d: "https://res.cloudinary.com/pfskomq5/raw/upload/v1787355000/uuh9w49gomfwasjrhbn8.glb",
     imagen: "https://res.cloudinary.com/pfskomq5/image/upload/v1786401902/anvojddt5zt762sa9fyi.jpg",
     imagenes: [
       "https://res.cloudinary.com/pfskomq5/image/upload/v1786401902/anvojddt5zt762sa9fyi.jpg",

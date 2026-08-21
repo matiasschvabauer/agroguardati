@@ -84,7 +84,21 @@ window.mergeCatalogData = function(firestoreItems) {
     return !fsItem || !fsItem._deleted;
   }).map(baseItem => {
     const fsItem = fsMap.get(String(baseItem.id));
-    return fsItem ? { ...baseItem, ...fsItem } : baseItem;
+    if (!fsItem) return baseItem;
+
+    const merged = { ...baseItem, ...fsItem };
+    if (baseItem.modelo3d && (!fsItem.modelo3d || fsItem.modelo3d !== baseItem.modelo3d)) {
+      merged.modelo3d = baseItem.modelo3d;
+      // Auto-sincronizar el modelo 3D a Firestore si no estaba presente
+      if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+        try {
+          firebase.firestore().collection('productos').doc(String(baseItem.id)).set({
+            modelo3d: baseItem.modelo3d
+          }, { merge: true }).catch(() => {});
+        } catch (e) {}
+      }
+    }
+    return merged;
   });
 
   return [...combinedNewItems, ...mergedBase];
