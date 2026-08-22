@@ -675,9 +675,32 @@ footer {
   margin-bottom: 1rem;
 }
 
+/* ---- Grass Field Canvas Engine ---- */
+.grass-field-container {
+  position: relative;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+.grass-canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  pointer-events: auto !important;
+}
+
+.grass-field-container > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Main section wrapper */
 .nosotros-section {
-  background: linear-gradient(180deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%);
+  position: relative;
+  background: transparent !important;
   padding: 0;
   overflow: hidden;
 }
@@ -756,6 +779,13 @@ footer {
 .nosotros-text {
   display: flex;
   flex-direction: column;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 2.2rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
 }
 
 .nosotros-title {
@@ -1011,7 +1041,7 @@ footer {
 
 .timeline-card--active {
   border-color: var(--brand-blue-light);
-  background: linear-gradient(135deg, rgba(29,84,151,0.04), rgba(42,115,204,0.06));
+  background: var(--white);
 }
 
 .timeline-year {
