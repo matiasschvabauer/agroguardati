@@ -1735,3 +1735,116 @@ footer {
   box-shadow: 0 8px 25px rgba(34, 197, 94, 0.45);
 }
 
+/* ==========================================================================
+   Proveedores / Marcas Aliadas (Infinite Slider Loop)
+   ========================================================================== */
+.proveedores-section {
+  padding: 4.5rem 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.6) 0%, #ffffff 50%, rgba(248, 250, 252, 0.6) 100%);
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.infinite-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.infinite-slider-track {
+  display: flex;
+  width: max-content;
+  gap: 1.75rem;
+  animation: infiniteSlider 34s linear infinite;
+  will-change: transform;
+}
+
+.infinite-slider-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes infiniteSlider {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.875rem));
+  }
+}
+
+.supplier-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 215px;
+  height: 112px;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+}
+
+.supplier-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--brand-blue-light);
+  box-shadow: 0 12px 22px -5px rgba(29, 84, 151, 0.14), 0 4px 6px -2px rgba(29, 84, 151, 0.05);
+}
+
+.supplier-logo-wrap {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.supplier-logo-wrap img,
+.supplier-logo-wrap svg {
+  max-height: 48px;
+  max-width: 160px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(10%) contrast(105%);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.supplier-card:hover .supplier-logo-wrap img,
+.supplier-card:hover .supplier-logo-wrap svg {
+  filter: grayscale(0%) contrast(100%);
+  transform: scale(1.04);
+}
+
+.supplier-info {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.supplier-card:hover .supplier-info {
+  color: var(--brand-blue);
+}
+
+.supplier-info i {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+

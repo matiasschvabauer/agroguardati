@@ -1025,5 +1025,104 @@ footer { background: #f1f5f9; padding: 2rem 16px; text-align: center; border-top
   width: 100%;
 }
 
+/* ==========================================================================
+   Proveedores / Marcas Aliadas Mobile (Infinite Slider)
+   ========================================================================== */
+.proveedores-section {
+  padding: 3rem 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.7) 0%, #ffffff 50%, rgba(248, 250, 252, 0.7) 100%);
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.infinite-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 0.85rem 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.infinite-slider-track {
+  display: flex;
+  width: max-content;
+  gap: 1.15rem;
+  animation: infiniteSliderMobile 26s linear infinite;
+  will-change: transform;
+}
+
+.infinite-slider-track:active {
+  animation-play-state: paused;
+}
+
+@keyframes infiniteSliderMobile {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.575rem));
+  }
+}
+
+.supplier-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 165px;
+  height: 94px;
+  padding: 0.75rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 0.85rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.supplier-card:active {
+  transform: scale(0.97);
+  border-color: var(--brand-blue);
+}
+
+.supplier-logo-wrap {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.supplier-logo-wrap img,
+.supplier-logo-wrap svg {
+  max-height: 38px;
+  max-width: 130px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.supplier-info {
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.supplier-info i {
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+
 
 
