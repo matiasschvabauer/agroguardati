@@ -227,9 +227,14 @@
       border-radius: 20px;
       font-size: 0.78rem;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .badge-nuevo { background: #dcfce7; color: #15803d; }
     .badge-usado { background: #e0f2fe; color: #0369a1; }
+    .badge-vendido { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+    .badge-disponible { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 
     .btn-icon {
       background: #f1f5f9;
@@ -245,6 +250,20 @@
 
     .btn-icon-edit:hover { background: #dbeafe; color: var(--brand-blue); }
     .btn-icon-delete:hover { background: #fee2e2; color: var(--brand-red); }
+    .btn-icon-sold {
+      width: auto !important;
+      padding: 0 10px !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .btn-icon-sold:hover { background: #fef2f2; color: #dc2626; }
+    .btn-icon-sold.is-sold { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-icon-sold.is-available { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
 
     /* Modal Form */
     .modal-backdrop {
@@ -500,10 +519,11 @@
         display: none !important;
       }
 
-      .col-estado {
+      .col-estado, .col-venta {
         padding: 0 !important;
         border: none !important;
         margin-top: 2px !important;
+        display: inline-block !important;
       }
 
       /* Botones de Editar y Borrar destacados en celular */
@@ -613,8 +633,8 @@
       </div>
 
       <!-- Search & Filters -->
-      <div class="admin-search-filter-wrapper" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
-        <div class="search-filter-bar">
+      <div class="admin-search-filter-wrapper" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div class="search-filter-bar" style="flex: 1; min-width: 260px;">
           <i class="fas fa-search" style="color: #94a3b8;"></i>
           <input type="text" id="admin-search-input" class="search-input" placeholder="Buscar por nombre o marca...">
         </div>
@@ -628,6 +648,11 @@
           <option value="Acoplados">Acoplados</option>
           <option value="Embarcaciones">Embarcaciones</option>
         </select>
+        <select id="admin-filter-disponibilidad" class="filter-select">
+          <option value="todos">Todos los estados</option>
+          <option value="disponible">Solo Disponibles</option>
+          <option value="vendido">Solo Vendidos</option>
+        </select>
       </div>
 
       <!-- Products Table -->
@@ -640,6 +665,7 @@
               <th>Categoría</th>
               <th>Marca</th>
               <th>Estado</th>
+              <th>Venta</th>
               <th style="text-align: right;">Acciones</th>
             </tr>
           </thead>
@@ -689,12 +715,27 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Estado</label>
-          <select id="form-prod-estado" class="form-control" required>
-            <option value="Nuevo">Nuevo</option>
-            <option value="Usado">Usado</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Condición</label>
+            <select id="form-prod-estado" class="form-control" required>
+              <option value="Nuevo">Nuevo</option>
+              <option value="Usado">Usado</option>
+            </select>
+          </div>
+
+          <!-- Opción Vendido -->
+          <div class="form-group" style="background: #fff1f2; padding: 0.9rem 1.1rem; border-radius: 10px; border: 1.5px solid #fecdd3; display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <input type="checkbox" id="form-prod-vendido" style="width: 20px; height: 20px; cursor: pointer; accent-color: #dc2626;">
+              <label for="form-prod-vendido" style="font-weight: 700; color: #be123c; cursor: pointer; margin: 0; font-size: 0.92rem;">
+                <i class="fas fa-tag"></i> Marcar como VENDIDO
+              </label>
+            </div>
+            <p style="font-size: 0.76rem; color: #9f1239; margin: 4px 0 0 30px;">
+              Aparecerá como vendido en el catálogo hasta que lo borres.
+            </p>
+          </div>
         </div>
 
         <!-- Control de Precio -->

@@ -84,19 +84,27 @@ function initCatalog() {
 
     items.forEach(item => {
       const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
+      const isSold = !!item.vendido;
+      const soldRibbon = isSold ? `<span class="badge-sold-ribbon"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
+      const soldTag = isSold ? `<span class="badge-status-sold">Vendido</span>` : '';
+
       const html = `
-        <article class="catalog-item" data-id="${item.id}">
+        <article class="catalog-item ${isSold ? 'is-sold' : ''}" data-id="${item.id}">
           <div class="catalog-item-img-wrapper">
+            ${soldRibbon}
             <img src="${item.imagen}" alt="${item.nombre}" class="catalog-item-img">
           </div>
           <div class="catalog-item-content">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 0.4rem;">
-              <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+                ${soldTag}
+              </div>
               ${priceTag}
             </div>
-            <h3 class="product-title">${item.nombre}</h3>
+            <h3 class="product-title" style="${isSold ? 'color: #991b1b;' : ''}">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
-            <a href="producto-detalle.html?id=${item.id}" class="btn btn-outline">Ver detalles</a>
+            <a href="producto-detalle.html?id=${item.id}" class="btn btn-outline ${isSold ? 'btn-outline-sold' : ''}">${isSold ? 'Ver equipo (Vendido)' : 'Ver detalles'}</a>
           </div>
         </article>
       `;
@@ -110,14 +118,22 @@ function initCatalog() {
 
   function applyFilters() {
     const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
-    const valCat = filterCat.value;
-    const valMarca = filterMarca.value;
-    const valEstado = filterEstado.value;
+    const valCat = filterCat ? filterCat.value : 'todas';
+    const valMarca = filterMarca ? filterMarca.value : 'todas';
+    const valEstado = filterEstado ? filterEstado.value : 'todos';
 
     const filtered = currentCatalog.filter(item => {
-      return (valCat === 'todas' || item.categoria === valCat) &&
-             (valMarca === 'todas' || item.marca === valMarca) &&
-             (valEstado === 'todos' || item.estado === valEstado);
+      const matchCat = valCat === 'todas' || item.categoria === valCat;
+      const matchMarca = valMarca === 'todas' || item.marca === valMarca;
+      let matchEstado = true;
+      if (valEstado === 'Nuevo' || valEstado === 'Usado') {
+        matchEstado = item.estado === valEstado;
+      } else if (valEstado === 'Disponibles') {
+        matchEstado = !item.vendido;
+      } else if (valEstado === 'Vendidos') {
+        matchEstado = !!item.vendido;
+      }
+      return matchCat && matchMarca && matchEstado;
     });
 
     renderCatalog(filtered);
@@ -174,10 +190,14 @@ function initFeatured() {
     
     featured.forEach(item => {
       const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
+      const isSold = !!item.vendido;
+      const soldRibbon = isSold ? `<span class="badge-sold-ribbon"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
+
       const html = `
-        <a href="producto-detalle.html?id=${item.id}" class="product-card" data-id="${item.id}">
+        <a href="producto-detalle.html?id=${item.id}" class="product-card ${isSold ? 'is-sold' : ''}" data-id="${item.id}">
           <div class="product-card-img-wrapper">
             <span class="product-badge">${item.estado}</span>
+            ${soldRibbon}
             <img src="${item.imagen}" alt="${item.nombre}" class="product-card-img">
           </div>
           <div class="product-card-content">
@@ -187,8 +207,8 @@ function initFeatured() {
             </div>
             <h3 class="product-title">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
-            <div style="color: var(--brand-blue); font-weight: 600; display:flex; align-items:center; gap: 0.5rem; margin-top: auto;">
-              Ver Detalles &rarr;
+            <div style="color: ${isSold ? '#dc2626' : 'var(--brand-blue)'}; font-weight: 600; display:flex; align-items:center; gap: 0.5rem; margin-top: auto;">
+              ${isSold ? 'Ver Equipo (Vendido) &rarr;' : 'Ver Detalles &rarr;'}
             </div>
           </div>
         </a>
@@ -231,12 +251,19 @@ function initProductDetails() {
     }
   }
 
+  const isSold = !!product.vendido;
+  const soldDetailBadge = isSold ? `<span class="badge-sold-pill"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
+  const soldGalleryBadge = isSold ? `<span class="badge-sold-ribbon detail-gallery-sold"><i class="fas fa-tag"></i> EQUIPO VENDIDO</span>` : '';
+
   // Handle multiple images if they exist
   let galleryHtml = '';
   if (product.imagenes && product.imagenes.length > 0) {
     galleryHtml = `
       <div class="detail-image-gallery">
-        <img src="${product.imagen}" alt="${product.nombre}" class="main-img" id="main-product-img">
+        <div style="position: relative; width: 100%; border-radius: var(--radius-lg); overflow: hidden;">
+          ${soldGalleryBadge}
+          <img src="${product.imagen}" alt="${product.nombre}" class="main-img" id="main-product-img">
+        </div>
         <div class="gallery-thumbnails">
           ${product.imagenes.map((img, index) => `
             <div class="gallery-thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
@@ -249,12 +276,18 @@ function initProductDetails() {
   } else {
     galleryHtml = `
       <div class="detail-image-gallery">
-        <img src="${product.imagen}" alt="${product.nombre}" class="main-img">
+        <div style="position: relative; width: 100%; border-radius: var(--radius-lg); overflow: hidden;">
+          ${soldGalleryBadge}
+          <img src="${product.imagen}" alt="${product.nombre}" class="main-img">
+        </div>
       </div>
     `;
   }
 
   const detailPriceTag = window.formatAgroPrice ? window.formatAgroPrice(product) : '';
+  const whatsappMsg = isSold 
+    ? `Hola, vi que el equipo ${encodeURIComponent(product.nombre)} figura como VENDIDO. ¿Tienen equipos similares disponibles?`
+    : `Hola, estoy interesado en el producto: ${encodeURIComponent(product.nombre)}`;
 
   container.innerHTML = `
     <div class="detail-hero">
@@ -262,9 +295,12 @@ function initProductDetails() {
         <span class="product-category" style="margin-bottom:1rem; display:block;">
           <a href="catalogo.html">Catálogo</a> / ${product.categoria} / ${product.marca}
         </span>
-        <h1 class="product-detail-title" style="font-size: 2.5rem; margin-bottom: 1rem;">${product.nombre}</h1>
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <h1 class="product-detail-title" style="font-size: 2.5rem; margin-bottom: 1rem;">
+          ${product.nombre}
+        </h1>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; flex-wrap: wrap;">
           <span class="product-badge" style="position:static; display:inline-block;">${product.estado}</span>
+          ${soldDetailBadge}
           ${detailPriceTag}
         </div>
       </div>
@@ -273,6 +309,17 @@ function initProductDetails() {
       <div class="detail-grid">
         ${galleryHtml}
         <div class="detail-info">
+          ${isSold ? `
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem 1.25rem; border-radius: 10px; margin-bottom: 1.5rem;">
+              <strong style="color: #991b1b; display: flex; align-items: center; gap: 6px; font-size: 1rem;">
+                <i class="fas fa-info-circle"></i> Este equipo ya ha sido vendido
+              </strong>
+              <p style="color: #b91c1c; font-size: 0.9rem; margin-top: 4px; margin-bottom: 0;">
+                Consultanos si buscás una máquina similar, tenemos más opciones disponibles para ofrecerte.
+              </p>
+            </div>
+          ` : ''}
+
           <h2 style="margin-bottom: 1rem;">Descripción</h2>
           <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem;">
             ${product.descripcionLarga}
@@ -286,9 +333,9 @@ function initProductDetails() {
           </table>
           
           <div style="margin-top: 3rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-            <a href="https://wa.me/5493404638524?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20${encodeURIComponent(product.nombre)}" target="_blank" class="btn btn-primary" style="background-color: #25D366; color:white;">
+            <a href="https://wa.me/5493404638524?text=${whatsappMsg}" target="_blank" class="btn btn-primary" style="background-color: #25D366; color:white;">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Consultar por WhatsApp
+              ${isSold ? 'Consultar por similares por WhatsApp' : 'Consultar por WhatsApp'}
             </a>
             <a href="catalogo.html" class="btn btn-outline">Volver</a>
           </div>

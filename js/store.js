@@ -173,6 +173,39 @@ window.deleteAgroProduct = async function(id) {
   return true;
 };
 
+// 3.1 Alternar estado de vendido / disponible
+window.toggleAgroProductSold = async function(id) {
+  let catalog = window.getAgroCatalog();
+  const index = catalog.findIndex(p => String(p.id) === String(id));
+  if (index === -1) return null;
+
+  catalog[index].vendido = !catalog[index].vendido;
+  const isSold = catalog[index].vendido;
+  const prodName = catalog[index].nombre || 'El equipo';
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+
+  if (typeof firebase !== 'undefined') {
+    const config = window.AGRO_CONFIG?.firebase;
+    if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && !firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    if (firebase.apps.length > 0) {
+      try {
+        const db = firebase.firestore();
+        await db.collection('productos').doc(String(id)).set({ vendido: isSold }, { merge: true });
+        console.log("✔ Estado de venta actualizado en Firestore:", id, isSold);
+      } catch (err) {
+        console.error("❌ Error actualizando estado de venta en Firestore:", err.message);
+        alert("⚠️ El estado se cambió localmente, pero hubo un error sincronizando en la nube: " + err.message);
+      }
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
+  return catalog[index];
+};
+
 // 4. Verificar si hay sesión admin iniciada
 window.isAgroAdmin = function() {
   const emails = window.AGRO_CONFIG?.adminEmails || window.AGRO_ADMIN_EMAILS || ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];

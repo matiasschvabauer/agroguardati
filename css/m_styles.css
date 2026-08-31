@@ -224,6 +224,75 @@ p { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 0.85rem; li
   border-radius: 20px;
 }
 
+/* --- SOLD BADGES & RIBBONS MOBILE --- */
+.badge-sold-ribbon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.badge-sold-ribbon.detail-gallery-sold {
+  top: 12px;
+  left: 12px;
+  right: auto;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+}
+
+.badge-status-sold {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid #fca5a5;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.badge-sold-pill {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #f87171;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+}
+
+.catalog-item.is-sold {
+  border-color: #fca5a5;
+}
+
+.catalog-item.is-sold .catalog-item-img,
+.product-card.is-sold .product-card-img {
+  filter: saturate(0.88);
+}
+
+.btn-outline-sold {
+  border-color: #f87171 !important;
+  color: #dc2626 !important;
+}
+
 .product-category {
   font-size: 0.75rem;
   color: var(--brand-blue);

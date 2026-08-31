@@ -103,6 +103,7 @@ function renderDashboardTable() {
   const countText = document.getElementById('product-count-text');
   const searchVal = (document.getElementById('admin-search-input')?.value || '').toLowerCase().trim();
   const filterCat = document.getElementById('admin-filter-categoria')?.value || 'todas';
+  const filterDisp = document.getElementById('admin-filter-disponibilidad')?.value || 'todos';
 
   if (!tableBody) return;
 
@@ -111,7 +112,10 @@ function renderDashboardTable() {
   const filtered = catalog.filter(p => {
     const matchesSearch = !searchVal || (p.nombre && p.nombre.toLowerCase().includes(searchVal)) || (p.marca && p.marca.toLowerCase().includes(searchVal));
     const matchesCat = filterCat === 'todas' || p.categoria === filterCat;
-    return matchesSearch && matchesCat;
+    let matchesDisp = true;
+    if (filterDisp === 'disponible') matchesDisp = !p.vendido;
+    if (filterDisp === 'vendido') matchesDisp = !!p.vendido;
+    return matchesSearch && matchesCat && matchesDisp;
   });
 
   if (countText) {
@@ -121,26 +125,35 @@ function renderDashboardTable() {
   tableBody.innerHTML = '';
 
   if (filtered.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2.5rem; color: #64748b;">No se encontraron productos con estos criterios.</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color: #64748b;">No se encontraron productos con estos criterios.</td></tr>';
     return;
   }
 
   filtered.forEach(item => {
     const tr = document.createElement('tr');
     const badgeClass = item.estado === 'Nuevo' ? 'badge-nuevo' : 'badge-usado';
+    const isSold = !!item.vendido;
+    const soldBadge = isSold 
+      ? '<span class="badge-status badge-vendido"><i class="fas fa-tag"></i> Vendido</span>' 
+      : '<span class="badge-status badge-disponible"><i class="fas fa-check"></i> Disponible</span>';
 
     tr.innerHTML = `
       <td class="col-thumb"><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
       <td class="col-nombre">
-        <strong>${item.nombre}</strong>
+        <strong style="${isSold ? 'color: #be123c;' : ''}">${item.nombre}</strong>
+        ${isSold ? '<span style="display:inline-block; margin-left:6px; background:#fee2e2; color:#dc2626; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #fecaca; text-transform:uppercase;">Vendido</span>' : ''}
         <div class="mobile-only-meta">
-          <span>${item.categoria} &bull; ${item.marca}</span>
+          <span>${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
         </div>
       </td>
       <td class="col-cat">${item.categoria}</td>
       <td class="col-marca">${item.marca}</td>
       <td class="col-estado"><span class="badge-status ${badgeClass}">${item.estado}</span></td>
+      <td class="col-venta">${soldBadge}</td>
       <td class="col-acciones">
+        <button class="btn-icon btn-icon-sold ${isSold ? 'is-sold' : 'is-available'}" onclick="toggleDashboardProductSold('${item.id}')" title="${isSold ? 'Cambiar a Disponible' : 'Marcar como Vendido'}">
+          <i class="fas ${isSold ? 'fa-undo' : 'fa-tag'}"></i> <span>${isSold ? 'Desmarcar' : 'Vendido'}</span>
+        </button>
         <button class="btn-icon btn-icon-edit" onclick="editDashboardProduct('${item.id}')" title="Editar"><i class="fas fa-edit"></i> <span>Editar</span></button>
         <button class="btn-icon btn-icon-delete" onclick="deleteDashboardProduct('${item.id}')" title="Borrar"><i class="fas fa-trash-alt"></i> <span>Borrar</span></button>
       </td>
@@ -328,6 +341,8 @@ function initDashboardModal() {
       document.getElementById('form-prod-marca').value = '';
       const m3d = document.getElementById('form-prod-modelo3d');
       if (m3d) m3d.value = '';
+      const chkVendido = document.getElementById('form-prod-vendido');
+      if (chkVendido) chkVendido.checked = false;
       document.getElementById('form-prod-desc-corta').value = '';
       document.getElementById('form-prod-desc-larga').value = '';
       currentFormImages = [];
@@ -368,6 +383,7 @@ function initDashboardModal() {
       const categoria = document.getElementById('form-prod-categoria').value;
       const marca = document.getElementById('form-prod-marca').value;
       const estado = document.getElementById('form-prod-estado').value;
+      const vendido = document.getElementById('form-prod-vendido') ? document.getElementById('form-prod-vendido').checked : false;
       const mostrarPrecio = document.getElementById('form-prod-mostrar-precio').checked;
       const moneda = document.getElementById('form-prod-moneda').value;
       const precio = document.getElementById('form-prod-precio').value.trim();
@@ -383,6 +399,7 @@ function initDashboardModal() {
       const prodData = {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
+        vendido,
         mostrarPrecio, moneda, precio,
         modelo3d,
         imagen: mainImg,
@@ -425,6 +442,9 @@ window.editDashboardProduct = function(id) {
   document.getElementById('form-prod-marca').value = prod.marca;
   document.getElementById('form-prod-estado').value = prod.estado;
 
+  const chkVendido = document.getElementById('form-prod-vendido');
+  if (chkVendido) chkVendido.checked = !!prod.vendido;
+
   const m3d = document.getElementById('form-prod-modelo3d');
   if (m3d) m3d.value = prod.modelo3d || '';
 
@@ -448,6 +468,14 @@ window.editDashboardProduct = function(id) {
   modal.style.display = 'flex';
 };
 
+// 1-Click Toggle Sold / Available Handler
+window.toggleDashboardProductSold = async function(id) {
+  if (window.toggleAgroProductSold) {
+    const updated = await window.toggleAgroProductSold(id);
+    renderDashboardTable();
+  }
+};
+
 // Instant Delete Product Handler
 window.deleteDashboardProduct = async function(id) {
   const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
@@ -468,9 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const searchInput = document.getElementById('admin-search-input');
   const catSelect = document.getElementById('admin-filter-categoria');
+  const dispSelect = document.getElementById('admin-filter-disponibilidad');
 
   if (searchInput) searchInput.addEventListener('input', renderDashboardTable);
   if (catSelect) catSelect.addEventListener('change', renderDashboardTable);
+  if (dispSelect) dispSelect.addEventListener('change', renderDashboardTable);
 
   window.addEventListener('agroCatalogUpdated', renderDashboardTable);
 });

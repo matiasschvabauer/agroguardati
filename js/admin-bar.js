@@ -163,17 +163,22 @@ function attachCardAdminControls() {
 
     if (prodId) {
       card.style.position = 'relative';
+      const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+      const prod = catalog.find(p => String(p.id) === String(prodId));
+      const isSold = prod ? !!prod.vendido : false;
+
       const actions = document.createElement('div');
       actions.className = 'admin-card-actions';
       actions.style.cssText = `
         position: absolute;
         top: 10px; right: 10px;
         display: flex; gap: 6px;
-        z-index: 10;
+        z-index: 15;
       `;
       actions.innerHTML = `
-        <button onclick="event.preventDefault(); event.stopPropagation(); openAdminModal('${prodId}')" style="background: rgba(29, 84, 151, 0.95); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-edit"></i> Editar</button>
-        <button onclick="event.preventDefault(); event.stopPropagation(); confirmDeleteProduct('${prodId}')" style="background: rgba(211, 47, 47, 0.95); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-trash-alt"></i> Borrar</button>
+        <button onclick="event.preventDefault(); event.stopPropagation(); window.toggleAgroProductSold('${prodId}')" title="${isSold ? 'Marcar como Disponible' : 'Marcar como Vendido'}" style="background: ${isSold ? 'rgba(225, 29, 72, 0.95)' : 'rgba(30, 41, 59, 0.9)'}; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas ${isSold ? 'fa-undo' : 'fa-tag'}"></i> ${isSold ? 'Vendido' : 'Vender'}</button>
+        <button onclick="event.preventDefault(); event.stopPropagation(); openAdminModal('${prodId}')" style="background: rgba(29, 84, 151, 0.95); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-edit"></i> Editar</button>
+        <button onclick="event.preventDefault(); event.stopPropagation(); confirmDeleteProduct('${prodId}')" style="background: rgba(211, 47, 47, 0.95); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-trash-alt"></i></button>
       `;
       card.appendChild(actions);
     }
@@ -245,12 +250,23 @@ window.openAdminModal = function(id = null) {
             </div>
           </div>
 
-          <div style="margin-bottom: 1.2rem;">
-            <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Estado</label>
-            <select id="modal-prod-estado" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
-              <option value="Nuevo">Nuevo</option>
-              <option value="Usado">Usado</option>
-            </select>
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem;">
+            <div>
+              <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Condición</label>
+              <select id="modal-prod-estado" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+              </select>
+            </div>
+            <div style="background: #fff1f2; padding: 0.75rem 1rem; border-radius: 10px; border: 1.5px solid #fecdd3; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="modal-prod-vendido" style="width: 18px; height: 18px; cursor: pointer; accent-color: #dc2626;">
+                <label for="modal-prod-vendido" style="font-weight: 700; color: #be123c; cursor: pointer; margin: 0; font-size: 0.88rem;">
+                  <i class="fas fa-tag"></i> Marcar como VENDIDO
+                </label>
+              </div>
+              <span style="font-size: 0.74rem; color: #9f1239; margin-top: 2px;">Visible como vendido hasta borrarlo.</span>
+            </div>
           </div>
 
           <!-- Control de Precio -->
@@ -406,6 +422,7 @@ window.openAdminModal = function(id = null) {
       const categoria = document.getElementById('modal-prod-categoria').value;
       const marca = document.getElementById('modal-prod-marca').value;
       const estado = document.getElementById('modal-prod-estado').value;
+      const vendido = document.getElementById('modal-prod-vendido') ? document.getElementById('modal-prod-vendido').checked : false;
       const mostrarPrecio = document.getElementById('modal-prod-mostrar-precio').checked;
       const moneda = document.getElementById('modal-prod-moneda').value;
       const precio = document.getElementById('modal-prod-precio').value.trim();
@@ -421,6 +438,7 @@ window.openAdminModal = function(id = null) {
       const prodData = {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
+        vendido,
         mostrarPrecio, moneda, precio,
         modelo3d,
         imagen: mainImg,
@@ -460,6 +478,9 @@ window.openAdminModal = function(id = null) {
       document.getElementById('modal-prod-marca').value = prod.marca;
       document.getElementById('modal-prod-estado').value = prod.estado;
 
+      const chkVendido = document.getElementById('modal-prod-vendido');
+      if (chkVendido) chkVendido.checked = !!prod.vendido;
+
       const m3d = document.getElementById('modal-prod-modelo3d');
       if (m3d) m3d.value = prod.modelo3d || '';
 
@@ -481,6 +502,8 @@ window.openAdminModal = function(id = null) {
     document.getElementById('agro-modal-title').textContent = 'Agregar Nuevo Equipo';
     document.getElementById('modal-prod-id').value = '';
     document.getElementById('modal-prod-nombre').value = '';
+    const chkVendido = document.getElementById('modal-prod-vendido');
+    if (chkVendido) chkVendido.checked = false;
     const m3d = document.getElementById('modal-prod-modelo3d');
     if (m3d) m3d.value = '';
     document.getElementById('modal-prod-desc-corta').value = '';
@@ -603,14 +626,19 @@ function attachDetailAdminControls() {
   const prodId = urlParams.get('id');
   if (!prodId) return;
 
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const prod = catalog.find(p => String(p.id) === String(prodId));
+  const isSold = prod ? !!prod.vendido : false;
+
   const titleEl = document.querySelector('.product-detail-title') || document.querySelector('h1');
   if (titleEl && !document.getElementById('detail-admin-bar')) {
     const div = document.createElement('div');
     div.id = 'detail-admin-bar';
-    div.style.cssText = `display: flex; gap: 10px; margin: 1rem 0;`;
+    div.style.cssText = `display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0;`;
     div.innerHTML = `
-      <button onclick="openAdminModal('${prodId}')" style="background: #1d5497; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;"><i class="fas fa-edit"></i> Editar este equipo</button>
-      <button onclick="confirmDeleteProduct('${prodId}')" style="background: #d32f2f; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;"><i class="fas fa-trash-alt"></i> Borrar este equipo</button>
+      <button onclick="window.toggleAgroProductSold('${prodId}').then(() => window.location.reload())" style="background: ${isSold ? '#059669' : '#e11d48'}; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i class="fas ${isSold ? 'fa-undo' : 'fa-tag'}"></i> ${isSold ? 'Marcar como Disponible' : 'Marcar como Vendido'}</button>
+      <button onclick="openAdminModal('${prodId}')" style="background: #1d5497; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i class="fas fa-edit"></i> Editar este equipo</button>
+      <button onclick="confirmDeleteProduct('${prodId}')" style="background: #d32f2f; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i class="fas fa-trash-alt"></i> Borrar</button>
     `;
     titleEl.parentNode.insertBefore(div, titleEl.nextSibling);
   }
