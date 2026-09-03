@@ -42,7 +42,14 @@
       </div>
       <ul class="nav-links" id="nav-links">
         <li><a href="m_index.html">Inicio</a></li>
-        <li><a href="m_catalogo.html">Catálogo</a></li>
+        <li class="nav-mobile-dropdown">
+          <a href="m_catalogo.html">Catálogo <i class="fas fa-chevron-down" style="font-size:0.75rem; margin-left:4px;"></i></a>
+          <div class="nav-mobile-submenu">
+            <a href="m_catalogo.html" class="nav-mobile-sublink"><i class="fas fa-th-large" style="color: var(--brand-blue);"></i> Todo el Catálogo</a>
+            <a href="m_catalogo.html?estado=Nuevo" class="nav-mobile-sublink"><i class="fas fa-certificate" style="color: #16a34a;"></i> Maquinaria Nueva</a>
+            <a href="m_catalogo.html?estado=Usado" class="nav-mobile-sublink"><i class="fas fa-tag" style="color: #0284c7;"></i> Equipos Usados</a>
+          </div>
+        </li>
         <li><a href="#proveedores">Proveedores</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
@@ -118,182 +125,182 @@
       <div class="infinite-slider-track">
         
         <!-- ITEM 1: Bernardin -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Bernardin" class="supplier-card" title="Ver Bernardin">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/bernardin.png" alt="Bernardin">
           </div>
           <span class="supplier-info">Bernardin</span>
-        </div>
+        </a>
 
         <!-- ITEM 2: Metalúrgica MW -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Metalúrgica MW" class="supplier-card" title="Ver Metalúrgica MW">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/mw.png" alt="Metalúrgica MW">
           </div>
           <span class="supplier-info">Metalúrgica MW</span>
-        </div>
+        </a>
 
         <!-- ITEM 3: Marpla -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Marpla" class="supplier-card" title="Ver Marpla">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/marpla.png" alt="Marpla">
           </div>
           <span class="supplier-info">Marpla</span>
-        </div>
+        </a>
 
         <!-- ITEM 4: Corti -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Corti S.A." class="supplier-card" title="Ver Corti S.A.">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/corti.png" alt="Corti S.A.">
           </div>
           <span class="supplier-info">Corti S.A.</span>
-        </div>
+        </a>
 
         <!-- ITEM 5: JyM Moro -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=JyM Moro" class="supplier-card" title="Ver JyM Moro">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/moro.png" alt="JyM Moro">
           </div>
           <span class="supplier-info">JyM Moro</span>
-        </div>
+        </a>
 
         <!-- ITEM 6: Industrias BG -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Industrias BG" class="supplier-card" title="Ver Industrias BG">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/bg.png" alt="Industrias BG">
           </div>
           <span class="supplier-info">Industrias BG</span>
-        </div>
+        </a>
 
         <!-- ITEM 7: Unión Metal -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Unión Metal" class="supplier-card" title="Ver Unión Metal">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/unionmetal.png" alt="Unión Metal" style="border-radius: 6px;">
           </div>
           <span class="supplier-info">Unión Metal</span>
-        </div>
+        </a>
 
         <!-- ITEM 8: Metalúrgica Mauro -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Metalúrgica Mauro" class="supplier-card" title="Ver Metalúrgica Mauro">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/mauro.png" alt="Metalúrgica Mauro" style="border-radius: 6px;">
           </div>
           <span class="supplier-info">Metalúrgica Mauro</span>
-        </div>
+        </a>
 
         <!-- ITEM 9: Sembradoras Monumental -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=Monumental" class="supplier-card" title="Ver Sembradoras Monumental">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/monumental.svg" alt="Sembradoras Monumental">
           </div>
           <span class="supplier-info">Monumental</span>
-        </div>
+        </a>
 
         <!-- ITEM 10: El Ranchero -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=El Ranchero" class="supplier-card" title="Ver El Ranchero">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/el_ranchero.svg" alt="El Ranchero">
           </div>
           <span class="supplier-info">El Ranchero</span>
-        </div>
+        </a>
 
         <!-- ITEM 11: TOOLKING -->
-        <div class="supplier-card">
+        <a href="m_catalogo.html?marca=TOOLKING" class="supplier-card" title="Ver TOOLKING">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/toolking.svg" alt="TOOLKING">
           </div>
           <span class="supplier-info">TOOLKING</span>
-        </div>
+        </a>
 
         <!-- ================= DUPLICATE SET FOR INFINITE LOOP ================= -->
 
         <!-- ITEM 1: Bernardin -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Bernardin" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/bernardin.png" alt="Bernardin">
           </div>
           <span class="supplier-info">Bernardin</span>
-        </div>
+        </a>
 
         <!-- ITEM 2: Metalúrgica MW -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Metalúrgica MW" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/mw.png" alt="Metalúrgica MW">
           </div>
           <span class="supplier-info">Metalúrgica MW</span>
-        </div>
+        </a>
 
         <!-- ITEM 3: Marpla -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Marpla" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/marpla.png" alt="Marpla">
           </div>
           <span class="supplier-info">Marpla</span>
-        </div>
+        </a>
 
         <!-- ITEM 4: Corti -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Corti S.A." class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/corti.png" alt="Corti S.A.">
           </div>
           <span class="supplier-info">Corti S.A.</span>
-        </div>
+        </a>
 
         <!-- ITEM 5: JyM Moro -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=JyM Moro" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/moro.png" alt="JyM Moro">
           </div>
           <span class="supplier-info">JyM Moro</span>
-        </div>
+        </a>
 
         <!-- ITEM 6: Industrias BG -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Industrias BG" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/bg.png" alt="Industrias BG">
           </div>
           <span class="supplier-info">Industrias BG</span>
-        </div>
+        </a>
 
         <!-- ITEM 7: Unión Metal -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Unión Metal" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/unionmetal.png" alt="Unión Metal" style="border-radius: 6px;">
           </div>
           <span class="supplier-info">Unión Metal</span>
-        </div>
+        </a>
 
         <!-- ITEM 8: Metalúrgica Mauro -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Metalúrgica Mauro" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/mauro.png" alt="Metalúrgica Mauro" style="border-radius: 6px;">
           </div>
           <span class="supplier-info">Metalúrgica Mauro</span>
-        </div>
+        </a>
 
         <!-- ITEM 9: Sembradoras Monumental -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=Monumental" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/monumental.svg" alt="Sembradoras Monumental">
           </div>
           <span class="supplier-info">Monumental</span>
-        </div>
+        </a>
 
         <!-- ITEM 10: El Ranchero -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=El Ranchero" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/el_ranchero.svg" alt="El Ranchero">
           </div>
           <span class="supplier-info">El Ranchero</span>
-        </div>
+        </a>
 
         <!-- ITEM 11: TOOLKING -->
-        <div class="supplier-card" aria-hidden="true">
+        <a href="m_catalogo.html?marca=TOOLKING" class="supplier-card" aria-hidden="true" tabindex="-1">
           <div class="supplier-logo-wrap">
             <img src="images/proveedores/toolking.svg" alt="TOOLKING">
           </div>
           <span class="supplier-info">TOOLKING</span>
-        </div>
+        </a>
 
       </div>
     </div>

@@ -88,6 +88,9 @@ function initCatalog() {
   const filterCat = document.getElementById('filter-categoria');
   const filterMarca = document.getElementById('filter-marca');
   const filterEstado = document.getElementById('filter-estado');
+  const estadoTabs = document.querySelectorAll('.estado-tab-btn');
+  const brandChips = document.querySelectorAll('.brand-chip');
+  const btnClearBrand = document.getElementById('btn-clear-brand-filter');
 
   if (!catalogContainer) return;
 
@@ -95,7 +98,25 @@ function initCatalog() {
     catalogContainer.innerHTML = '';
     
     if(items.length === 0) {
-      catalogContainer.innerHTML = '<p style="text-align:center; padding: 2rem;">No se encontraron productos.</p>';
+      catalogContainer.innerHTML = `
+        <div style="text-align:center; padding: 2.5rem 1rem; width: 100%; background: #ffffff; border-radius: 14px; border: 1px dashed #cbd5e1; grid-column: 1 / -1;">
+          <i class="fas fa-search" style="font-size: 2rem; color: #94a3b8; margin-bottom: 0.75rem; display: block;"></i>
+          <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 0.4rem;">Sin maquinarias encontradas</h3>
+          <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">No hay productos con los filtros seleccionados.</p>
+          <button type="button" class="btn btn-outline" id="btn-reset-filters-empty-m" style="font-size: 0.82rem; padding: 6px 14px;">
+            <i class="fas fa-undo"></i> Restablecer filtros
+          </button>
+        </div>
+      `;
+      const btnReset = document.getElementById('btn-reset-filters-empty-m');
+      if (btnReset) {
+        btnReset.addEventListener('click', () => {
+          if (filterCat) filterCat.value = 'todas';
+          if (filterMarca) filterMarca.value = 'todas';
+          if (filterEstado) filterEstado.value = 'todos';
+          applyFilters();
+        });
+      }
       return;
     }
 
@@ -104,6 +125,12 @@ function initCatalog() {
       const isSold = !!item.vendido;
       const soldRibbon = isSold ? `<span class="badge-sold-ribbon"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
       const soldTag = isSold ? `<span class="badge-status-sold">Vendido</span>` : '';
+
+      // Condition Badge Mobile
+      const isNuevo = item.estado === 'Nuevo';
+      const conditionBadge = isNuevo 
+        ? `<span class="badge-condition-nuevo" style="font-size:0.7rem; padding:2px 6px;"><i class="fas fa-certificate"></i> Nuevo</span>`
+        : `<span class="badge-condition-usado" style="font-size:0.7rem; padding:2px 6px;"><i class="fas fa-tag"></i> Usado</span>`;
 
       const html = `
         <article class="catalog-item ${isSold ? 'is-sold' : ''}" data-id="${item.id}">
@@ -114,14 +141,17 @@ function initCatalog() {
           <div class="catalog-item-content">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.3rem;">
               <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
+                <span class="product-category" style="margin-bottom:0;">${item.categoria} &bull; ${item.marca}</span>
+                ${conditionBadge}
                 ${soldTag}
               </div>
               ${priceTag}
             </div>
             <h3 class="product-title" style="${isSold ? 'color: #991b1b;' : ''}">${item.nombre}</h3>
             <p class="product-desc">${item.descripcionCorta}</p>
-            <a href="m_producto-detalle.html?id=${item.id}" class="btn btn-outline ${isSold ? 'btn-outline-sold' : ''}">${isSold ? 'Ver equipo (Vendido)' : 'Ver detalles'}</a>
+            <a href="m_producto-detalle.html?id=${item.id}" class="btn btn-outline ${isSold ? 'btn-outline-sold' : ''}">
+              ${isSold ? 'Ver equipo (Vendido)' : 'Ver detalles'}
+            </a>
           </div>
         </article>
       `;
@@ -133,11 +163,45 @@ function initCatalog() {
     }
   }
 
+  function syncFilterUI(valCat, valMarca, valEstado) {
+    // Sync Estado Tabs
+    estadoTabs.forEach(tab => {
+      const tabEstado = tab.getAttribute('data-estado');
+      if (tabEstado === valEstado) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Sync Brand Chips
+    brandChips.forEach(chip => {
+      const chipMarca = chip.getAttribute('data-marca');
+      if (chipMarca === valMarca) {
+        chip.classList.add('active');
+        chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // Clear Brand Filter button
+    if (btnClearBrand) {
+      if (valMarca && valMarca !== 'todas') {
+        btnClearBrand.style.display = 'inline-flex';
+      } else {
+        btnClearBrand.style.display = 'none';
+      }
+    }
+  }
+
   function applyFilters() {
     const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
     const valCat = filterCat ? filterCat.value : 'todas';
     const valMarca = filterMarca ? filterMarca.value : 'todas';
     const valEstado = filterEstado ? filterEstado.value : 'todos';
+
+    syncFilterUI(valCat, valMarca, valEstado);
 
     const filtered = currentCatalog.filter(item => {
       const matchCat = valCat === 'todas' || item.categoria === valCat;
@@ -156,9 +220,58 @@ function initCatalog() {
     renderCatalog(filtered);
   }
 
+  // Event Listeners
   if(filterCat) filterCat.addEventListener('change', applyFilters);
   if(filterMarca) filterMarca.addEventListener('change', applyFilters);
   if(filterEstado) filterEstado.addEventListener('change', applyFilters);
+
+  // Estado Tabs Click Event
+  estadoTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetEstado = tab.getAttribute('data-estado');
+      if (filterEstado) {
+        filterEstado.value = targetEstado;
+      }
+      applyFilters();
+    });
+  });
+
+  // Brand Chips Click Event
+  brandChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const targetMarca = chip.getAttribute('data-marca');
+      if (filterMarca) {
+        filterMarca.value = targetMarca;
+      }
+      applyFilters();
+    });
+  });
+
+  // Clear Brand Button
+  if (btnClearBrand) {
+    btnClearBrand.addEventListener('click', () => {
+      if (filterMarca) {
+        filterMarca.value = 'todas';
+      }
+      applyFilters();
+    });
+  }
+
+  // URL Parameters on Load
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramEstado = urlParams.get('estado');
+  const paramMarca = urlParams.get('marca');
+  const paramCat = urlParams.get('categoria');
+
+  if (paramEstado && filterEstado) {
+    filterEstado.value = paramEstado;
+  }
+  if (paramMarca && filterMarca) {
+    filterMarca.value = paramMarca;
+  }
+  if (paramCat && filterCat) {
+    filterCat.value = paramCat;
+  }
 
   // View Mode Switcher Mobile
   const btnList = document.getElementById('view-mode-list');
@@ -184,11 +297,12 @@ function initCatalog() {
   const savedView = localStorage.getItem('agro_catalog_view');
   if (savedView === 'grid') setViewMode('grid');
 
-  const activeItems = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
-  renderCatalog(activeItems);
+  // Initial render with applied filters (including URL params)
+  applyFilters();
 
-  window.addEventListener('agroCatalogUpdated', (e) => {
-    renderCatalog(e.detail || window.getAgroCatalog());
+  // Global event listener for reactive updates
+  window.addEventListener('agroCatalogUpdated', () => {
+    applyFilters();
   });
 }
 
@@ -339,9 +453,15 @@ function initProductDetails() {
           </table>
           
           <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-            <a href="https://wa.me/5493404638524?text=${whatsappMsg}" target="_blank" class="btn btn-primary" style="background-color: #25D366; border:none;">
-              <i class="fab fa-whatsapp"></i> ${isSold ? 'Consultar por similares' : 'Consultar'}
-            </a>
+            ${!isSold ? `
+              <a href="https://wa.me/5493404638524?text=${whatsappMsg}" target="_blank" class="btn btn-primary" style="background-color: #25D366; border:none;">
+                <i class="fab fa-whatsapp"></i> Consultar
+              </a>
+            ` : `
+              <a href="m_catalogo.html" class="btn btn-primary">
+                <i class="fas fa-th-large"></i> Ver otros equipos disponibles
+              </a>
+            `}
             <a href="m_catalogo.html" class="btn btn-outline">Volver</a>
           </div>
         </div>

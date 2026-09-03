@@ -31,7 +31,15 @@
       </div>
       <ul class="nav-links" id="nav-links">
         <li><a href="m_index.html">Inicio</a></li>
-        <li><a href="m_catalogo.html">Catálogo</a></li>
+        <li class="nav-mobile-dropdown">
+          <a href="m_catalogo.html" class="active">Catálogo <i class="fas fa-chevron-down" style="font-size:0.75rem; margin-left:4px;"></i></a>
+          <div class="nav-mobile-submenu">
+            <a href="m_catalogo.html" class="nav-mobile-sublink"><i class="fas fa-th-large" style="color: var(--brand-blue);"></i> Todo el Catálogo</a>
+            <a href="m_catalogo.html?estado=Nuevo" class="nav-mobile-sublink"><i class="fas fa-certificate" style="color: #16a34a;"></i> Maquinaria Nueva</a>
+            <a href="m_catalogo.html?estado=Usado" class="nav-mobile-sublink"><i class="fas fa-tag" style="color: #0284c7;"></i> Equipos Usados</a>
+          </div>
+        </li>
+        <li><a href="m_index.html#proveedores">Proveedores</a></li>
         <li><a href="m_index.html#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="m_login.html">Acceso <i class="fas fa-lock"></i></a></li>

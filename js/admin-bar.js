@@ -245,8 +245,21 @@ window.openAdminModal = function(id = null) {
               </select>
             </div>
             <div>
-              <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Marca</label>
-              <input type="text" id="modal-prod-marca" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;">
+              <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Marca / Proveedor</label>
+              <input type="text" id="modal-prod-marca" list="modal-marcas-datalist" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;" placeholder="Ej: Bernardin, MW, John Deere...">
+              <datalist id="modal-marcas-datalist">
+                <option value="Bernardin"></option>
+                <option value="Metalúrgica MW"></option>
+                <option value="Marpla"></option>
+                <option value="Corti S.A."></option>
+                <option value="JyM Moro"></option>
+                <option value="Industrias BG"></option>
+                <option value="Unión Metal"></option>
+                <option value="Metalúrgica Mauro"></option>
+                <option value="Monumental"></option>
+                <option value="El Ranchero"></option>
+                <option value="TOOLKING"></option>
+              </datalist>
             </div>
           </div>
 

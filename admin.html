@@ -710,8 +710,21 @@
           </div>
 
           <div class="form-group">
-            <label>Marca</label>
-            <input type="text" id="form-prod-marca" class="form-control" placeholder="Ej: John Deere" required>
+            <label>Marca / Proveedor</label>
+            <input type="text" id="form-prod-marca" list="admin-marcas-datalist" class="form-control" placeholder="Ej: Bernardin, MW, John Deere..." required>
+            <datalist id="admin-marcas-datalist">
+              <option value="Bernardin"></option>
+              <option value="Metalúrgica MW"></option>
+              <option value="Marpla"></option>
+              <option value="Corti S.A."></option>
+              <option value="JyM Moro"></option>
+              <option value="Industrias BG"></option>
+              <option value="Unión Metal"></option>
+              <option value="Metalúrgica Mauro"></option>
+              <option value="Monumental"></option>
+              <option value="El Ranchero"></option>
+              <option value="TOOLKING"></option>
+            </datalist>
           </div>
         </div>
 

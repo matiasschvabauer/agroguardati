@@ -221,7 +221,12 @@ window.isAgroAdmin = function() {
 
 // 5. Formateador de precios (Consultar vs USD / ARS)
 window.formatAgroPrice = function(prod) {
-  if (!prod || !prod.mostrarPrecio || !prod.precio) {
+  if (!prod) return '';
+  // Si el producto está vendido, no mostrar etiqueta de Consultar ni precio
+  if (prod.vendido) {
+    return '';
+  }
+  if (!prod.mostrarPrecio || !prod.precio) {
     return `<span class="price-tag price-consultar"><i class="fas fa-comments"></i> Consultar</span>`;
   }
   const moneda = prod.moneda || 'USD';

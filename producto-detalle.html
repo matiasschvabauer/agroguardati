@@ -34,7 +34,35 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html">Inicio</a></li>
-        <li><a href="catalogo.html" class="active">Catálogo</a></li>
+        <li class="nav-dropdown-item">
+          <a href="catalogo.html" class="active nav-dropdown-toggle">
+            Catálogo <i class="fas fa-chevron-down"></i>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a href="catalogo.html" class="dropdown-link">
+              <i class="fas fa-th-large" style="color: var(--brand-blue);"></i>
+              <div>
+                <span class="dropdown-link-title">Todo el Catálogo</span>
+                <span class="dropdown-link-sub">Ver todas las maquinarias</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Nuevo" class="dropdown-link">
+              <i class="fas fa-certificate" style="color: #16a34a;"></i>
+              <div>
+                <span class="dropdown-link-title">Maquinaria Nueva</span>
+                <span class="dropdown-link-sub">Línea oficial de proveedores</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Usado" class="dropdown-link">
+              <i class="fas fa-tag" style="color: #0284c7;"></i>
+              <div>
+                <span class="dropdown-link-title">Equipos Usados</span>
+                <span class="dropdown-link-sub">Usados seleccionados y garantizados</span>
+              </div>
+            </a>
+          </div>
+        </li>
+        <li><a href="index.html#proveedores">Proveedores</a></li>
         <li><a href="index.html#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="login.html"><i class="fas fa-lock"></i></a></li>

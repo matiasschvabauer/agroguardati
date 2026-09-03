@@ -31,7 +31,35 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html">Inicio</a></li>
-        <li><a href="catalogo.html" class="active">Catálogo</a></li>
+        <li class="nav-dropdown-item">
+          <a href="catalogo.html" class="active nav-dropdown-toggle">
+            Catálogo <i class="fas fa-chevron-down"></i>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a href="catalogo.html" class="dropdown-link">
+              <i class="fas fa-th-large" style="color: var(--brand-blue);"></i>
+              <div>
+                <span class="dropdown-link-title">Todo el Catálogo</span>
+                <span class="dropdown-link-sub">Ver todas las maquinarias</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Nuevo" class="dropdown-link">
+              <i class="fas fa-certificate" style="color: #16a34a;"></i>
+              <div>
+                <span class="dropdown-link-title">Maquinaria Nueva</span>
+                <span class="dropdown-link-sub">Línea oficial de proveedores</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Usado" class="dropdown-link">
+              <i class="fas fa-tag" style="color: #0284c7;"></i>
+              <div>
+                <span class="dropdown-link-title">Equipos Usados</span>
+                <span class="dropdown-link-sub">Usados seleccionados y garantizados</span>
+              </div>
+            </a>
+          </div>
+        </li>
+        <li><a href="index.html#proveedores">Proveedores</a></li>
         <li><a href="index.html#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="login.html"><i class="fas fa-lock"></i></a></li>
@@ -40,53 +68,171 @@
   </nav>
 
   <!-- Page Header -->
-  <div class="detail-hero" style="position: relative; overflow: hidden; text-align: center; padding: 6rem 0 4rem; background: #0f2b4c;">
+  <div class="detail-hero" style="position: relative; overflow: hidden; text-align: center; padding: 6rem 0 4.5rem; background: #0f2b4c;">
     <canvas id="gradient-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:0;"></canvas>
     <div class="container" style="position: relative; z-index: 2;">
       <h1 class="hero-title" style="font-size: 3rem; color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.3);">Nuestro Catálogo</h1>
-      <p class="hero-subtitle" style="color: rgba(255,255,255,0.95); font-weight: 500; font-size: 1.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Encuentra la maquinaria perfecta para tus necesidades.</p>
+      <p class="hero-subtitle" style="color: rgba(255,255,255,0.95); font-weight: 500; font-size: 1.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Encuentra maquinaria nueva de proveedores oficiales y equipos usados garantizados.</p>
     </div>
   </div>
 
   <!-- Catalog Section -->
   <section class="section container" style="padding-top: 0;">
     
-    <!-- Filters -->
+    <!-- Quick Estado Tabs (Todos / Nuevos / Usados) -->
+    <div class="estado-tabs-wrapper">
+      <button type="button" class="estado-tab-btn active" data-estado="todos">
+        <i class="fas fa-layer-group"></i> Todos los Equipos
+      </button>
+      <button type="button" class="estado-tab-btn tab-nuevos" data-estado="Nuevo">
+        <i class="fas fa-certificate" style="color: #22c55e;"></i> Nuevos (Proveedores)
+      </button>
+      <button type="button" class="estado-tab-btn tab-usados" data-estado="Usado">
+        <i class="fas fa-tag" style="color: #0284c7;"></i> Usados Seleccionados
+      </button>
+    </div>
+
+    <!-- Visual Brand / Proveedores Filter -->
+    <div class="brand-filter-section">
+      <div class="brand-filter-header">
+        <span class="brand-filter-title">
+          <i class="fas fa-industry"></i> Filtrar por Proveedor Aliado:
+        </span>
+        <button type="button" id="btn-clear-brand-filter" class="btn-clear-brand" style="display: none;">
+          <i class="fas fa-times-circle"></i> Quitar filtro de proveedor
+        </button>
+      </div>
+
+      <div class="brand-chips-scroll" id="brand-chips-container">
+        <!-- Chip: Todas -->
+        <div class="brand-chip active" data-marca="todas">
+          <div class="brand-chip-logo">
+            <i class="fas fa-th-large brand-chip-icon"></i>
+          </div>
+          <span class="brand-chip-name">Todos</span>
+        </div>
+
+        <!-- Los 11 Proveedores Oficiales -->
+        <div class="brand-chip" data-marca="Bernardin" title="Bernardin">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/bernardin.png" alt="Bernardin">
+          </div>
+          <span class="brand-chip-name">Bernardin</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Metalúrgica MW" title="Metalúrgica MW">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/mw.png" alt="Metalúrgica MW">
+          </div>
+          <span class="brand-chip-name">Metalúrgica MW</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Marpla" title="Marpla">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/marpla.png" alt="Marpla">
+          </div>
+          <span class="brand-chip-name">Marpla</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Corti S.A." title="Corti S.A.">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/corti.png" alt="Corti S.A.">
+          </div>
+          <span class="brand-chip-name">Corti S.A.</span>
+        </div>
+
+        <div class="brand-chip" data-marca="JyM Moro" title="JyM Moro">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/moro.png" alt="JyM Moro">
+          </div>
+          <span class="brand-chip-name">JyM Moro</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Industrias BG" title="Industrias BG">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/bg.png" alt="Industrias BG">
+          </div>
+          <span class="brand-chip-name">Industrias BG</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Unión Metal" title="Unión Metal">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/unionmetal.png" alt="Unión Metal" style="border-radius: 4px;">
+          </div>
+          <span class="brand-chip-name">Unión Metal</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Metalúrgica Mauro" title="Metalúrgica Mauro">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/mauro.png" alt="Metalúrgica Mauro" style="border-radius: 4px;">
+          </div>
+          <span class="brand-chip-name">Metalúrgica Mauro</span>
+        </div>
+
+        <div class="brand-chip" data-marca="Monumental" title="Sembradoras Monumental">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/monumental.svg" alt="Monumental">
+          </div>
+          <span class="brand-chip-name">Monumental</span>
+        </div>
+
+        <div class="brand-chip" data-marca="El Ranchero" title="El Ranchero">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/el_ranchero.svg" alt="El Ranchero">
+          </div>
+          <span class="brand-chip-name">El Ranchero</span>
+        </div>
+
+        <div class="brand-chip" data-marca="TOOLKING" title="TOOLKING">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/toolking.svg" alt="TOOLKING">
+          </div>
+          <span class="brand-chip-name">TOOLKING</span>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Filters Details Dropdowns -->
     <div class="filters-bar">
       <div class="filter-group">
         <label for="filter-categoria">Categoría:</label>
         <select id="filter-categoria" class="filter-select">
-          <option value="todas">Todas</option>
+          <option value="todas">Todas las categorías</option>
           <option value="Tractores">Tractores</option>
           <option value="Cosechadoras">Cosechadoras</option>
           <option value="Sembradoras">Sembradoras</option>
           <option value="Pulverizadores">Pulverizadores</option>
           <option value="Herramientas">Herramientas</option>
           <option value="Acoplados">Acoplados</option>
+          <option value="Embarcaciones">Embarcaciones</option>
         </select>
       </div>
       
       <div class="filter-group">
-        <label for="filter-marca">Marca:</label>
+        <label for="filter-marca">Proveedor Aliado:</label>
         <select id="filter-marca" class="filter-select">
-          <option value="todas">Todas</option>
-          <option value="Massey Ferguson">Massey Ferguson</option>
-          <option value="Case IH">Case IH</option>
-          <option value="John Deere">John Deere</option>
-          <option value="Agrometal">Agrometal</option>
-          <option value="Grosspal">Grosspal</option>
-          <option value="Taurus">Taurus</option>
-          <option value="Agroguardati">Agroguardati</option>
-          <option value="Gherardi">Gherardi</option>
+          <option value="todas">Todos los proveedores</option>
+          <option value="Bernardin">Bernardin</option>
+          <option value="Metalúrgica MW">Metalúrgica MW</option>
+          <option value="Marpla">Marpla</option>
+          <option value="Corti S.A.">Corti S.A.</option>
+          <option value="JyM Moro">JyM Moro</option>
+          <option value="Industrias BG">Industrias BG</option>
+          <option value="Unión Metal">Unión Metal</option>
+          <option value="Metalúrgica Mauro">Metalúrgica Mauro</option>
+          <option value="Monumental">Sembradoras Monumental</option>
+          <option value="El Ranchero">El Ranchero</option>
+          <option value="TOOLKING">TOOLKING</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label for="filter-estado">Estado:</label>
+        <label for="filter-estado">Estado / Condición:</label>
         <select id="filter-estado" class="filter-select">
-          <option value="todos">Todos</option>
-          <option value="Nuevo">Nuevo</option>
-          <option value="Usado">Usado</option>
+          <option value="todos">Todos los estados</option>
+          <option value="Nuevo">Nuevos (Proveedores)</option>
+          <option value="Usado">Usados Seleccionados</option>
           <option value="Disponibles">Solo Disponibles</option>
           <option value="Vendidos">Solo Vendidos</option>
         </select>
