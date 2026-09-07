@@ -115,6 +115,8 @@ function renderDashboardTable() {
     let matchesDisp = true;
     if (filterDisp === 'disponible') matchesDisp = !p.vendido;
     if (filterDisp === 'vendido') matchesDisp = !!p.vendido;
+    if (filterDisp === 'visibles') matchesDisp = !p.oculto;
+    if (filterDisp === 'ocultos') matchesDisp = !!p.oculto;
     return matchesSearch && matchesCat && matchesDisp;
   });
 
@@ -133,15 +135,20 @@ function renderDashboardTable() {
     const tr = document.createElement('tr');
     const badgeClass = item.estado === 'Nuevo' ? 'badge-nuevo' : 'badge-usado';
     const isSold = !!item.vendido;
+    const isHidden = !!item.oculto;
     const soldBadge = isSold 
       ? '<span class="badge-status badge-vendido"><i class="fas fa-tag"></i> Vendido</span>' 
       : '<span class="badge-status badge-disponible"><i class="fas fa-check"></i> Disponible</span>';
+    const hiddenBadge = isHidden
+      ? '<span class="badge-status badge-oculto" style="display:inline-block; margin-top:3px;"><i class="fas fa-eye-slash"></i> Oculto</span>'
+      : '<span class="badge-status" style="display:inline-block; margin-top:3px; background:#f1f5f9; color:#64748b; font-size:10px;"><i class="fas fa-eye"></i> Visible</span>';
 
     tr.innerHTML = `
       <td class="col-thumb"><img src="${item.imagen}" class="table-thumb" alt="${item.nombre}"></td>
       <td class="col-nombre">
-        <strong style="${isSold ? 'color: #be123c;' : ''}">${item.nombre}</strong>
+        <strong style="${isSold ? 'color: #be123c;' : (isHidden ? 'color: #b45309;' : '')}">${item.nombre}</strong>
         ${isSold ? '<span style="display:inline-block; margin-left:6px; background:#fee2e2; color:#dc2626; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #fecaca; text-transform:uppercase;">Vendido</span>' : ''}
+        ${isHidden ? '<span style="display:inline-block; margin-left:6px; background:#fef3c7; color:#b45309; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #fde68a; text-transform:uppercase;"><i class="fas fa-eye-slash"></i> Oculto</span>' : ''}
         <div class="mobile-only-meta">
           <span>${item.categoria} &bull; ${item.marca} &bull; ${item.estado}</span>
         </div>
@@ -149,10 +156,13 @@ function renderDashboardTable() {
       <td class="col-cat">${item.categoria}</td>
       <td class="col-marca">${item.marca}</td>
       <td class="col-estado"><span class="badge-status ${badgeClass}">${item.estado}</span></td>
-      <td class="col-venta">${soldBadge}</td>
+      <td class="col-venta">${soldBadge}<br>${hiddenBadge}</td>
       <td class="col-acciones">
         <button class="btn-icon btn-icon-sold ${isSold ? 'is-sold' : 'is-available'}" onclick="toggleDashboardProductSold('${item.id}')" title="${isSold ? 'Cambiar a Disponible' : 'Marcar como Vendido'}">
           <i class="fas ${isSold ? 'fa-undo' : 'fa-tag'}"></i> <span>${isSold ? 'Desmarcar' : 'Vendido'}</span>
+        </button>
+        <button class="btn-icon btn-icon-hide ${isHidden ? 'is-hidden' : 'is-visible'}" onclick="toggleDashboardProductHidden('${item.id}')" title="${isHidden ? 'Mostrar en la Web' : 'Ocultar de la Web'}">
+          <i class="fas ${isHidden ? 'fa-eye' : 'fa-eye-slash'}"></i> <span>${isHidden ? 'Mostrar' : 'Ocultar'}</span>
         </button>
         <button class="btn-icon btn-icon-edit" onclick="editDashboardProduct('${item.id}')" title="Editar"><i class="fas fa-edit"></i> <span>Editar</span></button>
         <button class="btn-icon btn-icon-delete" onclick="deleteDashboardProduct('${item.id}')" title="Borrar"><i class="fas fa-trash-alt"></i> <span>Borrar</span></button>
@@ -343,6 +353,8 @@ function initDashboardModal() {
       if (m3d) m3d.value = '';
       const chkVendido = document.getElementById('form-prod-vendido');
       if (chkVendido) chkVendido.checked = false;
+      const chkOculto = document.getElementById('form-prod-oculto');
+      if (chkOculto) chkOculto.checked = false;
       document.getElementById('form-prod-desc-corta').value = '';
       document.getElementById('form-prod-desc-larga').value = '';
       currentFormImages = [];
@@ -384,6 +396,7 @@ function initDashboardModal() {
       const marca = document.getElementById('form-prod-marca').value;
       const estado = document.getElementById('form-prod-estado').value;
       const vendido = document.getElementById('form-prod-vendido') ? document.getElementById('form-prod-vendido').checked : false;
+      const oculto = document.getElementById('form-prod-oculto') ? document.getElementById('form-prod-oculto').checked : false;
       const mostrarPrecio = document.getElementById('form-prod-mostrar-precio').checked;
       const moneda = document.getElementById('form-prod-moneda').value;
       const precio = document.getElementById('form-prod-precio').value.trim();
@@ -400,6 +413,7 @@ function initDashboardModal() {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
         vendido,
+        oculto,
         mostrarPrecio, moneda, precio,
         modelo3d,
         imagen: mainImg,
@@ -445,6 +459,9 @@ window.editDashboardProduct = function(id) {
   const chkVendido = document.getElementById('form-prod-vendido');
   if (chkVendido) chkVendido.checked = !!prod.vendido;
 
+  const chkOculto = document.getElementById('form-prod-oculto');
+  if (chkOculto) chkOculto.checked = !!prod.oculto;
+
   const m3d = document.getElementById('form-prod-modelo3d');
   if (m3d) m3d.value = prod.modelo3d || '';
 
@@ -472,6 +489,14 @@ window.editDashboardProduct = function(id) {
 window.toggleDashboardProductSold = async function(id) {
   if (window.toggleAgroProductSold) {
     const updated = await window.toggleAgroProductSold(id);
+    renderDashboardTable();
+  }
+};
+
+// 1-Click Toggle Hidden / Visible Handler (Modo Ocultar)
+window.toggleDashboardProductHidden = async function(id) {
+  if (window.toggleAgroProductHidden) {
+    await window.toggleAgroProductHidden(id);
     renderDashboardTable();
   }
 };

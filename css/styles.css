@@ -487,6 +487,37 @@ h1, h2, h3, h4 {
   color: #991b1b !important;
 }
 
+/* --- HIDDEN (OCULTO) PRODUCT BADGES & STATES (ADMIN VIEW) --- */
+.badge-hidden-ribbon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.catalog-item.is-hidden-preview {
+  border: 2px dashed #f59e0b !important;
+  background: #fffbeb !important;
+  opacity: 0.9;
+}
+
+.catalog-item.is-hidden-preview .catalog-item-img {
+  filter: grayscale(0.2) contrast(0.95);
+}
+
 .product-card-content {
   padding: 1.5rem;
   display: flex;

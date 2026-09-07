@@ -166,6 +166,7 @@ function attachCardAdminControls() {
       const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
       const prod = catalog.find(p => String(p.id) === String(prodId));
       const isSold = prod ? !!prod.vendido : false;
+      const isHidden = prod ? !!prod.oculto : false;
 
       const actions = document.createElement('div');
       actions.className = 'admin-card-actions';
@@ -177,6 +178,7 @@ function attachCardAdminControls() {
       `;
       actions.innerHTML = `
         <button onclick="event.preventDefault(); event.stopPropagation(); window.toggleAgroProductSold('${prodId}')" title="${isSold ? 'Marcar como Disponible' : 'Marcar como Vendido'}" style="background: ${isSold ? 'rgba(225, 29, 72, 0.95)' : 'rgba(30, 41, 59, 0.9)'}; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas ${isSold ? 'fa-undo' : 'fa-tag'}"></i> ${isSold ? 'Vendido' : 'Vender'}</button>
+        <button onclick="event.preventDefault(); event.stopPropagation(); window.toggleAgroProductHidden('${prodId}')" title="${isHidden ? 'Mostrar en catálogo público' : 'Ocultar del catálogo público'}" style="background: ${isHidden ? 'rgba(217, 119, 6, 0.95)' : 'rgba(71, 85, 105, 0.9)'}; color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas ${isHidden ? 'fa-eye' : 'fa-eye-slash'}"></i> ${isHidden ? 'Oculto' : 'Ocultar'}</button>
         <button onclick="event.preventDefault(); event.stopPropagation(); openAdminModal('${prodId}')" style="background: rgba(29, 84, 151, 0.95); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-edit"></i> Editar</button>
         <button onclick="event.preventDefault(); event.stopPropagation(); confirmDeleteProduct('${prodId}')" style="background: rgba(211, 47, 47, 0.95); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.78rem; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-trash-alt"></i></button>
       `;
@@ -245,9 +247,10 @@ window.openAdminModal = function(id = null) {
               </select>
             </div>
             <div>
-              <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Marca / Proveedor</label>
-              <input type="text" id="modal-prod-marca" list="modal-marcas-datalist" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;" placeholder="Ej: Bernardin, MW, John Deere...">
+              <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: #334155;">Marca del Producto</label>
+              <input type="text" id="modal-prod-marca" list="modal-marcas-datalist" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.95rem;" placeholder="Ej: Bernardin, MW, John Deere, Industrias Tango...">
               <datalist id="modal-marcas-datalist">
+                <option value="Industrias Tango"></option>
                 <option value="Bernardin"></option>
                 <option value="Metalúrgica MW"></option>
                 <option value="Marpla"></option>
@@ -279,6 +282,15 @@ window.openAdminModal = function(id = null) {
                 </label>
               </div>
               <span style="font-size: 0.74rem; color: #9f1239; margin-top: 2px;">Visible como vendido hasta borrarlo.</span>
+            </div>
+            <div style="background: #fffbeb; padding: 0.75rem 1rem; border-radius: 10px; border: 1.5px solid #fde68a; display: flex; flex-direction: column; justify-content: center; grid-column: span 2;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="modal-prod-oculto" style="width: 18px; height: 18px; cursor: pointer; accent-color: #d97706;">
+                <label for="modal-prod-oculto" style="font-weight: 700; color: #b45309; cursor: pointer; margin: 0; font-size: 0.88rem;">
+                  <i class="fas fa-eye-slash"></i> Ocultar Producto (No visible para clientes)
+                </label>
+              </div>
+              <span style="font-size: 0.74rem; color: #92400e; margin-top: 2px;">Oculta el equipo del catálogo público sin tener que borrarlo.</span>
             </div>
           </div>
 
@@ -436,6 +448,7 @@ window.openAdminModal = function(id = null) {
       const marca = document.getElementById('modal-prod-marca').value;
       const estado = document.getElementById('modal-prod-estado').value;
       const vendido = document.getElementById('modal-prod-vendido') ? document.getElementById('modal-prod-vendido').checked : false;
+      const oculto = document.getElementById('modal-prod-oculto') ? document.getElementById('modal-prod-oculto').checked : false;
       const mostrarPrecio = document.getElementById('modal-prod-mostrar-precio').checked;
       const moneda = document.getElementById('modal-prod-moneda').value;
       const precio = document.getElementById('modal-prod-precio').value.trim();
@@ -452,6 +465,7 @@ window.openAdminModal = function(id = null) {
         id: idVal ? idVal : undefined,
         nombre, categoria, marca, estado,
         vendido,
+        oculto,
         mostrarPrecio, moneda, precio,
         modelo3d,
         imagen: mainImg,
@@ -494,6 +508,9 @@ window.openAdminModal = function(id = null) {
       const chkVendido = document.getElementById('modal-prod-vendido');
       if (chkVendido) chkVendido.checked = !!prod.vendido;
 
+      const chkOculto = document.getElementById('modal-prod-oculto');
+      if (chkOculto) chkOculto.checked = !!prod.oculto;
+
       const m3d = document.getElementById('modal-prod-modelo3d');
       if (m3d) m3d.value = prod.modelo3d || '';
 
@@ -517,6 +534,8 @@ window.openAdminModal = function(id = null) {
     document.getElementById('modal-prod-nombre').value = '';
     const chkVendido = document.getElementById('modal-prod-vendido');
     if (chkVendido) chkVendido.checked = false;
+    const chkOculto = document.getElementById('modal-prod-oculto');
+    if (chkOculto) chkOculto.checked = false;
     const m3d = document.getElementById('modal-prod-modelo3d');
     if (m3d) m3d.value = '';
     document.getElementById('modal-prod-desc-corta').value = '';

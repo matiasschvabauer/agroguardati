@@ -293,6 +293,37 @@ p { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 0.85rem; li
   color: #dc2626 !important;
 }
 
+/* --- HIDDEN (OCULTO) PRODUCT BADGES & STATES (ADMIN VIEW) MOBILE --- */
+.badge-hidden-ribbon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.catalog-item.is-hidden-preview {
+  border: 1.5px dashed #f59e0b !important;
+  background: #fffbeb !important;
+  opacity: 0.9;
+}
+
+.catalog-item.is-hidden-preview .catalog-item-img {
+  filter: grayscale(0.2) contrast(0.95);
+}
+
 .product-category {
   font-size: 0.75rem;
   color: var(--brand-blue);

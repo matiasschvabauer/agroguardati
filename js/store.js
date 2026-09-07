@@ -1,6 +1,6 @@
 // --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
 
-const STORAGE_KEY = 'agroguardati_catalog_v2';
+const STORAGE_KEY = 'agroguardati_catalog_v3';
 window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
@@ -26,7 +26,24 @@ window.getAgroCatalog = function() {
     }
   }
 
-  // Si no hay datos guardados aún, inicializar con catalogo de data.js
+  // Si no hay datos en v3, verificar si había datos en v2 para migrar estados modificados
+  const oldLocalData = localStorage.getItem('agroguardati_catalog_v2');
+  if (oldLocalData) {
+    try {
+      const oldParsed = JSON.parse(oldLocalData);
+      if (Array.isArray(oldParsed) && oldParsed.length > 0) {
+        const oldMap = new Map(oldParsed.map(p => [String(p.id), p]));
+        const mergedInitial = initial.map(p => {
+          const old = oldMap.get(String(p.id));
+          return old ? { ...p, ...old } : p;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedInitial));
+        return mergedInitial;
+      }
+    } catch (e) {}
+  }
+
+  // Inicializar directamente con catalogo completo de data.js
   if (initial.length > 0) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   }
@@ -206,6 +223,37 @@ window.toggleAgroProductSold = async function(id) {
       } catch (err) {
         console.error("❌ Error actualizando estado de venta en Firestore:", err.message);
         alert("⚠️ El estado se cambió localmente, pero hubo un error sincronizando en la nube: " + err.message);
+      }
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: catalog }));
+  return catalog[index];
+};
+
+// 3.2 Alternar estado de oculto / visible (Modo Ocultar para admin)
+window.toggleAgroProductHidden = async function(id) {
+  let catalog = window.getAgroCatalog();
+  const index = catalog.findIndex(p => String(p.id) === String(id));
+  if (index === -1) return null;
+
+  catalog[index].oculto = !catalog[index].oculto;
+  const isHidden = catalog[index].oculto;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+
+  if (typeof firebase !== 'undefined') {
+    const config = window.AGRO_CONFIG?.firebase;
+    if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && !firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    if (firebase.apps.length > 0) {
+      try {
+        const db = firebase.firestore();
+        await db.collection('productos').doc(String(id)).set({ oculto: isHidden }, { merge: true });
+        console.log("✔ Estado oculto actualizado en Firestore:", id, isHidden);
+      } catch (err) {
+        console.warn("Error actualizando oculto en Firestore:", err.message);
       }
     }
   }

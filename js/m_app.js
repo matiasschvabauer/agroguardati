@@ -91,8 +91,16 @@ function initCatalog() {
   const estadoTabs = document.querySelectorAll('.estado-tab-btn');
   const brandChips = document.querySelectorAll('.brand-chip');
   const btnClearBrand = document.getElementById('btn-clear-brand-filter');
-
   if (!catalogContainer) return;
+
+  if (filterEstado && window.isAgroAdmin && window.isAgroAdmin()) {
+    if (!filterEstado.querySelector('option[value="Ocultos"]')) {
+      const opt = document.createElement('option');
+      opt.value = 'Ocultos';
+      opt.textContent = '🔒 Solo Ocultos (Admin)';
+      filterEstado.appendChild(opt);
+    }
+  }
 
   function renderCatalog(items) {
     catalogContainer.innerHTML = '';
@@ -123,7 +131,9 @@ function initCatalog() {
     items.forEach(item => {
       const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
       const isSold = !!item.vendido;
+      const isHidden = !!item.oculto;
       const soldRibbon = isSold ? `<span class="badge-sold-ribbon"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
+      const hiddenRibbon = isHidden ? `<span class="badge-hidden-ribbon"><i class="fas fa-eye-slash"></i> OCULTO</span>` : '';
       const soldTag = isSold ? `<span class="badge-status-sold">Vendido</span>` : '';
 
       // Condition Badge Mobile
@@ -133,9 +143,10 @@ function initCatalog() {
         : `<span class="badge-condition-usado" style="font-size:0.7rem; padding:2px 6px;"><i class="fas fa-tag"></i> Usado</span>`;
 
       const html = `
-        <article class="catalog-item ${isSold ? 'is-sold' : ''}" data-id="${item.id}">
+        <article class="catalog-item ${isSold ? 'is-sold' : ''} ${isHidden ? 'is-hidden-preview' : ''}" data-id="${item.id}">
           <div class="catalog-item-img-wrapper">
             ${soldRibbon}
+            ${hiddenRibbon}
             <img src="${item.imagen}" alt="${item.nombre}" class="catalog-item-img">
           </div>
           <div class="catalog-item-content">
@@ -205,7 +216,12 @@ function initCatalog() {
 
     syncFilterUI(valCat, valMarca, valEstado);
 
+    const isAdmin = window.isAgroAdmin ? window.isAgroAdmin() : false;
+
     const filtered = currentCatalog.filter(item => {
+      // Si el producto está oculto y el usuario NO es admin, no mostrar
+      if (item.oculto && !isAdmin) return false;
+
       const matchCat = valCat === 'todas' || item.categoria === valCat;
       const itemMarcaNorm = (item.marca || '').toLowerCase();
       const valMarcaNorm = (valMarca || '').toLowerCase();
@@ -220,6 +236,8 @@ function initCatalog() {
         matchEstado = !item.vendido;
       } else if (valEstado === 'Vendidos') {
         matchEstado = !!item.vendido;
+      } else if (valEstado === 'Ocultos') {
+        matchEstado = !!item.oculto;
       }
       return matchCat && matchMarca && matchEstado;
     });
@@ -321,7 +339,9 @@ function initFeatured() {
   function renderFeatured() {
     const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
     featuredContainer.innerHTML = '';
-    const featured = currentCatalog.slice(0, 3);
+    const isAdmin = window.isAgroAdmin ? window.isAgroAdmin() : false;
+    const visibleFeatured = currentCatalog.filter(p => !p.oculto || isAdmin);
+    const featured = visibleFeatured.slice(0, 3);
     
     featured.forEach(item => {
       const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
@@ -373,6 +393,19 @@ function initProductDetails() {
   
   if(!product) {
     container.innerHTML = '<div class="container section"><h2>Producto no encontrado.</h2><a href="m_catalogo.html" class="btn btn-primary">Volver al catálogo</a></div>';
+    return;
+  }
+
+  const isAdmin = window.isAgroAdmin ? window.isAgroAdmin() : false;
+  if (product.oculto && !isAdmin) {
+    container.innerHTML = `
+      <div class="container section" style="text-align: center; padding: 4rem 1rem;">
+        <i class="fas fa-eye-slash" style="font-size: 2.5rem; color: #94a3b8; margin-bottom: 0.8rem; display: inline-block;"></i>
+        <h2 style="font-size: 1.4rem; color: #1e293b; margin-bottom: 0.5rem;">Equipo momentáneamente no disponible</h2>
+        <p style="color: #64748b; max-width: 400px; margin: 0 auto 1.5rem; font-size: 0.9rem;">Esta maquinaria se encuentra pausada temporalmente del catálogo público.</p>
+        <a href="m_catalogo.html" class="btn btn-primary">Ver otros equipos disponibles</a>
+      </div>
+    `;
     return;
   }
 
