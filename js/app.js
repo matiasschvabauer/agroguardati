@@ -159,8 +159,10 @@ function initCatalog() {
 
     // Sync Brand Chips
     brandChips.forEach(chip => {
-      const chipMarca = chip.getAttribute('data-marca');
-      if (chipMarca === valMarca) {
+      const chipMarca = chip.getAttribute('data-marca') || '';
+      const isMatch = (chipMarca.toLowerCase() === (valMarca || '').toLowerCase()) ||
+                      (valMarca !== 'todas' && chipMarca.toLowerCase().includes(valMarca.toLowerCase()));
+      if (isMatch) {
         chip.classList.add('active');
         // Scroll chip into view smoothly if container exists
         chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -195,7 +197,12 @@ function initCatalog() {
 
     const filtered = currentCatalog.filter(item => {
       const matchCat = valCat === 'todas' || item.categoria === valCat;
-      const matchMarca = valMarca === 'todas' || item.marca === valMarca;
+      const itemMarcaNorm = (item.marca || '').toLowerCase();
+      const valMarcaNorm = (valMarca || '').toLowerCase();
+      const matchMarca = valMarca === 'todas' || 
+                         itemMarcaNorm === valMarcaNorm ||
+                         itemMarcaNorm.includes(valMarcaNorm) ||
+                         valMarcaNorm.includes(itemMarcaNorm);
       let matchEstado = true;
       if (valEstado === 'Nuevo' || valEstado === 'Usado') {
         matchEstado = item.estado === valEstado;

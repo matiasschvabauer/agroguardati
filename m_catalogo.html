@@ -36,7 +36,7 @@
             <a href="m_catalogo.html?estado=Usado" class="nav-mobile-sublink"><i class="fas fa-tag" style="color: #0284c7;"></i> Equipos Usados</a>
           </div>
         </li>
-        <li><a href="m_index.html#proveedores">Proveedores</a></li>
+        <li><a href="m_index.html#productos">Productos</a></li>
         <li><a href="m_index.html#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="m_login.html">Acceso <i class="fas fa-lock"></i></a></li>
@@ -71,7 +71,7 @@
     <div class="brand-filter-section">
       <div class="brand-filter-header">
         <span class="brand-filter-title">
-          <i class="fas fa-industry"></i> Proveedores Aliados:
+          <i class="fas fa-industry"></i> Marcas de Productos:
         </span>
         <button type="button" id="btn-clear-brand-filter" class="btn-clear-brand" style="display: none;">
           <i class="fas fa-times-circle"></i> Quitar
@@ -164,6 +164,12 @@
           </div>
           <span class="brand-chip-name">TOOLKING</span>
         </div>
+        <div class="brand-chip" data-marca="Industrias Tango" title="Industrias Tango">
+          <div class="brand-chip-logo">
+            <img src="images/proveedores/tango.png" alt="Industrias Tango">
+          </div>
+          <span class="brand-chip-name">Tango</span>
+        </div>
       </div>
     </div>
 
@@ -183,9 +189,10 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>Proveedor Aliado</label>
+        <label>Marca</label>
         <select id="filter-marca" class="filter-select">
-          <option value="todas">Todos los proveedores</option>
+          <option value="todas">Todas las marcas</option>
+          <option value="Industrias Tango">Industrias Tango</option>
           <option value="Bernardin">Bernardin</option>
           <option value="Metalúrgica MW">Metalúrgica MW</option>
           <option value="Marpla">Marpla</option>
@@ -203,7 +210,7 @@
         <label>Estado / Condición</label>
         <select id="filter-estado" class="filter-select">
           <option value="todos">Todos los estados</option>
-          <option value="Nuevo">Nuevos (Proveedores)</option>
+          <option value="Nuevo">Equipos Nuevos (0km)</option>
           <option value="Usado">Usados Seleccionados</option>
           <option value="Disponibles">Solo Disponibles</option>
           <option value="Vendidos">Solo Vendidos</option>

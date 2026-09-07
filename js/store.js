@@ -5,11 +5,20 @@ window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gma
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
 window.getAgroCatalog = function() {
+  const initial = typeof catalogo !== 'undefined' ? catalogo : [];
   const localData = localStorage.getItem(STORAGE_KEY);
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Asegurar que si data.js tiene productos nuevos (ej. líneas oficiales), se incorporen automáticamente
+        const localIds = new Set(parsed.map(p => String(p.id)));
+        const missingFromBase = initial.filter(b => !localIds.has(String(b.id)));
+        if (missingFromBase.length > 0) {
+          const updated = [...parsed, ...missingFromBase];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          return updated;
+        }
         return parsed;
       }
     } catch (e) {
@@ -18,7 +27,6 @@ window.getAgroCatalog = function() {
   }
 
   // Si no hay datos guardados aún, inicializar con catalogo de data.js
-  const initial = typeof catalogo !== 'undefined' ? catalogo : [];
   if (initial.length > 0) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   }
