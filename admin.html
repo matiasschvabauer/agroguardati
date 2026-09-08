@@ -648,9 +648,14 @@
           <h1 style="font-size: 1.7rem;">Gestión del Catálogo</h1>
           <p style="color: var(--text-muted); font-size: 0.9rem;" id="product-count-text">Cargando maquinaria...</p>
         </div>
-        <button id="btn-add-product" class="btn-primary">
-          <i class="fas fa-plus"></i> Agregar Maquinaria
-        </button>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btn-admin-download-pdf" type="button" class="btn-primary" style="background: #153f71; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-file-pdf" style="color: #ef4444;"></i> Descargar Catálogo PDF
+          </button>
+          <button id="btn-add-product" class="btn-primary">
+            <i class="fas fa-plus"></i> Agregar Maquinaria
+          </button>
+        </div>
       </div>
 
       <!-- Search & Filters -->
@@ -875,5 +880,7 @@
   <script src="js/data.js?v=3.1"></script>
   <script src="js/store.js?v=3.1"></script>
   <script src="js/admin.js?v=3.1"></script>
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="js/pdf-catalog-generator.js?v=3.2"></script>
 </body>
 </html>

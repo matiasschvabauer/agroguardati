@@ -324,6 +324,49 @@ p { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 0.85rem; li
   filter: grayscale(0.2) contrast(0.95);
 }
 
+/* --- BOTÓN DESCARGA CATÁLOGO PDF MOBILE --- */
+.btn-download-pdf-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  color: var(--brand-blue-dark);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+}
+
+.btn-download-pdf-mobile:active {
+  transform: scale(0.98);
+}
+
+.btn-download-pdf-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #153f71;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1.5px solid #cbd5e1;
+}
+
+.btn-download-pdf-compact:hover,
+.btn-download-pdf-compact:active {
+  border-color: #d32f2f;
+  color: #d32f2f;
+  background: #fff5f5;
+}
+
 .product-category {
   font-size: 0.75rem;
   color: var(--brand-blue);

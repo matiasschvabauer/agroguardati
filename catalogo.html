@@ -73,6 +73,12 @@
     <div class="container" style="position: relative; z-index: 2;">
       <h1 class="hero-title" style="font-size: 3rem; color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.3);">Nuestro Catálogo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.95); font-weight: 500; font-size: 1.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Encuentra maquinaria nueva y equipos usados seleccionados.</p>
+      <div style="margin-top: 1.6rem;">
+        <a href="Catalogo_Agroguardati_Completo.pdf" download="Catalogo_Agroguardati_Completo.pdf" class="btn-download-pdf-hero" title="Descargar Catálogo Completo en formato PDF">
+          <i class="fas fa-file-pdf" style="color: #d32f2f; font-size: 1.15rem;"></i>
+          <span>Descargar Catálogo Completo (PDF)</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -247,11 +253,18 @@
       </div>
     </div>
 
-    <!-- View Mode Switcher -->
-    <div class="view-mode-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-      <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Modo de Vista:</span>
-      <button id="view-mode-list" class="btn-view-mode active" title="Vista Lista"><i class="fas fa-bars"></i> Lista</button>
-      <button id="view-mode-grid" class="btn-view-mode" title="Vista Cuadrícula 2 por fila"><i class="fas fa-th-large"></i> Cuadrícula (2 por fila)</button>
+    <!-- View Mode Switcher & PDF Download -->
+    <div class="view-mode-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <div>
+        <a href="Catalogo_Agroguardati_Completo.pdf" download="Catalogo_Agroguardati_Completo.pdf" class="btn-download-pdf" title="Descargar Catálogo Completo en PDF">
+          <i class="fas fa-file-pdf" style="color: #d32f2f;"></i> Descargar Catálogo (PDF)
+        </a>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Modo de Vista:</span>
+        <button id="view-mode-list" class="btn-view-mode active" title="Vista Lista"><i class="fas fa-bars"></i> Lista</button>
+        <button id="view-mode-grid" class="btn-view-mode" title="Vista Cuadrícula 2 por fila"><i class="fas fa-th-large"></i> Cuadrícula (2 por fila)</button>
+      </div>
     </div>
 
     <!-- Catalog List (Alternating Layout or Grid) -->
@@ -323,5 +336,7 @@
   <script src="js/store.js?v=3.1"></script>
   <script src="js/admin-bar.js?v=3.1"></script>
   <script src="js/app.js?v=3.1"></script>
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="js/pdf-catalog-generator.js?v=3.2"></script>
 </body>
 </html>

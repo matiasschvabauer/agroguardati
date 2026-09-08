@@ -518,6 +518,55 @@ h1, h2, h3, h4 {
   filter: grayscale(0.2) contrast(0.95);
 }
 
+/* --- BOTÓN DESCARGA CATÁLOGO PDF --- */
+.btn-download-pdf-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--brand-blue-dark);
+  font-weight: 700;
+  font-size: 0.98rem;
+  padding: 10px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btn-download-pdf-hero:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(211, 47, 47, 0.35);
+  color: #d32f2f;
+}
+
+.btn-download-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #153f71;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 8px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.btn-download-pdf:hover {
+  border-color: #d32f2f;
+  color: #d32f2f;
+  background: #fff5f5;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+  transform: translateY(-1px);
+}
+
 .product-card-content {
   padding: 1.5rem;
   display: flex;
