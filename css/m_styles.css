@@ -1465,6 +1465,49 @@ footer { background: #f1f5f9; padding: 2rem 16px; text-align: center; border-top
   color: var(--brand-blue);
 }
 
+/* =========================================
+   BOTONES MÓVILES DE DESCARGA DE PDF
+   ========================================= */
+.btn-download-pdf-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff !important;
+  color: #153f71 !important;
+  padding: 10px 20px !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  border: 1.5px solid #ffffff !important;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-download-pdf-mobile:active {
+  transform: scale(0.97);
+  background: #f1f5f9 !important;
+}
+
+.btn-download-pdf-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff !important;
+  color: #153f71 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  -webkit-tap-highlight-color: transparent;
+}
+
+
 
 
 

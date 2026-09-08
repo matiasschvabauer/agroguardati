@@ -2412,5 +2412,62 @@ a.supplier-card:hover {
   gap: 4px;
 }
 
+/* =========================================
+   BOTONES DE DESCARGA DE CATÁLOGO EN PDF
+   ========================================= */
+.btn-download-pdf-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ffffff !important;
+  color: #153f71 !important;
+  padding: 11px 26px !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-download-pdf-hero:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 24px rgba(0, 0, 0, 0.3) !important;
+  background: #f8fafc !important;
+  color: #0f2b4c !important;
+}
+
+.btn-download-pdf-hero:active {
+  transform: translateY(0);
+}
+
+.btn-download-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff !important;
+  color: #153f71 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  padding: 7px 16px !important;
+  border-radius: 10px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-download-pdf:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+  transform: translateY(-1px);
+}
+
+
 
 
