@@ -1,7 +1,7 @@
 // --- AGROGUARDATI - PANEL ADMINISTRADOR DASHBOARD (ESTILO CASA DRUETTO) ---
 
 let currentFormImages = [];
-let currentFormSpecs = {};
+let currentFormSpecs = [];
 
 // Auth Check & Initialization
 function initDashboardAuth() {
@@ -291,46 +291,79 @@ function renderFormImageThumbnails() {
   });
 }
 
-// Dynamic Specifications Editor (Key-Value pairs)
-function renderFormSpecsRows() {
+// Dynamic Specifications Editor (Key-Value pairs con orden estable e inmutable)
+function syncSpecsFromDOM() {
+  const container = document.getElementById('specs-rows-container');
+  if (!container) return;
+  const rows = container.querySelectorAll('.spec-row-item');
+  const updated = [];
+  rows.forEach(row => {
+    const keyInput = row.querySelector('.spec-key');
+    const valInput = row.querySelector('.spec-val');
+    if (keyInput && valInput) {
+      updated.push({
+        key: keyInput.value,
+        val: valInput.value
+      });
+    }
+  });
+  currentFormSpecs = updated;
+}
+
+function renderFormSpecsRows(focusIndex = -1) {
   const container = document.getElementById('specs-rows-container');
   if (!container) return;
 
   container.innerHTML = '';
 
-  const entries = Object.entries(currentFormSpecs);
-  if (entries.length === 0) {
-    container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Sin especificaciones adicionales.</p>';
+  if (!Array.isArray(currentFormSpecs) || currentFormSpecs.length === 0) {
+    container.innerHTML = '<p style="font-size: 0.85rem; color: #94a3b8; margin: 0; padding: 0.5rem 0;">Sin especificaciones adicionales. Presiona "+ Especificación" para agregar una.</p>';
     return;
   }
 
-  entries.forEach(([key, val], idx) => {
+  currentFormSpecs.forEach((spec, idx) => {
     const div = document.createElement('div');
-    div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 6px; align-items: center;';
-    div.innerHTML = `
-      <input type="text" value="${key}" placeholder="Característica (ej: Potencia)" class="form-control spec-key" style="font-size:0.85rem; padding: 0.5rem 0.8rem;">
-      <input type="text" value="${val}" placeholder="Valor (ej: 200 CV)" class="form-control spec-val" style="font-size:0.85rem; padding: 0.5rem 0.8rem;">
-      <button type="button" style="background:#fee2e2; color:#dc2626; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:bold;">&times;</button>
-    `;
+    div.className = 'spec-row-item';
+    div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center; width: 100%;';
     
-    div.querySelector('button').onclick = () => {
-      delete currentFormSpecs[key];
-      renderFormSpecsRows();
-    };
+    div.innerHTML = `
+      <input type="text" placeholder="Característica (ej: Potencia)" class="form-control spec-key" style="flex: 1; font-size:0.85rem; padding: 0.5rem 0.8rem;">
+      <input type="text" placeholder="Valor (ej: 200 CV)" class="form-control spec-val" style="flex: 1.2; font-size:0.85rem; padding: 0.5rem 0.8rem;">
+      <button type="button" class="btn-remove-spec" title="Eliminar especificación" style="background:#fee2e2; color:#dc2626; border:none; width:34px; height:34px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 1.15rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s ease;">&times;</button>
+    `;
 
-    div.querySelector('.spec-key').onchange = (e) => {
-      const newKey = e.target.value.trim();
-      if (newKey && newKey !== key) {
-        currentFormSpecs[newKey] = currentFormSpecs[key];
-        delete currentFormSpecs[key];
+    const keyInput = div.querySelector('.spec-key');
+    const valInput = div.querySelector('.spec-val');
+    const btnRemove = div.querySelector('.btn-remove-spec');
+
+    keyInput.value = spec.key || '';
+    valInput.value = spec.val || '';
+
+    // Sincronizar cada pulsación de tecla inmediatamente sin alterar el orden ni el foco
+    keyInput.addEventListener('input', (e) => {
+      if (currentFormSpecs[idx]) {
+        currentFormSpecs[idx].key = e.target.value;
       }
-    };
+    });
 
-    div.querySelector('.spec-val').onchange = (e) => {
-      currentFormSpecs[key] = e.target.value.trim();
-    };
+    valInput.addEventListener('input', (e) => {
+      if (currentFormSpecs[idx]) {
+        currentFormSpecs[idx].val = e.target.value;
+      }
+    });
+
+    // Eliminar únicamente esta fila sin desacomodar el texto de las demás
+    btnRemove.addEventListener('click', () => {
+      syncSpecsFromDOM();
+      currentFormSpecs.splice(idx, 1);
+      renderFormSpecsRows();
+    });
 
     container.appendChild(div);
+
+    if (focusIndex === idx) {
+      setTimeout(() => keyInput.focus(), 60);
+    }
   });
 }
 
@@ -358,7 +391,10 @@ function initDashboardModal() {
       document.getElementById('form-prod-desc-corta').value = '';
       document.getElementById('form-prod-desc-larga').value = '';
       currentFormImages = [];
-      currentFormSpecs = { "Marca": "", "Estado": "Nuevo" };
+      currentFormSpecs = [
+        { key: "Marca", val: "" },
+        { key: "Estado", val: "Nuevo" }
+      ];
       renderFormImageThumbnails();
       renderFormSpecsRows();
       modal.style.display = 'flex';
@@ -371,9 +407,9 @@ function initDashboardModal() {
 
   if (btnAddSpec) {
     btnAddSpec.onclick = () => {
-      const newKey = 'Nueva característica ' + (Object.keys(currentFormSpecs).length + 1);
-      currentFormSpecs[newKey] = '';
-      renderFormSpecsRows();
+      syncSpecsFromDOM();
+      currentFormSpecs.push({ key: '', val: '' });
+      renderFormSpecsRows(currentFormSpecs.length - 1);
     };
   }
 
@@ -406,8 +442,15 @@ function initDashboardModal() {
 
       const mainImg = currentFormImages.length > 0 ? currentFormImages[0] : 'AGLOGOCIRC.png';
 
-      currentFormSpecs["Marca"] = marca;
-      currentFormSpecs["Estado"] = estado;
+      syncSpecsFromDOM();
+      const specsObj = {};
+      currentFormSpecs.forEach(item => {
+        const k = (item.key || '').trim();
+        const v = (item.val || '').trim();
+        if (k) {
+          specsObj[k] = v;
+        }
+      });
 
       const prodData = {
         id: idVal ? idVal : undefined,
@@ -420,7 +463,7 @@ function initDashboardModal() {
         imagenes: currentFormImages.length > 0 ? currentFormImages : [mainImg],
         descripcionCorta: descCorta,
         descripcionLarga: descLarga,
-        especificaciones: currentFormSpecs
+        especificaciones: specsObj
       };
 
       try {
@@ -478,7 +521,18 @@ window.editDashboardProduct = function(id) {
   document.getElementById('form-prod-desc-larga').value = prod.descripcionLarga;
 
   currentFormImages = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
-  currentFormSpecs = prod.especificaciones ? { ...prod.especificaciones } : { "Marca": prod.marca, "Estado": prod.estado };
+  
+  let specs = prod.especificaciones || {};
+  if (Array.isArray(specs)) {
+    currentFormSpecs = specs.map(s => ({ key: s.key || '', val: s.val || '' }));
+  } else if (typeof specs === 'object' && specs !== null) {
+    currentFormSpecs = Object.entries(specs).map(([k, v]) => ({ key: k, val: String(v) }));
+  } else {
+    currentFormSpecs = [
+      { key: "Marca", val: prod.marca || '' },
+      { key: "Estado", val: prod.estado || 'Nuevo' }
+    ];
+  }
 
   renderFormImageThumbnails();
   renderFormSpecsRows();

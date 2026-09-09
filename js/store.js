@@ -1,25 +1,60 @@
 // --- AGROGUARDATI - GESTOR REACTIVO DE CATÁLOGO Y AUTENTICACIÓN ---
 
 const STORAGE_KEY = 'agroguardati_catalog_v3';
+const DELETED_KEY = 'agroguardati_deleted_ids_v3';
 window.AGRO_ADMIN_EMAILS = ['matiasschvabauer@gmail.com', 'guillermoguardati@gmail.com', 'Lucioguardati1@gmail.com', 'lucioguardati1@gmail.com'];
+
+// Funciones para gestionar IDs eliminados permanentemente (evita que data.js los vuelva a insertar abajo)
+window.getAgroDeletedIds = function() {
+  try {
+    const raw = localStorage.getItem(DELETED_KEY);
+    return new Set(raw ? JSON.parse(raw).map(String) : []);
+  } catch (e) {
+    return new Set();
+  }
+};
+
+window.addAgroDeletedId = function(id) {
+  const set = window.getAgroDeletedIds();
+  set.add(String(id));
+  localStorage.setItem(DELETED_KEY, JSON.stringify([...set]));
+};
+
+window.removeAgroDeletedId = function(id) {
+  const set = window.getAgroDeletedIds();
+  if (set.has(String(id))) {
+    set.delete(String(id));
+    localStorage.setItem(DELETED_KEY, JSON.stringify([...set]));
+  }
+};
 
 // 1. Obtener catálogo actual (priorizando localStorage / Firestore, con fallback a catalogo inicial)
 window.getAgroCatalog = function() {
   const initial = typeof catalogo !== 'undefined' ? catalogo : [];
+  const deletedIds = window.getAgroDeletedIds();
   const localData = localStorage.getItem(STORAGE_KEY);
+
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Asegurar que si data.js tiene productos nuevos (ej. líneas oficiales), se incorporen automáticamente
-        const localIds = new Set(parsed.map(p => String(p.id)));
-        const missingFromBase = initial.filter(b => !localIds.has(String(b.id)));
+        // Filtrar productos marcados como eliminados o presentes en deletedIds
+        const activeParsed = parsed.filter(p => p && !p._deleted && !deletedIds.has(String(p.id)));
+
+        // Detectar si en data.js hay productos genuinamente nuevos que no estén en local NI hayan sido eliminados por el usuario
+        const localIds = new Set(activeParsed.map(p => String(p.id)));
+        const missingFromBase = initial.filter(b => !localIds.has(String(b.id)) && !deletedIds.has(String(b.id)));
+        
         if (missingFromBase.length > 0) {
-          const updated = [...parsed, ...missingFromBase];
+          const updated = [...activeParsed, ...missingFromBase];
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
           return updated;
         }
-        return parsed;
+
+        if (activeParsed.length !== parsed.length) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(activeParsed));
+        }
+        return activeParsed;
       }
     } catch (e) {
       console.error("Error leyendo catálogo local:", e);
@@ -33,44 +68,55 @@ window.getAgroCatalog = function() {
       const oldParsed = JSON.parse(oldLocalData);
       if (Array.isArray(oldParsed) && oldParsed.length > 0) {
         const oldMap = new Map(oldParsed.map(p => [String(p.id), p]));
-        const mergedInitial = initial.map(p => {
-          const old = oldMap.get(String(p.id));
-          return old ? { ...p, ...old } : p;
-        });
+        const mergedInitial = initial
+          .filter(b => !deletedIds.has(String(b.id)))
+          .map(p => {
+            const old = oldMap.get(String(p.id));
+            return old ? { ...p, ...old } : p;
+          });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedInitial));
         return mergedInitial;
       }
     } catch (e) {}
   }
 
-  // Inicializar directamente con catalogo completo de data.js
-  if (initial.length > 0) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  // Inicializar directamente con catalogo completo de data.js excluyendo eliminados
+  const cleanInitial = initial.filter(b => !deletedIds.has(String(b.id)));
+  if (cleanInitial.length > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanInitial));
   }
-  return initial;
+  return cleanInitial;
 };
 
 // Función auxiliar para fusionar Firestore con el catálogo base (data.js) y auto-sincronizar creados en local
 window.mergeCatalogData = function(firestoreItems) {
   const initial = typeof catalogo !== 'undefined' ? catalogo : [];
+  const deletedIds = window.getAgroDeletedIds();
   const fsMap = new Map();
 
   firestoreItems.forEach(item => {
     fsMap.set(String(item.id), item);
+    if (item._deleted) {
+      window.addAgroDeletedId(item.id);
+    }
   });
 
   // Detectar productos creados previamente en localStorage que aún no llegaron a Firestore
   const localData = localStorage.getItem(STORAGE_KEY);
   let unsyncedLocalItems = [];
+  const localMap = new Map();
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
       if (Array.isArray(parsed)) {
+        parsed.forEach(p => {
+          if (p && p.id != null) localMap.set(String(p.id), p);
+        });
         unsyncedLocalItems = parsed.filter(item => {
           const idStr = String(item.id);
           const isBase = initial.some(b => String(b.id) === idStr);
           const isFs = fsMap.has(idStr);
-          return !isBase && !isFs && !item._deleted;
+          return !isBase && !isFs && !item._deleted && !deletedIds.has(idStr);
         });
       }
     } catch (e) {}
@@ -81,7 +127,7 @@ window.mergeCatalogData = function(firestoreItems) {
     const db = firebase.firestore();
     unsyncedLocalItems.forEach(async (item) => {
       try {
-        await db.collection('productos').doc(String(item.id)).set(item, { merge: true });
+        await db.collection('productos').doc(String(item.id)).set(item);
         console.log("✔ Auto-sincronizado producto local a la nube Firestore:", item.id);
       } catch (err) {
         console.warn("Auto-sync Firestore fallback:", err.message);
@@ -91,8 +137,9 @@ window.mergeCatalogData = function(firestoreItems) {
 
   // Productos nuevos en Firestore que no son de data.js
   const newFirestoreItems = firestoreItems.filter(item => {
-    const isBase = initial.some(b => String(b.id) === String(item.id));
-    return !isBase && !item._deleted;
+    const idStr = String(item.id);
+    const isBase = initial.some(b => String(b.id) === idStr);
+    return !isBase && !item._deleted && !deletedIds.has(idStr);
   });
 
   // Combinar los pendientes locales + los nuevos de Firestore
@@ -105,19 +152,36 @@ window.mergeCatalogData = function(firestoreItems) {
 
   // Productos base de data.js con sus modificaciones o borrados
   const mergedBase = initial.filter(baseItem => {
-    const fsItem = fsMap.get(String(baseItem.id));
+    const idStr = String(baseItem.id);
+    if (deletedIds.has(idStr)) return false;
+    const fsItem = fsMap.get(idStr);
+    const localItem = localMap.get(idStr);
+    if (localItem && localItem._deleted) return false;
     return !fsItem || !fsItem._deleted;
   }).map(baseItem => {
-    const fsItem = fsMap.get(String(baseItem.id));
-    if (!fsItem) return baseItem;
+    const idStr = String(baseItem.id);
+    const fsItem = fsMap.get(idStr);
+    const localItem = localMap.get(idStr);
 
-    const merged = { ...baseItem, ...fsItem };
-    if (baseItem.modelo3d && (!fsItem.modelo3d || fsItem.modelo3d !== baseItem.modelo3d)) {
+    let merged = { ...baseItem };
+    if (fsItem) {
+      merged = { ...merged, ...fsItem };
+    }
+    // Si el usuario editó este producto en su navegador (ej. especificaciones modificadas o precio),
+    // preservamos los cambios locales más recientes
+    if (localItem) {
+      const localTime = Number(localItem._updatedAt) || 0;
+      const fsTime = Number(fsItem?._updatedAt) || 0;
+      if (localTime >= fsTime) {
+        merged = { ...merged, ...localItem };
+      }
+    }
+
+    if (baseItem.modelo3d && (!merged.modelo3d || merged.modelo3d !== baseItem.modelo3d)) {
       merged.modelo3d = baseItem.modelo3d;
-      // Auto-sincronizar el modelo 3D a Firestore si no estaba presente
       if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
         try {
-          firebase.firestore().collection('productos').doc(String(baseItem.id)).set({
+          firebase.firestore().collection('productos').doc(idStr).set({
             modelo3d: baseItem.modelo3d
           }, { merge: true }).catch(() => {});
         } catch (e) {}
@@ -137,8 +201,12 @@ window.saveAgroProduct = async function(productData) {
     productData.id = Date.now();
   }
 
-  // Eliminar marca de borrado si existía
+  // Timestamp de actualización para resolución de versiones
+  productData._updatedAt = Date.now();
+
+  // Eliminar marca de borrado y sacar de la lista de IDs eliminados
   delete productData._deleted;
+  window.removeAgroDeletedId(productData.id);
 
   const index = catalog.findIndex(p => String(p.id) === String(productData.id));
   if (index !== -1) {
@@ -157,7 +225,7 @@ window.saveAgroProduct = async function(productData) {
     if (firebase.apps.length > 0) {
       try {
         const db = firebase.firestore();
-        await db.collection('productos').doc(String(productData.id)).set(productData, { merge: true });
+        await db.collection('productos').doc(String(productData.id)).set(productData);
         console.log("✔ Producto guardado/editado exitosamente en Firestore:", productData.id);
       } catch (err) {
         console.error("❌ Error guardando en Firestore:", err.message);
@@ -170,10 +238,13 @@ window.saveAgroProduct = async function(productData) {
   return productData;
 };
 
-// 3. Eliminar producto
+// 3. Eliminar producto permanentemente
 window.deleteAgroProduct = async function(id) {
+  const idStr = String(id);
+  window.addAgroDeletedId(idStr);
+
   let catalog = window.getAgroCatalog();
-  catalog = catalog.filter(p => String(p.id) !== String(id));
+  catalog = catalog.filter(p => String(p.id) !== idStr);
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
@@ -185,11 +256,10 @@ window.deleteAgroProduct = async function(id) {
     if (firebase.apps.length > 0) {
       try {
         const db = firebase.firestore();
-        await db.collection('productos').doc(String(id)).set({ id: String(id), _deleted: true }, { merge: true });
-        console.log("✔ Producto marcado como eliminado en Firestore:", id);
+        await db.collection('productos').doc(idStr).set({ id: idStr, _deleted: true }, { merge: true });
+        console.log("✔ Producto marcado como eliminado en Firestore:", idStr);
       } catch (err) {
         console.error("❌ Error eliminando de Firestore:", err.message);
-        alert("⚠️ Atención: El producto se eliminó localmente, pero ocurrió un error al eliminarlo en la nube (Firestore): " + err.message);
       }
     }
   }
