@@ -123,15 +123,34 @@ window.mergeCatalogData = function(firestoreItems) {
     } catch (e) {}
   }
 
-  // Auto-subir a Firestore los productos locales pendientes
-  if (unsyncedLocalItems.length > 0 && typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+  // Auto-subir a Firestore los productos locales pendientes o modificados
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
     const db = firebase.firestore();
-    unsyncedLocalItems.forEach(async (item) => {
-      try {
-        await db.collection('productos').doc(String(item.id)).set(item);
-        console.log("✔ Auto-sincronizado producto local a la nube Firestore:", item.id);
-      } catch (err) {
-        console.warn("Auto-sync Firestore fallback:", err.message);
+    if (unsyncedLocalItems.length > 0) {
+      unsyncedLocalItems.forEach(async (item) => {
+        try {
+          await db.collection('productos').doc(String(item.id)).set(item);
+          console.log("✔ Auto-sincronizado producto local a la nube Firestore:", item.id);
+        } catch (err) {
+          console.warn("Auto-sync Firestore fallback:", err.message);
+        }
+      });
+    }
+
+    // Auto-subir productos existentes que fueron modificados en este navegador
+    localMap.forEach(async (lItem, idStr) => {
+      if (lItem && lItem._updatedAt && !lItem._deleted && !deletedIds.has(idStr)) {
+        const fs = fsMap.get(idStr);
+        const lTime = Number(lItem._updatedAt) || 0;
+        const fsTime = Number(fs?._updatedAt) || 0;
+        if (lTime > fsTime) {
+          try {
+            await db.collection('productos').doc(idStr).set(lItem);
+            console.log("✔ Auto-sincronizado producto modificado a Firestore:", idStr);
+          } catch (err) {
+            console.warn("Auto-sync Firestore modified fallback:", err.message);
+          }
+        }
       }
     });
   }
@@ -168,12 +187,11 @@ window.mergeCatalogData = function(firestoreItems) {
     if (fsItem) {
       merged = { ...merged, ...fsItem };
     }
-    // Si el usuario editó este producto en su navegador (ej. especificaciones modificadas o precio),
-    // preservamos los cambios locales más recientes
-    if (localItem) {
+    // Solo si el usuario editó explícitamente este producto en ESTE navegador y tiene un timestamp más nuevo
+    if (localItem && localItem._updatedAt) {
       const localTime = Number(localItem._updatedAt) || 0;
       const fsTime = Number(fsItem?._updatedAt) || 0;
-      if (localTime >= fsTime) {
+      if (localTime > fsTime) {
         merged = { ...merged, ...localItem };
       }
     }
