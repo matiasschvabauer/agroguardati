@@ -196,8 +196,7 @@ window.confirmDeleteProduct = async function(id) {
   if (confirm(`¿Estás seguro de que deseas eliminar "${name}" del catálogo?`)) {
     await window.deleteAgroProduct(id);
     document.querySelectorAll(`[data-id="${id}"]`).forEach(el => el.remove());
-    if (window.initCatalog) window.initCatalog();
-    if (window.initFeatured) window.initFeatured();
+    window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: window.getAgroCatalog() }));
   }
 };
 

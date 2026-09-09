@@ -96,8 +96,9 @@ window.mergeCatalogData = function(firestoreItems) {
 
   firestoreItems.forEach(item => {
     fsMap.set(String(item.id), item);
-    if (item._deleted) {
+    if (item._deleted === true || item._deleted === 'true') {
       window.addAgroDeletedId(item.id);
+      deletedIds.add(String(item.id));
     }
   });
 
