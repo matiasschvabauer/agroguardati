@@ -2,6 +2,13 @@
  * AGROGUARDATI - Controlador de Galería Desktop (galeria.js)
  */
 
+async function convertHeicIfNeeded(file) {
+  if (typeof window.convertHeicIfNeeded === 'function') {
+    return await window.convertHeicIfNeeded(file);
+  }
+  return file;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   let activeSeccion = 'todas';
   let activeTipo = 'todos';
@@ -348,48 +355,121 @@ document.addEventListener('DOMContentLoaded', () => {
       const tipo = document.getElementById('gal-item-tipo').value;
 
       let url = '';
-      if (tipo === 'youtube') {
-        url = document.getElementById('gal-youtube-url').value.trim();
-      } else if (tipo === 'foto') {
-        const fileInput = document.getElementById('gal-foto-file');
-        if (fileInput.files && fileInput.files[0]) {
-          const file = fileInput.files[0];
-          url = await readFileAsBase64(file);
-        } else if (id) {
-          // Keep existing
-          const existing = window.AgroGaleriaStore.getItems().find(i => i.id === id);
-          if (existing) url = existing.url;
+      let miniatura = '';
+      let youtubeId = '';
+
+      const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+      const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+
+      try {
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', 'Procesando archivo y datos...', 15);
         }
-      } else if (tipo === 'video') {
-        const fileInput = document.getElementById('gal-video-file');
-        if (fileInput.files && fileInput.files[0]) {
-          const file = fileInput.files[0];
-          url = await readFileAsBase64(file);
-        } else if (id) {
-          const existing = window.AgroGaleriaStore.getItems().find(i => i.id === id);
-          if (existing) url = existing.url;
+
+        if (tipo === 'youtube') {
+          const ytInput = document.getElementById('gal-youtube-url').value.trim();
+          youtubeId = window.AgroGaleriaStore.extractYouTubeId(ytInput);
+          if (!youtubeId) {
+            alert('Por favor ingresá un enlace válido de YouTube.');
+            return;
+          }
+          url = `https://www.youtube.com/watch?v=${youtubeId}`;
+          miniatura = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+        } else if (tipo === 'foto') {
+          const fileInput = document.getElementById('gal-foto-file');
+          if (fileInput.files && fileInput.files[0]) {
+            let file = fileInput.files[0];
+            file = await convertHeicIfNeeded(file);
+
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Conectando con Cloudinary...', 30);
+            }
+
+            const data = await window.uploadToCloudinaryWithProgress(file, 'image', (pct) => {
+              if (window.showAgroUploadProgress) {
+                const overallPct = Math.round(30 + (pct * 0.55));
+                window.showAgroUploadProgress('Subiendo Foto a la Nube', `Subiendo imagen: ${pct}%...`, overallPct);
+              }
+            });
+
+            if (data.secure_url) {
+              url = data.secure_url;
+              miniatura = data.secure_url;
+            } else {
+              throw new Error(data.error?.message || 'Error al subir foto a Cloudinary');
+            }
+          } else if (id) {
+            const existing = window.AgroGaleriaStore.getItems().find(i => i.id === id);
+            if (existing) {
+              url = existing.url;
+              miniatura = existing.miniatura || existing.url;
+            }
+          }
+        } else if (tipo === 'video') {
+          const fileInput = document.getElementById('gal-video-file');
+          if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Video a la Nube', 'Conectando con Cloudinary...', 25);
+            }
+
+            const data = await window.uploadToCloudinaryWithProgress(file, 'video', (pct) => {
+              if (window.showAgroUploadProgress) {
+                const overallPct = Math.round(25 + (pct * 0.60));
+                window.showAgroUploadProgress('Subiendo Video a la Nube', `Subiendo video: ${pct}%...`, overallPct);
+              }
+            });
+
+            if (data.secure_url) {
+              url = data.secure_url;
+              miniatura = data.secure_url.replace(/\.[^/.]+$/, ".jpg");
+            } else {
+              throw new Error(data.error?.message || 'Error al subir video a Cloudinary');
+            }
+          } else if (id) {
+            const existing = window.AgroGaleriaStore.getItems().find(i => i.id === id);
+            if (existing) {
+              url = existing.url;
+              miniatura = existing.miniatura || existing.url;
+            }
+          }
         }
+
+        if (!url && !youtubeId) {
+          alert('Por favor selecciona una foto, video o enlace de YouTube.');
+          return;
+        }
+
+        const itemData = {
+          id: id || undefined,
+          titulo,
+          descripcion,
+          fecha,
+          seccionId,
+          tipo,
+          url,
+          youtubeId: youtubeId || undefined,
+          miniatura: miniatura || url
+        };
+
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', 'Guardando en la galería...', 92);
+        }
+
+        await window.AgroGaleriaStore.saveItem(itemData);
+
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', '¡Contenido guardado exitosamente!', 100);
+        }
+
+        closeAdminModals();
+        renderSeccionChips();
+        renderGalleryItems();
+      } catch (err) {
+        alert('Error al guardar contenido: ' + err.message);
+      } finally {
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
       }
-
-      if (!url && !id) {
-        alert('Por favor selecciona una imagen, video o enlace de YouTube.');
-        return;
-      }
-
-      const itemData = {
-        id: id || undefined,
-        titulo,
-        descripcion,
-        fecha,
-        seccionId,
-        tipo,
-        url
-      };
-
-      window.AgroGaleriaStore.saveItem(itemData);
-      closeAdminModals();
-      renderSeccionChips();
-      renderGalleryItems();
     });
   }
 

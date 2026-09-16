@@ -414,7 +414,7 @@ window.showAgroUploadProgress = function(titleText, statusText, percent) {
           Guardando y Publicando en la Nube
         </h3>
         
-        <div style="background: #fffbebf; border-left: 4px solid #f59e0b; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #92400e; text-align: left; line-height: 1.45;">
+        <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #92400e; text-align: left; line-height: 1.45;">
           <strong style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
             <i class="fas fa-exclamation-triangle"></i> ¡Atención! No cierres esta pestaña:
           </strong>
@@ -442,7 +442,7 @@ window.showAgroUploadProgress = function(titleText, statusText, percent) {
   if (titleText && titleEl) titleEl.textContent = titleText;
   if (statusText && statusEl) statusEl.textContent = statusText;
   
-  const pct = Math.min(100, Math.max(0, percent || 0));
+  const pct = Math.min(100, Math.max(0, Math.round(percent || 0)));
   if (percentEl) percentEl.textContent = pct + '%';
   if (barEl) barEl.style.width = pct + '%';
 
@@ -454,6 +454,107 @@ window.hideAgroUploadProgress = function() {
   const modal = document.getElementById('agro-global-upload-progress-modal');
   if (modal) modal.style.display = 'none';
   window.setAgroUploadLock(false);
+};
+
+// Global Helper for HEIC / HIEC / HEIF conversion
+window.convertHeicIfNeeded = async function(file) {
+  if (!file) return file;
+  const fileName = (file.name || '').toLowerCase();
+  const fileType = (file.type || '').toLowerCase();
+  const isHeic = /\.(heic|hiec|heif|hief)$/i.test(fileName) || 
+                 fileType.includes('heic') || 
+                 fileType.includes('heif') || 
+                 fileType.includes('hiec') ||
+                 fileType.includes('hief') ||
+                 (fileType === '' && /\.(heic|hiec|heif|hief)$/i.test(fileName));
+  if (!isHeic) return file;
+
+  if (typeof heic2any === 'undefined') {
+    try {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    } catch (e) {
+      console.warn('Could not dynamically load heic2any:', e);
+    }
+  }
+
+  if (typeof heic2any !== 'undefined') {
+    try {
+      if (window.showAgroUploadProgress) {
+        window.showAgroUploadProgress('Procesando Foto de iPhone', 'Convirtiendo formato HEIC/HIEC a JPG...', 20);
+      }
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.92
+      });
+      const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+      const newFileName = file.name.replace(/\.(heic|hiec|heif|hief)$/i, '.jpg');
+      return new File([blob], newFileName, { type: 'image/jpeg' });
+    } catch (err) {
+      console.warn('HEIC conversion error:', err);
+      return file;
+    }
+  }
+  return file;
+};
+
+// Global Helper for Cloudinary upload with real-time XHR progress
+window.uploadToCloudinaryWithProgress = function(file, resourceType = 'image', onProgress = null) {
+  return new Promise((resolve, reject) => {
+    const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+    const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', uploadPreset);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+
+    if (xhr.upload && typeof onProgress === 'function') {
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && e.total > 0) {
+          const percentComplete = Math.round((e.loaded / e.total) * 100);
+          onProgress(percentComplete);
+        }
+      };
+    }
+
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.secure_url) {
+            resolve(data);
+          } else {
+            reject(new Error(data.error?.message || 'Error desconocido de Cloudinary'));
+          }
+        } catch (e) {
+          reject(new Error('Respuesta inválida del servidor'));
+        }
+      } else {
+        try {
+          const errData = JSON.parse(xhr.responseText);
+          reject(new Error(errData.error?.message || `Error HTTP ${xhr.status} al subir archivo`));
+        } catch (e) {
+          reject(new Error(`Error HTTP ${xhr.status} al subir archivo`));
+        }
+      }
+    };
+
+    xhr.onerror = function() {
+      reject(new Error('Error de conexión al subir a Cloudinary'));
+    };
+
+    xhr.send(formData);
+  });
 };
 
 // Sincronizar catálogo inicial desde Firestore si está disponible (con fusión inteligente)

@@ -6,28 +6,10 @@ let currentFormVideo = '';
 
 // Helper for converting iPhone HEIC/HEIF images to JPEG before upload
 async function convertHeicIfNeeded(file) {
-  const isHeic = file.name.toLowerCase().endsWith('.heic') || 
-                 file.name.toLowerCase().endsWith('.heif') || 
-                 file.type === 'image/heic' || 
-                 file.type === 'image/heif';
-  if (!isHeic) return file;
-  if (typeof heic2any === 'undefined') {
-    console.warn('heic2any library not loaded, uploading original file');
-    return file;
+  if (typeof window.convertHeicIfNeeded === 'function') {
+    return await window.convertHeicIfNeeded(file);
   }
-  try {
-    const convertedBlob = await heic2any({
-      blob: file,
-      toType: 'image/jpeg',
-      quality: 0.9
-    });
-    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-    const newFileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
-    return new File([blob], newFileName, { type: 'image/jpeg' });
-  } catch (err) {
-    console.warn('HEIC conversion error:', err);
-    return file;
-  }
+  return file;
 }
 
 // Auth Check & Initialization
@@ -220,28 +202,33 @@ function initDashboardImageManager() {
       try {
         for (let i = 0; i < total; i++) {
           let file = files[i];
-          const pct = Math.round(((i + 1) / total) * 90);
+          const basePct = Math.round((i / total) * 90);
+          const nextPct = Math.round(((i + 1) / total) * 90);
+
           if (window.showAgroUploadProgress) {
             window.showAgroUploadProgress(
               'Subiendo Imágenes a la Nube',
               `Procesando foto ${i + 1} de ${total}: ${file.name}...`,
-              pct
+              basePct + 5
             );
           }
 
           // Convert HEIC if needed
           file = await convertHeicIfNeeded(file);
 
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('upload_preset', uploadPreset);
-
           dropzone.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
-          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-            method: 'POST',
-            body: formData
+
+          const data = await window.uploadToCloudinaryWithProgress(file, 'image', (pct) => {
+            if (window.showAgroUploadProgress) {
+              const currentStepPct = Math.round(basePct + (pct / 100) * (nextPct - basePct));
+              window.showAgroUploadProgress(
+                'Subiendo Imágenes a la Nube',
+                `Subiendo foto ${i + 1} de ${total} (${pct}%): ${file.name}...`,
+                currentStepPct
+              );
+            }
           });
-          const data = await res.json();
+
           if (data.secure_url) {
             currentFormImages.push(data.secure_url);
             renderFormImageThumbnails();
@@ -334,18 +321,16 @@ function initDashboardVideoManager() {
 
         try {
           if (window.showAgroUploadProgress) {
-            window.showAgroUploadProgress('Subiendo Video a la Nube', `Subiendo video: ${file.name}...`, 40);
+            window.showAgroUploadProgress('Subiendo Video a la Nube', `Conectando para subir: ${file.name}...`, 20);
           }
 
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('upload_preset', uploadPreset);
-
-          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
-            method: 'POST',
-            body: formData
+          const data = await window.uploadToCloudinaryWithProgress(file, 'video', (pct) => {
+            if (window.showAgroUploadProgress) {
+              const overallPct = Math.round(20 + (pct * 0.75));
+              window.showAgroUploadProgress('Subiendo Video a la Nube', `Subiendo video: ${pct}% (${(file.size / (1024*1024)).toFixed(1)} MB)...`, overallPct);
+            }
           });
-          const data = await res.json();
+
           if (data.secure_url) {
             currentFormVideo = data.secure_url;
             renderFormVideoPreview();
@@ -1052,18 +1037,16 @@ function initAdminGaleriaModals() {
             file = await convertHeicIfNeeded(file);
 
             if (window.showAgroUploadProgress) {
-              window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Subiendo foto...', 60);
+              window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Subiendo foto a Cloudinary...', 30);
             }
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', uploadPreset);
-
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-              method: 'POST',
-              body: formData
+            const data = await window.uploadToCloudinaryWithProgress(file, 'image', (pct) => {
+              if (window.showAgroUploadProgress) {
+                const overallPct = Math.round(30 + (pct * 0.55));
+                window.showAgroUploadProgress('Subiendo Foto a la Nube', `Subiendo foto: ${pct}%...`, overallPct);
+              }
             });
-            const data = await res.json();
+
             if (data.secure_url) {
               url = data.secure_url;
               miniatura = data.secure_url;
@@ -1076,18 +1059,16 @@ function initAdminGaleriaModals() {
           if (videoInput && videoInput.files && videoInput.files[0]) {
             const file = videoInput.files[0];
             if (window.showAgroUploadProgress) {
-              window.showAgroUploadProgress('Subiendo Video a la Nube', 'Subiendo video...', 60);
+              window.showAgroUploadProgress('Subiendo Video a la Nube', 'Subiendo video a Cloudinary...', 25);
             }
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', uploadPreset);
-
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
-              method: 'POST',
-              body: formData
+            const data = await window.uploadToCloudinaryWithProgress(file, 'video', (pct) => {
+              if (window.showAgroUploadProgress) {
+                const overallPct = Math.round(25 + (pct * 0.60));
+                window.showAgroUploadProgress('Subiendo Video a la Nube', `Subiendo video: ${pct}%...`, overallPct);
+              }
             });
-            const data = await res.json();
+
             if (data.secure_url) {
               url = data.secure_url;
               miniatura = data.secure_url.replace(/\.[^/.]+$/, ".jpg");

@@ -6,28 +6,10 @@ let currentModalVideo = '';
 
 // Helper for converting iPhone HEIC/HEIF images to JPEG before upload
 async function convertHeicIfNeeded(file) {
-  const isHeic = file.name.toLowerCase().endsWith('.heic') || 
-                 file.name.toLowerCase().endsWith('.heif') || 
-                 file.type === 'image/heic' || 
-                 file.type === 'image/heif';
-  if (!isHeic) return file;
-  if (typeof heic2any === 'undefined') {
-    console.warn('heic2any library not loaded, uploading original file');
-    return file;
+  if (typeof window.convertHeicIfNeeded === 'function') {
+    return await window.convertHeicIfNeeded(file);
   }
-  try {
-    const convertedBlob = await heic2any({
-      blob: file,
-      toType: 'image/jpeg',
-      quality: 0.9
-    });
-    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-    const newFileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
-    return new File([blob], newFileName, { type: 'image/jpeg' });
-  } catch (err) {
-    console.warn('HEIC conversion error:', err);
-    return file;
-  }
+  return file;
 }
 
 function initAdminBar() {
@@ -355,7 +337,7 @@ window.openAdminModal = function(id = null) {
             <div id="modal-cloudinary-upload" style="border: 2px dashed #cbd5e1; border-radius: 10px; padding: 1rem; text-align: center; background: white; cursor: pointer;">
               <i class="fas fa-cloud-upload-alt" style="font-size: 1.8rem; color: #1d5497; margin-bottom: 0.3rem;"></i>
               <p style="font-size: 0.85rem; font-weight: 600; color: #334155; margin: 0;">Subir foto (JPG, PNG, HEIC de iPhone)</p>
-              <input type="file" id="modal-file-input" multiple accept="image/*,image/heic,image/heif,.heic,.HEIC,.heif,.HEIF" style="display: none;">
+              <input type="file" id="modal-file-input" multiple accept="image/*,image/heic,image/heif,image/heic-sequence,image/heif-sequence,.heic,.HEIC,.hiec,.HIEC,.heif,.HEIF,.hief,.HIEF" style="display: none;">
             </div>
           </div>
 
@@ -443,26 +425,32 @@ window.openAdminModal = function(id = null) {
       try {
         for (let i = 0; i < total; i++) {
           let file = files[i];
-          const pct = Math.round(((i + 1) / total) * 90);
+          const basePct = Math.round((i / total) * 90);
+          const nextPct = Math.round(((i + 1) / total) * 90);
+
           if (window.showAgroUploadProgress) {
             window.showAgroUploadProgress(
               'Subiendo Foto a la Nube',
               `Procesando foto ${i + 1} de ${total}: ${file.name}...`,
-              pct
+              basePct + 5
             );
           }
 
           file = await convertHeicIfNeeded(file);
 
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('upload_preset', uploadPreset);
-
           uploadBox.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
-          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-            method: 'POST', body: formData
+
+          const data = await window.uploadToCloudinaryWithProgress(file, 'image', (pct) => {
+            if (window.showAgroUploadProgress) {
+              const currentStepPct = Math.round(basePct + (pct / 100) * (nextPct - basePct));
+              window.showAgroUploadProgress(
+                'Subiendo Foto a la Nube',
+                `Subiendo foto ${i + 1} de ${total} (${pct}%): ${file.name}...`,
+                currentStepPct
+              );
+            }
           });
-          const data = await res.json();
+
           if (data.secure_url) {
             currentModalImages.push(data.secure_url);
             renderModalThumbnails();
@@ -522,16 +510,16 @@ window.openAdminModal = function(id = null) {
 
           try {
             if (window.showAgroUploadProgress) {
-              window.showAgroUploadProgress('Subiendo Video', `Subiendo: ${file.name}...`, 45);
+              window.showAgroUploadProgress('Subiendo Video', `Conectando para subir: ${file.name}...`, 20);
             }
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', uploadPreset);
 
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
-              method: 'POST', body: formData
+            const data = await window.uploadToCloudinaryWithProgress(file, 'video', (pct) => {
+              if (window.showAgroUploadProgress) {
+                const overallPct = Math.round(20 + (pct * 0.75));
+                window.showAgroUploadProgress('Subiendo Video', `Subiendo video: ${pct}% (${(file.size / (1024*1024)).toFixed(1)} MB)...`, overallPct);
+              }
             });
-            const data = await res.json();
+
             if (data.secure_url) {
               currentModalVideo = data.secure_url;
               renderModalVideo();
@@ -875,7 +863,7 @@ window.openStoryUploaderModal = function() {
           <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: #e11d48; margin-bottom: 0.5rem;"></i>
           <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0;">Haz clic o arrastra fotos/videos aquí</p>
           <span style="font-size: 0.8rem; color: #94a3b8; display: block; margin-top: 4px;">Puedes seleccionar múltiples archivos juntos</span>
-          <input type="file" id="story-file-input" accept="image/*,video/*" multiple style="display: none;">
+          <input type="file" id="story-file-input" accept="image/*,video/*,image/heic,image/heif,.heic,.HEIC,.hiec,.HIEC,.heif,.HEIF,.hief,.HIEF" multiple style="display: none;">
         </div>
 
         <!-- Previsualización de Archivos Seleccionados -->
