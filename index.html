@@ -83,6 +83,7 @@
         </li>
         <li><a href="#productos">Productos</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="galeria.html">Galería</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="login.html" title="Acceso Administrativo"><i class="fas fa-lock"></i></a></li>
       </ul>
@@ -362,10 +363,19 @@
           <span class="section-tag">Sobre Nosotros</span>
           <h2 class="nosotros-title">Más de dos décadas<br><span class="text-gradient">acompañando al campo</span></h2>
           <p class="nosotros-desc">
-            Somos Agroguardati, una empresa familiar fundada en el corazón productivo de la región pampeana. Desde nuestros inicios, nos dedicamos a acercar la mejor maquinaria agrícola a quienes trabajan la tierra: tractores, cosechadoras, sembradoras y mucho más, tanto nuevos como usados, siempre con el respaldo y la garantía que el productor necesita.
+            Somos Agro Guardati, una empresa familiar ubicada en Galvez Santa fe. Desde nuestros inicios, trabajamos para acercarte maquinaria agrícola de calidad, pensada para acompañar cada desafío del campo.
           </p>
           <p class="nosotros-desc">
-            Creemos que el progreso del campo es el progreso del país. Por eso nos comprometemos con cada cliente a brindar soluciones reales, asesoramiento honesto y posventa de calidad.
+            Tractores, cosechadoras, sembradoras y mucho más, con opciones nuevas y usadas para que encuentres la solución que mejor se adapte a tus necesidades.
+          </p>
+          <p class="nosotros-desc">
+            Te acompañamos en cada paso con asesoramiento personalizado, atención cercana y un servicio de posventa confiable.
+          </p>
+          <p class="nosotros-desc">
+            Porque sabemos que detrás de cada máquina hay trabajo, esfuerzo y proyectos.
+          </p>
+          <p class="nosotros-desc nosotros-highlight">
+            Tu campo avanza. Nosotros avanzamos con vos.
           </p>
 
           <div class="valores-grid">
@@ -395,19 +405,27 @@
       <div class="container">
         <div class="stats-grid">
           <div class="stat-item">
-            <span class="stat-number" data-target="20">0</span><span class="stat-suffix">+</span>
-            <span class="stat-label">Años en el mercado</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="20">0</span>
+            </div>
+            <span class="stat-label">Años de trayectoria</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="500">0</span><span class="stat-suffix">+</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="1000">0</span>
+            </div>
             <span class="stat-label">Equipos vendidos</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="300">0</span><span class="stat-suffix">+</span>
-            <span class="stat-label">Clientes activos</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="15">0</span>
+            </div>
+            <span class="stat-label">Marcas líderes</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="5">0</span><span class="stat-suffix"></span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="5">0</span>
+            </div>
             <span class="stat-label">Provincias con cobertura</span>
           </div>
         </div>
@@ -416,9 +434,9 @@
 
     <!-- Bloque 2: Nuestra Historia (Timeline) -->
     <div class="historia-block container">
-      <div style="text-align: center; margin-bottom: 3.5rem;">
-        <span class="section-tag">Nuestra Trayectoria</span>
-        <h2 style="margin-top: 0.75rem;">Una historia forjada<br><span class="text-gradient">en el campo argentino</span></h2>
+      <div class="historia-header-card">
+        <span class="section-tag section-tag-solid">Nuestra Trayectoria</span>
+        <h2 class="historia-header-title">Una historia forjada<br><span class="text-gradient">en el campo argentino</span></h2>
       </div>
 
       <div class="timeline">
@@ -562,8 +580,9 @@
           <h3>Enlaces Rápidos</h3>
           <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
             <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
-            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
             <li><a href="#nosotros" style="color: #cbd5e1;">Sobre Nosotros</a></li>
+            <li><a href="galeria.html" style="color: #cbd5e1;">Galería Multimedia</a></li>
+            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
             <li><a href="#contacto" style="color: #cbd5e1;">Contacto</a></li>
           </ul>
         </div>
@@ -615,6 +634,9 @@
       </div>
     </div>
   </footer>
+
+  <!-- HEIC Image Support -->
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
   <!-- Firebase & Admin Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

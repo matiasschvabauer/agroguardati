@@ -85,13 +85,18 @@ function initMobileMenu() {
 // --- CATALOG RENDERING & FILTERING ---
 function initCatalog() {
   const catalogContainer = document.getElementById('catalog-list');
-  const filterCat = document.getElementById('filter-categoria');
+  const filterFecha = document.getElementById('filter-fecha');
   const filterMarca = document.getElementById('filter-marca');
   const filterEstado = document.getElementById('filter-estado');
   const estadoTabs = document.querySelectorAll('.estado-tab-btn');
   const brandChips = document.querySelectorAll('.brand-chip');
+  const categoryChips = document.querySelectorAll('.category-chip');
   const btnClearBrand = document.getElementById('btn-clear-brand-filter');
+  const btnClearCategory = document.getElementById('btn-clear-category-filter');
   if (!catalogContainer) return;
+
+  let activeCategoria = 'todas';
+  let activeMarca = 'todas';
 
   if (filterEstado && window.isAgroAdmin && window.isAgroAdmin()) {
     if (!filterEstado.querySelector('option[value="Ocultos"]')) {
@@ -119,9 +124,11 @@ function initCatalog() {
       const btnReset = document.getElementById('btn-reset-filters-empty-m');
       if (btnReset) {
         btnReset.addEventListener('click', () => {
-          if (filterCat) filterCat.value = 'todas';
+          activeCategoria = 'todas';
+          activeMarca = 'todas';
           if (filterMarca) filterMarca.value = 'todas';
           if (filterEstado) filterEstado.value = 'todos';
+          if (filterFecha) filterFecha.value = 'reciente';
           applyFilters();
         });
       }
@@ -198,23 +205,36 @@ function initCatalog() {
       }
     });
 
+    // Sync Category Chips
+    categoryChips.forEach(chip => {
+      const chipCat = chip.getAttribute('data-categoria') || '';
+      const isMatch = (chipCat.toLowerCase() === (valCat || '').toLowerCase());
+      if (isMatch) {
+        chip.classList.add('active');
+        chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
     // Clear Brand Filter button
     if (btnClearBrand) {
-      if (valMarca && valMarca !== 'todas') {
-        btnClearBrand.style.display = 'inline-flex';
-      } else {
-        btnClearBrand.style.display = 'none';
-      }
+      btnClearBrand.style.display = (valMarca && valMarca !== 'todas') ? 'inline-flex' : 'none';
+    }
+
+    // Clear Category Filter button
+    if (btnClearCategory) {
+      btnClearCategory.style.display = (valCat && valCat !== 'todas') ? 'inline-flex' : 'none';
     }
   }
 
   function applyFilters() {
     const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
-    const valCat = filterCat ? filterCat.value : 'todas';
-    const valMarca = filterMarca ? filterMarca.value : 'todas';
+    const valMarca = activeMarca;
     const valEstado = filterEstado ? filterEstado.value : 'todos';
+    const valFecha = filterFecha ? filterFecha.value : 'reciente';
 
-    syncFilterUI(valCat, valMarca, valEstado);
+    syncFilterUI(activeCategoria, valMarca, valEstado);
 
     const isAdmin = window.isAgroAdmin ? window.isAgroAdmin() : false;
 
@@ -222,13 +242,43 @@ function initCatalog() {
       // Si el producto está oculto y el usuario NO es admin, no mostrar
       if (item.oculto && !isAdmin) return false;
 
-      const matchCat = valCat === 'todas' || item.categoria === valCat;
+      // Filtro de Categoría por Chips
+      let matchCat = true;
+      if (activeCategoria !== 'todas') {
+        const itemCat = (item.categoria || '').toLowerCase();
+        const itemName = (item.nombre || '').toLowerCase();
+        const sel = activeCategoria.toLowerCase();
+
+        if (sel === 'tractores') {
+          matchCat = itemCat.includes('tractor') || itemName.includes('tractor');
+        } else if (sel === 'cosechadoras') {
+          matchCat = itemCat.includes('cosecha') || itemName.includes('cosecha');
+        } else if (sel === 'sembradoras') {
+          matchCat = itemCat.includes('sembrad') || itemName.includes('sembrad');
+        } else if (sel === 'tolvas' || sel === 'acoplados' || sel === 'acoplado') {
+          matchCat = itemCat.includes('acoplado') || itemName.includes('tolva') || itemName.includes('acoplado') || itemName.includes('tanque');
+        } else if (sel === 'cortadoras' || sel === 'cortadora') {
+          matchCat = itemName.includes('corta') || itemName.includes('desmalezadora') || itemName.includes('pasto') || itemName.includes('cesped') || itemName.includes('césped');
+        } else if (sel === 'pulverizadores') {
+          matchCat = itemCat.includes('pulveriz') || itemName.includes('pulveriz') || itemName.includes('fumig');
+        } else if (sel === 'lanchas') {
+          matchCat = itemCat.includes('embarca') || itemName.includes('lancha') || itemName.includes('guadalupe');
+        } else if (sel === 'herramientas') {
+          matchCat = itemCat.includes('herramienta');
+        } else {
+          matchCat = itemCat.includes(sel) || itemName.includes(sel);
+        }
+      }
+
+      // Filtro de Marca
       const itemMarcaNorm = (item.marca || '').toLowerCase();
       const valMarcaNorm = (valMarca || '').toLowerCase();
       const matchMarca = valMarca === 'todas' || 
                          itemMarcaNorm === valMarcaNorm ||
                          itemMarcaNorm.includes(valMarcaNorm) ||
                          valMarcaNorm.includes(itemMarcaNorm);
+
+      // Filtro de Estado / Disponibilidad
       let matchEstado = true;
       if (valEstado === 'Nuevo' || valEstado === 'Usado') {
         matchEstado = item.estado === valEstado;
@@ -239,16 +289,51 @@ function initCatalog() {
       } else if (valEstado === 'Ocultos') {
         matchEstado = !!item.oculto;
       }
+
       return matchCat && matchMarca && matchEstado;
+    });
+
+    // Ordenamiento por Fecha y Disponibilidad (Los vendidos aparecen al final)
+    filtered.sort((a, b) => {
+      const aSold = !!a.vendido;
+      const bSold = !!b.vendido;
+      if (aSold !== bSold) {
+        return aSold ? 1 : -1; // Disponibles primero, Vendidos al final
+      }
+
+      const aTime = a.fecha || a.fechaPublicacion || a._updatedAt || (Number(a.id) || 0);
+      const bTime = b.fecha || b.fechaPublicacion || b._updatedAt || (Number(b.id) || 0);
+
+      if (valFecha === 'antigua') {
+        return aTime - bTime;
+      } else {
+        return bTime - aTime;
+      }
     });
 
     renderCatalog(filtered);
   }
 
   // Event Listeners
-  if(filterCat) filterCat.addEventListener('change', applyFilters);
+  if(filterFecha) filterFecha.addEventListener('change', applyFilters);
   if(filterMarca) filterMarca.addEventListener('change', applyFilters);
   if(filterEstado) filterEstado.addEventListener('change', applyFilters);
+
+  // Category Chips Click Event
+  categoryChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeCategoria = chip.getAttribute('data-categoria') || 'todas';
+      applyFilters();
+    });
+  });
+
+  // Clear Category Button
+  if (btnClearCategory) {
+    btnClearCategory.addEventListener('click', () => {
+      activeCategoria = 'todas';
+      applyFilters();
+    });
+  }
 
   // Estado Tabs Click Event
   estadoTabs.forEach(tab => {
@@ -264,10 +349,7 @@ function initCatalog() {
   // Brand Chips Click Event
   brandChips.forEach(chip => {
     chip.addEventListener('click', () => {
-      const targetMarca = chip.getAttribute('data-marca');
-      if (filterMarca) {
-        filterMarca.value = targetMarca;
-      }
+      activeMarca = chip.getAttribute('data-marca') || 'todas';
       applyFilters();
     });
   });
@@ -275,9 +357,7 @@ function initCatalog() {
   // Clear Brand Button
   if (btnClearBrand) {
     btnClearBrand.addEventListener('click', () => {
-      if (filterMarca) {
-        filterMarca.value = 'todas';
-      }
+      activeMarca = 'todas';
       applyFilters();
     });
   }
@@ -291,11 +371,11 @@ function initCatalog() {
   if (paramEstado && filterEstado) {
     filterEstado.value = paramEstado;
   }
-  if (paramMarca && filterMarca) {
-    filterMarca.value = paramMarca;
+  if (paramMarca) {
+    activeMarca = paramMarca;
   }
-  if (paramCat && filterCat) {
-    filterCat.value = paramCat;
+  if (paramCat) {
+    activeCategoria = paramCat;
   }
 
   // View Mode Switcher Mobile
@@ -491,6 +571,21 @@ function initProductDetails() {
           <table class="specs-table" style="width:100%; border-collapse:collapse; margin-top:1rem;">
             <tbody>${specsRows}</tbody>
           </table>
+
+          ${product.video ? `
+            <div class="detail-video-container" style="margin-top: 1.5rem; background: #0f172a; border-radius: 14px; padding: 1rem; border: 1px solid #334155; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; color: #f8fafc;">
+                <span style="font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fas fa-play-circle" style="color: #38bdf8;"></i> Video del Equipo
+                </span>
+                <span style="font-size: 0.72rem; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 20px; font-weight: 600;">Máx. 60s</span>
+              </div>
+              <video controls playsinline preload="metadata" style="width: 100%; max-height: 350px; border-radius: 8px; background: #000; object-fit: contain; display: block;">
+                <source src="${product.video}">
+                Tu dispositivo no soporta la reproducción de este video.
+              </video>
+            </div>
+          ` : ''}
           
           <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
             ${!isSold ? `

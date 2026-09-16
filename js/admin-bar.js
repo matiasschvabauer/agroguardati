@@ -2,6 +2,33 @@
 
 let currentModalImages = [];
 let currentModalSpecs = {};
+let currentModalVideo = '';
+
+// Helper for converting iPhone HEIC/HEIF images to JPEG before upload
+async function convertHeicIfNeeded(file) {
+  const isHeic = file.name.toLowerCase().endsWith('.heic') || 
+                 file.name.toLowerCase().endsWith('.heif') || 
+                 file.type === 'image/heic' || 
+                 file.type === 'image/heif';
+  if (!isHeic) return file;
+  if (typeof heic2any === 'undefined') {
+    console.warn('heic2any library not loaded, uploading original file');
+    return file;
+  }
+  try {
+    const convertedBlob = await heic2any({
+      blob: file,
+      toType: 'image/jpeg',
+      quality: 0.9
+    });
+    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+    const newFileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+    return new File([blob], newFileName, { type: 'image/jpeg' });
+  } catch (err) {
+    console.warn('HEIC conversion error:', err);
+    return file;
+  }
+}
 
 function initAdminBar() {
   const config = window.AGRO_CONFIG?.firebase;
@@ -327,8 +354,29 @@ window.openAdminModal = function(id = null) {
 
             <div id="modal-cloudinary-upload" style="border: 2px dashed #cbd5e1; border-radius: 10px; padding: 1rem; text-align: center; background: white; cursor: pointer;">
               <i class="fas fa-cloud-upload-alt" style="font-size: 1.8rem; color: #1d5497; margin-bottom: 0.3rem;"></i>
-              <p style="font-size: 0.85rem; font-weight: 600; color: #334155; margin: 0;">Subir foto a Cloudinary</p>
-              <input type="file" id="modal-file-input" multiple accept="image/*" style="display: none;">
+              <p style="font-size: 0.85rem; font-weight: 600; color: #334155; margin: 0;">Subir foto (JPG, PNG, HEIC de iPhone)</p>
+              <input type="file" id="modal-file-input" multiple accept="image/*,image/heic,image/heif,.heic,.HEIC,.heif,.HEIF" style="display: none;">
+            </div>
+          </div>
+
+          <!-- Video Corto Demostrativo (Máx 60s) -->
+          <div style="margin-bottom: 1.2rem; background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <label style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.6rem; color: #1e293b;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-video" style="color: #dc2626;"></i> Video Demostrativo (Máx. 60s)
+              </span>
+              <span style="font-size: 0.78rem; font-weight: 500; color: #64748b;">1 solo video</span>
+            </label>
+            <div id="modal-video-preview-container" style="display: none; margin-bottom: 0.8rem; background: #0f172a; padding: 8px; border-radius: 10px; position: relative;">
+              <video id="modal-video-preview" controls playsinline style="width: 100%; max-height: 200px; border-radius: 6px; display: block;"></video>
+              <button type="button" id="modal-btn-remove-video" style="position: absolute; top: 12px; right: 12px; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                <i class="fas fa-trash"></i> Quitar
+              </button>
+            </div>
+            <div id="modal-cloudinary-video-upload" style="border: 2px dashed #cbd5e1; border-radius: 10px; padding: 0.8rem; text-align: center; background: white; cursor: pointer;">
+              <i class="fas fa-file-video" style="font-size: 1.6rem; color: #dc2626; margin-bottom: 0.2rem;"></i>
+              <p id="modal-video-dropzone-text" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin: 0;">Seleccionar video corto (hasta 60s)</p>
+              <input type="file" id="modal-video-file-input" accept="video/*" style="display: none;">
             </div>
           </div>
 
@@ -394,15 +442,17 @@ window.openAdminModal = function(id = null) {
 
       try {
         for (let i = 0; i < total; i++) {
-          const file = files[i];
+          let file = files[i];
           const pct = Math.round(((i + 1) / total) * 90);
           if (window.showAgroUploadProgress) {
             window.showAgroUploadProgress(
               'Subiendo Foto a la Nube',
-              `Subiendo foto ${i + 1} de ${total}: ${file.name}...`,
+              `Procesando foto ${i + 1} de ${total}: ${file.name}...`,
               pct
             );
           }
+
+          file = await convertHeicIfNeeded(file);
 
           const formData = new FormData();
           formData.append('file', file);
@@ -426,10 +476,87 @@ window.openAdminModal = function(id = null) {
       } catch (err) {
         alert("Error subiendo foto: " + err.message);
       } finally {
-        uploadBox.querySelector('p').textContent = 'Subir foto a Cloudinary';
+        uploadBox.querySelector('p').textContent = 'Subir foto (JPG, PNG, HEIC de iPhone)';
         if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
       }
     };
+
+    // Video Upload Handlers in Modal
+    const videoUploadBox = document.getElementById('modal-cloudinary-video-upload');
+    const videoFileInput = document.getElementById('modal-video-file-input');
+    const btnRemoveVideo = document.getElementById('modal-btn-remove-video');
+
+    if (videoUploadBox && videoFileInput) {
+      videoUploadBox.onclick = () => videoFileInput.click();
+
+      videoFileInput.onchange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        // Duration Check (max 60s)
+        const tempVideo = document.createElement('video');
+        tempVideo.preload = 'metadata';
+        const objUrl = URL.createObjectURL(file);
+        tempVideo.src = objUrl;
+
+        await new Promise((resolve) => {
+          tempVideo.onloadedmetadata = () => {
+            URL.revokeObjectURL(objUrl);
+            if (tempVideo.duration > 60.5) {
+              alert(`El video dura ${Math.round(tempVideo.duration)} segundos. El límite máximo es de 60 segundos.`);
+              videoFileInput.value = '';
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          };
+          tempVideo.onerror = () => {
+            URL.revokeObjectURL(objUrl);
+            resolve(true);
+          };
+        }).then(async (valid) => {
+          if (!valid) return;
+
+          const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+          const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+
+          try {
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Video', `Subiendo: ${file.name}...`, 45);
+            }
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+              method: 'POST', body: formData
+            });
+            const data = await res.json();
+            if (data.secure_url) {
+              currentModalVideo = data.secure_url;
+              renderModalVideo();
+              if (window.showAgroUploadProgress) {
+                window.showAgroUploadProgress('Subiendo Video', '¡Video subido con éxito!', 100);
+              }
+            } else if (data.error) {
+              alert('Error Cloudinary: ' + data.error.message);
+            }
+          } catch (err) {
+            alert('Error subiendo video: ' + err.message);
+          } finally {
+            videoFileInput.value = '';
+            if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
+          }
+        });
+      };
+    }
+
+    if (btnRemoveVideo) {
+      btnRemoveVideo.onclick = () => {
+        currentModalVideo = '';
+        renderModalVideo();
+      };
+    }
 
     const chkPrice = document.getElementById('modal-prod-mostrar-precio');
     const priceFields = document.getElementById('modal-price-fields-container');
@@ -467,6 +594,7 @@ window.openAdminModal = function(id = null) {
         oculto,
         mostrarPrecio, moneda, precio,
         modelo3d,
+        video: currentModalVideo || '',
         imagen: mainImg,
         imagenes: currentModalImages.length > 0 ? currentModalImages : [mainImg],
         descripcionCorta: descCorta,
@@ -525,6 +653,7 @@ window.openAdminModal = function(id = null) {
       document.getElementById('modal-prod-desc-corta').value = prod.descripcionCorta;
       document.getElementById('modal-prod-desc-larga').value = prod.descripcionLarga;
       currentModalImages = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
+      currentModalVideo = prod.video || '';
       currentModalSpecs = prod.especificaciones ? { ...prod.especificaciones } : { "Marca": prod.marca, "Estado": prod.estado };
     }
   } else {
@@ -549,13 +678,31 @@ window.openAdminModal = function(id = null) {
     document.getElementById('modal-prod-precio').value = '';
 
     currentModalImages = [];
+    currentModalVideo = '';
     currentModalSpecs = { "Marca": "", "Estado": "Nuevo" };
   }
 
   renderModalThumbnails();
+  renderModalVideo();
   renderModalSpecs();
   modal.style.display = 'flex';
 };
+
+function renderModalVideo() {
+  const previewBox = document.getElementById('modal-video-preview-container');
+  const videoEl = document.getElementById('modal-video-preview');
+  const dropText = document.getElementById('modal-video-dropzone-text');
+  if (!previewBox || !videoEl) return;
+  if (currentModalVideo) {
+    videoEl.src = currentModalVideo;
+    previewBox.style.display = 'block';
+    if (dropText) dropText.textContent = 'Cambiar video';
+  } else {
+    videoEl.src = '';
+    previewBox.style.display = 'none';
+    if (dropText) dropText.textContent = 'Seleccionar video corto (hasta 60s)';
+  }
+}
 
 function moveModalImage(fromIndex, toIndex) {
   if (toIndex < 0 || toIndex >= currentModalImages.length) return;
@@ -704,7 +851,7 @@ window.openStoryUploaderModal = function() {
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
           <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-camera" style="color: #e11d48;"></i> Subida Masiva de Historias (24h)
+            <i class="fas fa-camera" style="color: #e11d48;"></i> Subida Masiva de Historias (7 días)
           </h3>
           <button id="close-story-uploader" style="background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; font-weight: 700;">&times;</button>
         </div>
@@ -789,7 +936,7 @@ window.openStoryUploaderModal = function() {
 
     dropzone.onclick = () => fileInput.click();
 
-    fileInput.onchange = (e) => {
+    fileInput.onchange = async (e) => {
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
 
@@ -798,18 +945,18 @@ window.openStoryUploaderModal = function() {
         return;
       }
 
-      files.forEach(file => {
-        // Validar tamaño de foto (15MB) y video (100MB)
+      for (let rawFile of files) {
+        const file = await convertHeicIfNeeded(rawFile);
         const isVideo = file.type.startsWith('video');
         const maxSize = isVideo ? 100 * 1024 * 1024 : 15 * 1024 * 1024;
 
         if (file.size > maxSize) {
           alert(`El archivo "${file.name}" supera el tamaño máximo permitido (${isVideo ? '100MB para videos' : '15MB para fotos'}).`);
-          return;
+          continue;
         }
 
         selectedFiles.push(file);
-      });
+      }
 
       renderPreviews();
     };

@@ -1,6 +1,7 @@
-// --- AGROGUARDATI - MÓDULO DE HISTORIAS / NOVEDADES 24HS (ESTILO INSTAGRAM/WHATSAPP) ---
+// --- AGROGUARDATI - MÓDULO DE HISTORIAS / NOVEDADES SEMANALES (168HS / 7 DÍAS) ---
 
 const STORIES_KEY = 'agroguardati_stories_v1';
+const STORY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 días (168 horas)
 
 const DEFAULT_STORIES = [
   {
@@ -9,11 +10,11 @@ const DEFAULT_STORIES = [
     url: 'https://res.cloudinary.com/pfskomq5/image/upload/v1786402390/ppkewsxmkf0uwqi1tn7g.jpg',
     caption: '¡Nuevos ingresos de maquinarias en Agroguardati! Consultá disponibilidad.',
     fecha: Date.now(),
-    expira: Date.now() + (24 * 60 * 60 * 1000)
+    expira: Date.now() + STORY_DURATION_MS
   }
 ];
 
-// 1. Obtener historias activas (menos de 24hs de antigüedad)
+// 1. Obtener historias activas (menos de 7 días de antigüedad)
 window.getAgroStories = function() {
   const localData = localStorage.getItem(STORIES_KEY);
   let stories = [];
@@ -53,7 +54,7 @@ window.saveAgroStoriesBatch = async function(storiesArray) {
     public_id: st.public_id || '',
     caption: st.caption || '',
     fecha: now,
-    expira: now + (24 * 60 * 60 * 1000)
+    expira: now + STORY_DURATION_MS
   }));
 
   stories = [...formattedNewStories, ...stories];
@@ -110,7 +111,7 @@ function renderStoriesBar() {
       <img src="${thumbUrl}" class="story-avatar-img">
     </div>
     <span class="story-avatar-label" style="display: flex; align-items: center; gap: 6px;">
-      Novedades (24h) 
+      Novedades (Semanal) 
       <i class="fas fa-chevron-down story-dropdown-arrow" style="font-size: 0.75rem; transition: transform 0.3s ease;"></i>
     </span>
   `;

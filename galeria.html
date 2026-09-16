@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galería Multimedia - Agroguardati | Maquinaria Agrícola</title>
+  <meta name="description" content="Descubrí fotos, videos, nuestra historia y maquinaria en acción en la galería multimedia de Agroguardati.">
+  <link rel="icon" type="image/png" href="AGLOGOCIRC.png">
+
+  <!-- Preconnect y Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Estilos Globales -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Detección de Dispositivo Móvil -->
+  <script>
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
+      window.location.replace("m_galeria.html" + window.location.search);
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ===== HEADER / NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="logo-container" style="display: flex; align-items: center; gap: 1rem;">
+        <img src="AgroGuardatiLogo.png" alt="Agroguardati Logo">
+        <span style="font-size: 1.5rem; font-weight: 700; color: var(--brand-blue-dark); font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">Agro<span style="color: #d32f2f;">guardati</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Inicio</a></li>
+        <li class="nav-dropdown-item">
+          <a href="catalogo.html" class="nav-dropdown-toggle">
+            Catálogo <i class="fas fa-chevron-down"></i>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a href="catalogo.html" class="dropdown-link">
+              <i class="fas fa-th-large" style="color: var(--brand-blue);"></i>
+              <div>
+                <span class="dropdown-link-title">Todo el Catálogo</span>
+                <span class="dropdown-link-sub">Ver todas las maquinarias</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Nuevo" class="dropdown-link">
+              <i class="fas fa-certificate" style="color: #16a34a;"></i>
+              <div>
+                <span class="dropdown-link-title">Maquinaria Nueva</span>
+                <span class="dropdown-link-sub">Línea oficial de marcas 0km</span>
+              </div>
+            </a>
+            <a href="catalogo.html?estado=Usado" class="dropdown-link">
+              <i class="fas fa-tag" style="color: #0284c7;"></i>
+              <div>
+                <span class="dropdown-link-title">Equipos Usados</span>
+                <span class="dropdown-link-sub">Usados seleccionados y garantizados</span>
+              </div>
+            </a>
+          </div>
+        </li>
+        <li><a href="index.html#productos">Productos</a></li>
+        <li><a href="index.html#nosotros">Nosotros</a></li>
+        <li><a href="galeria.html" class="active">Galería</a></li>
+        <li><a href="index.html#contacto">Contacto</a></li>
+        <li><a href="login.html" title="Acceso Administrativo"><i class="fas fa-lock"></i></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== HERO DE GALERÍA ===== -->
+  <section class="galeria-hero">
+    <div class="container">
+      <span class="section-tag" style="background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3); margin-bottom: 0.75rem;">
+        <i class="fas fa-photo-video"></i> Espacio Multimedia
+      </span>
+      <h1 class="galeria-hero-title">Galería de <span class="text-gradient">Agroguardati</span></h1>
+      <p class="galeria-hero-subtitle">
+        Conocé nuestra historia, el trabajo en el campo, entregas a productores y las instalaciones que nos acompañan día a día en Gálvez, Santa Fe.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== BARRA DE MICRO-SECCIONES Y FORMATOS (STICKY) ===== -->
+  <section class="galeria-sections-container">
+    <div class="container galeria-filter-flex">
+      <div class="galeria-chips-wrapper" id="galeria-chips-container">
+        <!-- Renderizado dinámico de chips de micro-secciones -->
+      </div>
+
+      <div class="galeria-format-filters">
+        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-right: 4px;">Formato:</span>
+        <button class="btn-format-filter active" data-tipo="todos">Todos</button>
+        <button class="btn-format-filter" data-tipo="foto"><i class="fas fa-camera"></i> Fotos</button>
+        <button class="btn-format-filter" data-tipo="video"><i class="fas fa-video"></i> Videos</button>
+        <button class="btn-format-filter" data-tipo="youtube"><i class="fab fa-youtube" style="color:#ef4444;"></i> YouTube</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GRILLA PRINCIPAL DE GALERÍA ===== -->
+  <main class="galeria-main-section">
+    <div class="container">
+
+      <!-- Admin Floating Quick Action Bar (Visible si está logueado como Admin) -->
+      <div id="galeria-admin-actions" style="display: none; justify-content: flex-end; gap: 10px; margin-bottom: 2rem;">
+        <button id="btn-admin-add-seccion" class="btn btn-secondary" style="background: #ffffff; border: 1.5px solid #cbd5e1; color: var(--brand-blue-dark); font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-folder-plus"></i> Crear Micro-Sección
+        </button>
+        <button id="btn-admin-add-galeria" class="btn btn-primary" style="background: var(--brand-blue); color: #fff; font-weight: 700; padding: 8px 18px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(29,84,151,0.25);">
+          <i class="fas fa-plus-circle"></i> Agregar Foto / Video / YouTube
+        </button>
+      </div>
+
+      <!-- Grilla de Cards -->
+      <div id="galeria-items-grid" class="galeria-grid">
+        <!-- Dynamic Cards -->
+      </div>
+
+      <!-- Estado Vacío -->
+      <div id="galeria-empty-state" style="display: none; text-align: center; padding: 5rem 1.5rem; background: #ffffff; border-radius: 20px; border: 1px dashed #cbd5e1; max-width: 550px; margin: 3rem auto;">
+        <div style="width: 70px; height: 70px; border-radius: 50%; background: #eff6ff; color: var(--brand-blue); display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+          <i class="fas fa-images"></i>
+        </div>
+        <h3 style="font-size: 1.3rem; color: #0f172a; margin-bottom: 0.5rem;">No hay contenidos en esta sección</h3>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 0;">Selecciona otra categoría o formato para ver fotos y videos disponibles.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== MODAL LIGHTBOX PARA FOTOS ===== -->
+  <div id="galeria-lightbox-modal" class="galeria-modal-backdrop">
+    <div class="galeria-modal-content">
+      <button id="btn-close-lightbox" class="galeria-modal-close" title="Cerrar">&times;</button>
+      <div class="galeria-modal-body">
+        <img id="lightbox-img" src="" alt="Foto en alta resolución" class="galeria-lightbox-img">
+        <div class="galeria-modal-info">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span id="lightbox-section" style="font-size: 0.8rem; font-weight: 700; color: var(--brand-blue); text-transform: uppercase;"></span>
+            <span id="lightbox-date" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);"></span>
+          </div>
+          <h2 id="lightbox-title" style="font-size: 1.4rem; color: #0f172a; margin-bottom: 0.5rem;"></h2>
+          <p id="lightbox-desc" style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL REPRODUCTOR PARA VIDEOS Y YOUTUBE ===== -->
+  <div id="galeria-video-modal" class="galeria-modal-backdrop">
+    <div class="galeria-modal-content" style="max-width: 850px;">
+      <button id="btn-close-video" class="galeria-modal-close" title="Cerrar">&times;</button>
+      <div class="galeria-modal-body">
+        <div id="video-player-container" class="galeria-video-container">
+          <!-- Dynamic Iframe / Video element -->
+        </div>
+        <div class="galeria-modal-info">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span id="video-modal-section" style="font-size: 0.8rem; font-weight: 700; color: var(--brand-blue); text-transform: uppercase;"></span>
+            <span id="video-modal-date" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);"></span>
+          </div>
+          <h2 id="video-modal-title" style="font-size: 1.4rem; color: #0f172a; margin-bottom: 0.5rem;"></h2>
+          <p id="video-modal-desc" style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ADMIN: AGREGAR ITEM A GALERÍA ===== -->
+  <div id="modal-admin-galeria-item" class="modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="modal-card" style="background: white; border-radius: 20px; max-width: 650px; width: 100%; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.8rem;">
+        <h3 id="modal-item-title" style="font-size: 1.3rem; color: #0f172a; margin: 0;">Agregar Contenido a Galería</h3>
+        <button type="button" class="btn-close-admin-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+
+      <form id="form-galeria-item">
+        <input type="hidden" id="gal-item-id">
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Micro-Sección</label>
+          <select id="gal-item-seccion" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;" required></select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Tipo de Contenido</label>
+          <select id="gal-item-tipo" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;" required>
+            <option value="foto">📷 Foto (Imagen / Subida directa)</option>
+            <option value="youtube">▶️ Video de YouTube (Enlace / ID)</option>
+            <option value="video">🎥 Video Directo (Subida de archivo MP4)</option>
+          </select>
+        </div>
+
+        <!-- Grupo Foto -->
+        <div id="group-upload-foto" class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Seleccionar Foto (.jpg, .png, .heic)</label>
+          <input type="file" id="gal-foto-file" accept="image/*,.heic,.heif" class="form-control" style="width: 100%; padding: 0.75rem; border-radius: 10px; border: 1px dashed #94a3b8; background: #f8fafc;">
+        </div>
+
+        <!-- Grupo Video Upload -->
+        <div id="group-upload-video" class="form-group" style="display: none; margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Seleccionar Video (.mp4, .webm, .mov)</label>
+          <input type="file" id="gal-video-file" accept="video/*" class="form-control" style="width: 100%; padding: 0.75rem; border-radius: 10px; border: 1px dashed #94a3b8; background: #f8fafc;">
+        </div>
+
+        <!-- Grupo YouTube URL -->
+        <div id="group-youtube-url" class="form-group" style="display: none; margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Enlace del Video de YouTube</label>
+          <input type="url" id="gal-youtube-url" class="form-control" placeholder="Ej: https://www.youtube.com/watch?v=..." style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Título de la Publicación</label>
+          <input type="text" id="gal-item-titulo" class="form-control" placeholder="Ej: Entrega de Cosechadora en Rafaela" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Descripción / Detalles</label>
+          <textarea id="gal-item-desc" class="form-control" rows="3" placeholder="Detalle o contexto de la foto/video..." style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;"></textarea>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Año o Fecha</label>
+          <input type="text" id="gal-item-fecha" class="form-control" placeholder="Ej: 2024 o 15/05/2024" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn-close-admin-modal" style="padding: 0.75rem 1.25rem; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; cursor: pointer;">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 10px; border: none; background: var(--brand-blue); color: #ffffff; font-weight: 700; cursor: pointer;">Guardar en Galería</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ADMIN: CREAR MICRO-SECCIÓN ===== -->
+  <div id="modal-admin-galeria-seccion" class="modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="modal-card" style="background: white; border-radius: 20px; max-width: 550px; width: 100%; padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.8rem;">
+        <h3 style="font-size: 1.3rem; color: #0f172a; margin: 0;">Crear Nueva Micro-Sección</h3>
+        <button type="button" class="btn-close-admin-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+
+      <form id="form-galeria-seccion">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Nombre de la Sección</label>
+          <input type="text" id="gal-sec-nombre" class="form-control" placeholder="Ej: Eventos y Exposiciones" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Descripción breve</label>
+          <input type="text" id="gal-sec-desc" class="form-control" placeholder="Ej: Presencia de Agroguardati en ferias y exposiciones del agro" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: #334155;">Icono representativo</label>
+          <select id="gal-sec-icono" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+            <option value="fa-folder">📁 Carpeta general</option>
+            <option value="fa-landmark">🏛️ Historia y Orígenes</option>
+            <option value="fa-truck-loading">🚚 Entregas y Envíos</option>
+            <option value="fa-tractor">🚜 Maquinaria / Campo</option>
+            <option value="fa-tools">🔧 Taller y Servicio</option>
+            <option value="fa-users">👥 Equipo y Clientes</option>
+            <option value="fa-award">🏆 Reconocimientos y Ferias</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn-close-admin-modal" style="padding: 0.75rem 1.25rem; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; cursor: pointer;">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 10px; border: none; background: var(--brand-blue); color: #ffffff; font-weight: 700; cursor: pointer;">Crear Sección</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="AgroGuardatiLogo.png" alt="Agroguardati"
+            style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+          <p>Potenciando el desarrollo agropecuario con soluciones integrales en maquinaria.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Enlaces Rápidos</h3>
+          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
+            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
+            <li><a href="index.html#productos" style="color: #cbd5e1;">Productos Destacados</a></li>
+            <li><a href="index.html#nosotros" style="color: #cbd5e1;">Sobre Nosotros</a></li>
+            <li><a href="galeria.html" style="color: #cbd5e1;">Galería Multimedia</a></li>
+            <li><a href="index.html#contacto" style="color: #cbd5e1;">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Legales y Políticas</h3>
+          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="terminos.html#terminos" style="color: #cbd5e1;">Términos y Condiciones</a></li>
+            <li><a href="terminos.html#privacidad" style="color: #cbd5e1;">Políticas de Privacidad</a></li>
+            <li><a href="terminos.html#logistica" style="color: #cbd5e1;">Logística y Envíos</a></li>
+            <li><a href="terminos.html#equipos" style="color: #cbd5e1;">Maquinaria Usada</a></li>
+            <li><a href="terminos.html#defensa-consumidor" style="color: #cbd5e1;">Defensa del Consumidor</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Contacto</h3>
+          <p>📞 +54 9 3404 63-8524</p>
+          <p>📍 Av Jorge Newbery 526 bis</p>
+          <div class="social-links" style="margin-top: 1rem;">
+            <a href="https://www.facebook.com/profile.php?id=100063607388862" target="_blank" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/agroguardati/" target="_blank" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+            <a href="https://www.google.com/maps/place/AGROGUARDATI/@-32.0368264,-61.2019932,19.54z" target="_blank"
+              aria-label="Google Maps">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Agroguardati. Todos los derechos reservados.</p>
+        <p style="margin-top: 5px; font-size: 0.85rem; color: #94a3b8;">
+            Desarrollado por <a href="https://matiasschvabauer.github.io/portafolio/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: 500;">Schvabauer Matías</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts Firebase & Admin -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/galeria-store.js"></script>
+  <script src="js/galeria.js"></script>
+  <script src="js/admin-bar.js?v=3.5"></script>
+</body>
+</html>

@@ -2,6 +2,33 @@
 
 let currentFormImages = [];
 let currentFormSpecs = [];
+let currentFormVideo = '';
+
+// Helper for converting iPhone HEIC/HEIF images to JPEG before upload
+async function convertHeicIfNeeded(file) {
+  const isHeic = file.name.toLowerCase().endsWith('.heic') || 
+                 file.name.toLowerCase().endsWith('.heif') || 
+                 file.type === 'image/heic' || 
+                 file.type === 'image/heif';
+  if (!isHeic) return file;
+  if (typeof heic2any === 'undefined') {
+    console.warn('heic2any library not loaded, uploading original file');
+    return file;
+  }
+  try {
+    const convertedBlob = await heic2any({
+      blob: file,
+      toType: 'image/jpeg',
+      quality: 0.9
+    });
+    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+    const newFileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+    return new File([blob], newFileName, { type: 'image/jpeg' });
+  } catch (err) {
+    console.warn('HEIC conversion error:', err);
+    return file;
+  }
+}
 
 // Auth Check & Initialization
 function initDashboardAuth() {
@@ -192,15 +219,18 @@ function initDashboardImageManager() {
 
       try {
         for (let i = 0; i < total; i++) {
-          const file = files[i];
+          let file = files[i];
           const pct = Math.round(((i + 1) / total) * 90);
           if (window.showAgroUploadProgress) {
             window.showAgroUploadProgress(
               'Subiendo Imágenes a la Nube',
-              `Subiendo foto ${i + 1} de ${total}: ${file.name}...`,
+              `Procesando foto ${i + 1} de ${total}: ${file.name}...`,
               pct
             );
           }
+
+          // Convert HEIC if needed
+          file = await convertHeicIfNeeded(file);
 
           const formData = new FormData();
           formData.append('file', file);
@@ -225,7 +255,7 @@ function initDashboardImageManager() {
       } catch (err) {
         alert('Error al subir foto: ' + err.message);
       } finally {
-        dropzone.querySelector('p').textContent = 'Arrastrá o selecciona fotos para subir a Cloudinary';
+        dropzone.querySelector('p').textContent = 'Arrastrá o selecciona fotos (JPG, PNG, HEIC de iPhone)';
         if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
       }
     };
@@ -238,6 +268,117 @@ function initDashboardImageManager() {
         currentFormImages.push(url);
         manualUrlInput.value = '';
         renderFormImageThumbnails();
+      }
+    };
+  }
+}
+
+// Video Manager (Max 1 video, <= 60 seconds)
+function renderFormVideoPreview() {
+  const container = document.getElementById('video-preview-container');
+  const preview = document.getElementById('form-video-preview');
+  const dropzoneText = document.getElementById('video-dropzone-text');
+  if (!container || !preview) return;
+
+  if (currentFormVideo) {
+    preview.src = currentFormVideo;
+    container.style.display = 'block';
+    if (dropzoneText) dropzoneText.textContent = 'Cambiar video corto';
+  } else {
+    preview.src = '';
+    container.style.display = 'none';
+    if (dropzoneText) dropzoneText.textContent = 'Seleccionar video corto (hasta 60s)';
+  }
+}
+
+function initDashboardVideoManager() {
+  const videoDropzone = document.getElementById('video-dropzone');
+  const videoFileInput = document.getElementById('video-file-input');
+  const btnRemoveVideo = document.getElementById('btn-remove-video');
+  const btnAddManualVideo = document.getElementById('btn-add-manual-video');
+  const manualVideoUrlInput = document.getElementById('manual-video-url-input');
+
+  if (videoDropzone && videoFileInput) {
+    videoDropzone.onclick = () => videoFileInput.click();
+
+    videoFileInput.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      // Validate video duration (max 60 seconds)
+      const tempVideo = document.createElement('video');
+      tempVideo.preload = 'metadata';
+      const objUrl = URL.createObjectURL(file);
+      tempVideo.src = objUrl;
+
+      await new Promise((resolve) => {
+        tempVideo.onloadedmetadata = () => {
+          URL.revokeObjectURL(objUrl);
+          if (tempVideo.duration > 60.5) {
+            alert(`El video dura ${Math.round(tempVideo.duration)} segundos. El límite máximo permitido es de 60 segundos.`);
+            videoFileInput.value = '';
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+        tempVideo.onerror = () => {
+          URL.revokeObjectURL(objUrl);
+          resolve(true); // Proceed if browser cannot load metadata synchronously
+        };
+      }).then(async (valid) => {
+        if (!valid) return;
+
+        const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+        const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+
+        try {
+          if (window.showAgroUploadProgress) {
+            window.showAgroUploadProgress('Subiendo Video a la Nube', `Subiendo video: ${file.name}...`, 40);
+          }
+
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', uploadPreset);
+
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (data.secure_url) {
+            currentFormVideo = data.secure_url;
+            renderFormVideoPreview();
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Video a la Nube', '¡Video subido con éxito!', 100);
+            }
+          } else if (data.error) {
+            alert('Error Cloudinary: ' + data.error.message);
+          }
+        } catch (err) {
+          alert('Error al subir video: ' + err.message);
+        } finally {
+          videoFileInput.value = '';
+          if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
+        }
+      });
+    };
+  }
+
+  if (btnRemoveVideo) {
+    btnRemoveVideo.onclick = () => {
+      currentFormVideo = '';
+      renderFormVideoPreview();
+    };
+  }
+
+  if (btnAddManualVideo && manualVideoUrlInput) {
+    btnAddManualVideo.onclick = () => {
+      const url = manualVideoUrlInput.value.trim();
+      if (url) {
+        currentFormVideo = url;
+        manualVideoUrlInput.value = '';
+        renderFormVideoPreview();
       }
     };
   }
@@ -391,11 +532,13 @@ function initDashboardModal() {
       document.getElementById('form-prod-desc-corta').value = '';
       document.getElementById('form-prod-desc-larga').value = '';
       currentFormImages = [];
+      currentFormVideo = '';
       currentFormSpecs = [
         { key: "Marca", val: "" },
         { key: "Estado", val: "Nuevo" }
       ];
       renderFormImageThumbnails();
+      renderFormVideoPreview();
       renderFormSpecsRows();
       modal.style.display = 'flex';
     };
@@ -459,6 +602,7 @@ function initDashboardModal() {
         oculto,
         mostrarPrecio, moneda, precio,
         modelo3d,
+        video: currentFormVideo || '',
         imagen: mainImg,
         imagenes: currentFormImages.length > 0 ? currentFormImages : [mainImg],
         descripcionCorta: descCorta,
@@ -521,6 +665,7 @@ window.editDashboardProduct = function(id) {
   document.getElementById('form-prod-desc-larga').value = prod.descripcionLarga;
 
   currentFormImages = prod.imagenes ? [...prod.imagenes] : [prod.imagen];
+  currentFormVideo = prod.video || '';
   
   let specs = prod.especificaciones || {};
   if (Array.isArray(specs)) {
@@ -535,6 +680,7 @@ window.editDashboardProduct = function(id) {
   }
 
   renderFormImageThumbnails();
+  renderFormVideoPreview();
   renderFormSpecsRows();
   modal.style.display = 'flex';
 };
@@ -567,11 +713,493 @@ window.deleteDashboardProduct = async function(id) {
   }
 };
 
-// Event Listeners for Filters
+/* ==========================================================================
+   GESTIÓN DE GALERÍA Y MICRO-SECCIONES EN ADMIN
+   ========================================================================== */
+
+let currentAdminGalEditItem = null;
+
+// Tab Switcher between Catálogo and Galería
+function initAdminTabs() {
+  const btnCat = document.getElementById('tab-btn-catalogo');
+  const btnGal = document.getElementById('tab-btn-galeria');
+  const viewCat = document.getElementById('admin-view-catalogo');
+  const viewGal = document.getElementById('admin-view-galeria');
+
+  if (!btnCat || !btnGal || !viewCat || !viewGal) return;
+
+  function switchTab(target) {
+    if (target === 'galeria') {
+      btnGal.classList.add('active');
+      btnGal.style.color = 'var(--brand-blue)';
+      btnGal.style.borderBottom = '3px solid var(--brand-blue)';
+      btnGal.style.marginBottom = '-2px';
+
+      btnCat.classList.remove('active');
+      btnCat.style.color = '#64748b';
+      btnCat.style.borderBottom = 'none';
+      btnCat.style.marginBottom = '0';
+
+      viewCat.style.display = 'none';
+      viewGal.style.display = 'block';
+
+      renderAdminSeccionesChips();
+      renderAdminGaleriaTable();
+    } else {
+      btnCat.classList.add('active');
+      btnCat.style.color = 'var(--brand-blue)';
+      btnCat.style.borderBottom = '3px solid var(--brand-blue)';
+      btnCat.style.marginBottom = '-2px';
+
+      btnGal.classList.remove('active');
+      btnGal.style.color = '#64748b';
+      btnGal.style.borderBottom = 'none';
+      btnGal.style.marginBottom = '0';
+
+      viewGal.style.display = 'none';
+      viewCat.style.display = 'block';
+
+      renderDashboardTable();
+    }
+  }
+
+  btnCat.addEventListener('click', () => switchTab('catalogo'));
+  btnGal.addEventListener('click', () => switchTab('galeria'));
+}
+
+// Render Micro-Sections Chips in Admin
+function renderAdminSeccionesChips() {
+  const container = document.getElementById('admin-secciones-chips-container');
+  const filterSelect = document.getElementById('admin-gal-filter-seccion');
+  const formSelect = document.getElementById('admin-gal-form-seccion');
+
+  if (!window.AgroGaleriaStore) return;
+
+  const secciones = window.AgroGaleriaStore.getMicroSecciones();
+  const items = window.AgroGaleriaStore.getItems();
+
+  // Populate Filter Select
+  if (filterSelect) {
+    const currentVal = filterSelect.value;
+    filterSelect.innerHTML = `<option value="todas">Todas las micro-secciones (${items.length})</option>`;
+    secciones.forEach(sec => {
+      const count = items.filter(it => it.seccionId === sec.id).length;
+      filterSelect.innerHTML += `<option value="${sec.id}">${sec.nombre} (${count})</option>`;
+    });
+    if (currentVal) filterSelect.value = currentVal;
+  }
+
+  // Populate Form Select
+  if (formSelect) {
+    const currentVal = formSelect.value;
+    formSelect.innerHTML = '';
+    secciones.forEach(sec => {
+      formSelect.innerHTML += `<option value="${sec.id}">${sec.nombre}</option>`;
+    });
+    if (currentVal) formSelect.value = currentVal;
+  }
+
+  // Populate Chips
+  if (container) {
+    container.innerHTML = '';
+    secciones.forEach(sec => {
+      const count = items.filter(it => it.seccionId === sec.id).length;
+      const isDefaultSec = sec.id === 'historia';
+
+      const chip = document.createElement('div');
+      chip.style.cssText = 'display: inline-flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 14px; border-radius: 30px; border: 1px solid #cbd5e1; font-size: 0.88rem; font-weight: 600; color: #1e293b;';
+      chip.innerHTML = `
+        <i class="fas ${sec.icono || 'fa-folder'}" style="color: var(--brand-blue);"></i>
+        <span>${sec.nombre}</span>
+        <span style="background: #e2e8f0; color: #475569; font-size: 0.75rem; padding: 2px 7px; border-radius: 12px; font-weight: 700;">${count}</span>
+        ${!isDefaultSec ? `
+          <button type="button" onclick="deleteAdminMicroSeccion('${sec.id}')" title="Eliminar micro-sección" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; padding: 2px; margin-left: 2px;">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        ` : ''}
+      `;
+      container.appendChild(chip);
+    });
+  }
+}
+
+// Render Gallery Items Table in Admin
+function renderAdminGaleriaTable() {
+  const tableBody = document.getElementById('admin-galeria-table-body');
+  const countText = document.getElementById('galeria-count-text');
+  const searchVal = (document.getElementById('admin-gal-search-input')?.value || '').toLowerCase().trim();
+  const filterSec = document.getElementById('admin-gal-filter-seccion')?.value || 'todas';
+  const filterTipo = document.getElementById('admin-gal-filter-tipo')?.value || 'todos';
+
+  if (!tableBody || !window.AgroGaleriaStore) return;
+
+  const items = window.AgroGaleriaStore.getItems();
+  const secciones = window.AgroGaleriaStore.getMicroSecciones();
+  const secMap = {};
+  secciones.forEach(s => secMap[s.id] = s.nombre);
+
+  const filtered = items.filter(item => {
+    const matchesSearch = !searchVal || 
+      (item.titulo && item.titulo.toLowerCase().includes(searchVal)) || 
+      (item.descripcion && item.descripcion.toLowerCase().includes(searchVal));
+    const matchesSec = filterSec === 'todas' || item.seccionId === filterSec;
+    const matchesTipo = filterTipo === 'todos' || item.tipo === filterTipo;
+    return matchesSearch && matchesSec && matchesTipo;
+  });
+
+  if (countText) {
+    countText.textContent = `Mostrando ${filtered.length} de ${items.length} publicaciones`;
+  }
+
+  if (filtered.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; padding: 3rem 1rem; color: #64748b;">
+          <i class="fas fa-images" style="font-size: 2.2rem; margin-bottom: 0.75rem; color: #cbd5e1; display: block;"></i>
+          No se encontraron contenidos de galería con los filtros aplicados.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tableBody.innerHTML = filtered.map(item => {
+    let thumbUrl = item.miniatura || item.url || 'AGLOGOCIRC.png';
+    let typeBadge = '';
+    if (item.tipo === 'youtube') {
+      typeBadge = `<span style="background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px;"><i class="fab fa-youtube"></i> YouTube</span>`;
+    } else if (item.tipo === 'video') {
+      typeBadge = `<span style="background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-video"></i> Video</span>`;
+    } else {
+      typeBadge = `<span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-camera"></i> Foto</span>`;
+    }
+
+    const secName = secMap[item.seccionId] || item.seccionId;
+
+    return `
+      <tr>
+        <td class="col-thumb" style="width: 80px;">
+          <div style="position: relative; width: 65px; height: 65px; border-radius: 10px; overflow: hidden; background: #0f172a;">
+            <img src="${thumbUrl}" alt="${item.titulo}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='AGLOGOCIRC.png'">
+            ${item.tipo !== 'foto' ? `<span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); color: white; font-size: 1.1rem;"><i class="fas fa-play-circle"></i></span>` : ''}
+          </div>
+        </td>
+        <td class="col-nombre">
+          <strong style="color: #0f172a; font-size: 0.95rem; display: block; margin-bottom: 2px;">${item.titulo}</strong>
+          <span style="color: #64748b; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">${item.descripcion || 'Sin descripción'}</span>
+        </td>
+        <td>
+          <span style="background: #f1f5f9; color: #1e293b; padding: 4px 10px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; border: 1px solid #cbd5e1;">
+            ${secName}
+          </span>
+        </td>
+        <td>${typeBadge}</td>
+        <td style="color: #475569; font-size: 0.85rem; font-weight: 600;">${item.fecha || '-'}</td>
+        <td class="col-acciones" style="text-align: right; white-space: nowrap;">
+          <button type="button" class="btn-icon btn-icon-edit" onclick="editAdminGaleriaItem('${item.id}')" title="Editar contenido">
+            <i class="fas fa-edit"></i> <span>Editar</span>
+          </button>
+          <button type="button" class="btn-icon btn-icon-delete" onclick="deleteAdminGaleriaItem('${item.id}')" title="Eliminar contenido">
+            <i class="fas fa-trash-alt"></i> <span>Borrar</span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Init Gallery Modals and Forms
+function initAdminGaleriaModals() {
+  const itemModal = document.getElementById('admin-galeria-item-modal');
+  const seccionModal = document.getElementById('admin-galeria-seccion-modal');
+
+  const btnOpenAddSec = document.getElementById('btn-admin-add-sec-dashboard');
+  const btnOpenAddItem = document.getElementById('btn-admin-add-item-dashboard');
+
+  const closeGalBtns = document.querySelectorAll('.btn-close-gal-modal');
+  const closeSecBtns = document.querySelectorAll('.btn-close-sec-modal');
+
+  const itemForm = document.getElementById('admin-galeria-item-form');
+  const seccionForm = document.getElementById('admin-galeria-seccion-form');
+
+  const selectTipo = document.getElementById('admin-gal-form-tipo');
+  const groupFoto = document.getElementById('admin-gal-group-foto');
+  const groupVideo = document.getElementById('admin-gal-group-video');
+  const groupYoutube = document.getElementById('admin-gal-group-youtube');
+
+  // Toggle Format Type in Item Form
+  if (selectTipo) {
+    selectTipo.addEventListener('change', () => {
+      const tipo = selectTipo.value;
+      if (groupFoto) groupFoto.style.display = tipo === 'foto' ? 'block' : 'none';
+      if (groupVideo) groupVideo.style.display = tipo === 'video' ? 'block' : 'none';
+      if (groupYoutube) groupYoutube.style.display = tipo === 'youtube' ? 'block' : 'none';
+    });
+  }
+
+  // Open Add Section Modal
+  if (btnOpenAddSec) {
+    btnOpenAddSec.onclick = () => {
+      if (seccionForm) seccionForm.reset();
+      if (seccionModal) seccionModal.style.display = 'flex';
+    };
+  }
+
+  // Open Add Item Modal
+  if (btnOpenAddItem) {
+    btnOpenAddItem.onclick = () => {
+      currentAdminGalEditItem = null;
+      if (itemForm) itemForm.reset();
+      document.getElementById('admin-gal-form-id').value = '';
+      document.getElementById('admin-gal-modal-title').textContent = 'Agregar Contenido a Galería';
+      renderAdminSeccionesChips();
+      if (selectTipo) {
+        selectTipo.value = 'foto';
+        selectTipo.dispatchEvent(new Event('change'));
+      }
+      if (itemModal) itemModal.style.display = 'flex';
+    };
+  }
+
+  // Close Modals
+  closeGalBtns.forEach(btn => {
+    btn.onclick = () => {
+      if (itemModal) itemModal.style.display = 'none';
+    };
+  });
+
+  closeSecBtns.forEach(btn => {
+    btn.onclick = () => {
+      if (seccionModal) seccionModal.style.display = 'none';
+    };
+  });
+
+  // Submit Section Form
+  if (seccionForm) {
+    seccionForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('admin-sec-form-nombre').value.trim();
+      const desc = document.getElementById('admin-sec-form-desc').value.trim();
+      const icono = document.getElementById('admin-sec-form-icono').value;
+
+      if (!nombre) return;
+
+      try {
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Creando Micro-Sección', 'Guardando sección...', 50);
+        }
+        await window.AgroGaleriaStore.saveMicroSeccion({
+          nombre: nombre,
+          descripcion: desc,
+          icono: icono
+        });
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Creando Micro-Sección', '¡Sección creada con éxito!', 100);
+        }
+        if (seccionModal) seccionModal.style.display = 'none';
+        renderAdminSeccionesChips();
+        renderAdminGaleriaTable();
+      } catch (err) {
+        alert("Error creando sección: " + err.message);
+      } finally {
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
+      }
+    };
+  }
+
+  // Submit Gallery Item Form
+  if (itemForm) {
+    itemForm.onsubmit = async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('admin-gal-form-id').value || null;
+      const seccionId = document.getElementById('admin-gal-form-seccion').value;
+      const tipo = document.getElementById('admin-gal-form-tipo').value;
+      const titulo = document.getElementById('admin-gal-form-titulo').value.trim();
+      const desc = document.getElementById('admin-gal-form-desc').value.trim();
+      const fecha = document.getElementById('admin-gal-form-fecha').value.trim();
+
+      let url = currentAdminGalEditItem ? currentAdminGalEditItem.url : '';
+      let miniatura = currentAdminGalEditItem ? currentAdminGalEditItem.miniatura : '';
+      let youtubeId = '';
+
+      const cloudName = window.AGRO_CONFIG?.cloudinary?.cloudName || 'pfskomq5';
+      const uploadPreset = window.AGRO_CONFIG?.cloudinary?.uploadPreset || 'nwrslkmw';
+
+      try {
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', 'Procesando archivo y datos...', 30);
+        }
+
+        if (tipo === 'youtube') {
+          const ytInput = document.getElementById('admin-gal-form-youtube-url').value.trim();
+          youtubeId = window.AgroGaleriaStore.extractYouTubeId(ytInput);
+          if (!youtubeId) {
+            alert('Por favor ingresá un enlace válido de YouTube.');
+            return;
+          }
+          url = `https://www.youtube.com/watch?v=${youtubeId}`;
+          miniatura = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+        } else if (tipo === 'foto') {
+          const photoInput = document.getElementById('admin-gal-form-file');
+          const manualUrl = document.getElementById('admin-gal-form-manual-url').value.trim();
+
+          if (manualUrl) {
+            url = manualUrl;
+            miniatura = manualUrl;
+          } else if (photoInput && photoInput.files && photoInput.files[0]) {
+            let file = photoInput.files[0];
+            file = await convertHeicIfNeeded(file);
+
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Subiendo foto...', 60);
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+            if (data.secure_url) {
+              url = data.secure_url;
+              miniatura = data.secure_url;
+            } else {
+              throw new Error(data.error?.message || 'Error al subir foto a Cloudinary');
+            }
+          }
+        } else if (tipo === 'video') {
+          const videoInput = document.getElementById('admin-gal-form-video-file');
+          if (videoInput && videoInput.files && videoInput.files[0]) {
+            const file = videoInput.files[0];
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Video a la Nube', 'Subiendo video...', 60);
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+            if (data.secure_url) {
+              url = data.secure_url;
+              miniatura = data.secure_url.replace(/\.[^/.]+$/, ".jpg");
+            } else {
+              throw new Error(data.error?.message || 'Error al subir video');
+            }
+          }
+        }
+
+        if (!url && !youtubeId) {
+          alert('Por favor selecciona una foto, un video o un enlace de YouTube.');
+          return;
+        }
+
+        const itemData = {
+          id: id,
+          seccionId: seccionId,
+          tipo: tipo,
+          url: url,
+          youtubeId: youtubeId || undefined,
+          miniatura: miniatura || url,
+          titulo: titulo,
+          descripcion: desc,
+          fecha: fecha
+        };
+
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', 'Guardando en la galería...', 90);
+        }
+
+        await window.AgroGaleriaStore.saveItem(itemData);
+
+        if (window.showAgroUploadProgress) {
+          window.showAgroUploadProgress('Guardando Contenido', '¡Contenido guardado exitosamente!', 100);
+        }
+
+        if (itemModal) itemModal.style.display = 'none';
+        renderAdminSeccionesChips();
+        renderAdminGaleriaTable();
+      } catch (err) {
+        alert("Error guardando contenido en galería: " + err.message);
+      } finally {
+        if (window.hideAgroUploadProgress) setTimeout(window.hideAgroUploadProgress, 600);
+      }
+    };
+  }
+}
+
+// Global Handlers for Edit and Delete in Gallery
+window.editAdminGaleriaItem = function(id) {
+  if (!window.AgroGaleriaStore) return;
+  const item = window.AgroGaleriaStore.getItemById(id);
+  if (!item) return;
+
+  currentAdminGalEditItem = item;
+  renderAdminSeccionesChips();
+
+  const itemModal = document.getElementById('admin-galeria-item-modal');
+  document.getElementById('admin-gal-modal-title').textContent = 'Editar Contenido de Galería';
+  document.getElementById('admin-gal-form-id').value = item.id;
+  document.getElementById('admin-gal-form-seccion').value = item.seccionId;
+
+  const selectTipo = document.getElementById('admin-gal-form-tipo');
+  selectTipo.value = item.tipo;
+  selectTipo.dispatchEvent(new Event('change'));
+
+  if (item.tipo === 'youtube') {
+    document.getElementById('admin-gal-form-youtube-url').value = item.url || `https://www.youtube.com/watch?v=${item.youtubeId}`;
+  } else if (item.tipo === 'foto') {
+    document.getElementById('admin-gal-form-manual-url').value = item.url;
+  }
+
+  document.getElementById('admin-gal-form-titulo').value = item.titulo;
+  document.getElementById('admin-gal-form-desc').value = item.descripcion || '';
+  document.getElementById('admin-gal-form-fecha').value = item.fecha || '';
+
+  if (itemModal) itemModal.style.display = 'flex';
+};
+
+window.deleteAdminGaleriaItem = async function(id) {
+  if (!window.AgroGaleriaStore) return;
+  const item = window.AgroGaleriaStore.getItemById(id);
+  const name = item ? item.titulo : 'esta publicación';
+
+  if (confirm(`¿Estás seguro de que deseas eliminar "${name}" de la galería?`)) {
+    await window.AgroGaleriaStore.deleteItem(id);
+    renderAdminSeccionesChips();
+    renderAdminGaleriaTable();
+  }
+};
+
+window.deleteAdminMicroSeccion = async function(id) {
+  if (!window.AgroGaleriaStore) return;
+  const secciones = window.AgroGaleriaStore.getMicroSecciones();
+  const sec = secciones.find(s => s.id === id);
+  if (!sec) return;
+
+  if (confirm(`¿Eliminar la micro-sección "${sec.nombre}"? Los contenidos asociados pasarán a "Historia".`)) {
+    await window.AgroGaleriaStore.deleteMicroSeccion(id);
+    renderAdminSeccionesChips();
+    renderAdminGaleriaTable();
+  }
+};
+
+// Event Listeners for Filters & Init
 document.addEventListener('DOMContentLoaded', () => {
   initDashboardAuth();
   initDashboardImageManager();
+  initDashboardVideoManager();
   initDashboardModal();
+  initAdminTabs();
+  initAdminGaleriaModals();
 
   const searchInput = document.getElementById('admin-search-input');
   const catSelect = document.getElementById('admin-filter-categoria');
@@ -581,5 +1209,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (catSelect) catSelect.addEventListener('change', renderDashboardTable);
   if (dispSelect) dispSelect.addEventListener('change', renderDashboardTable);
 
+  const galSearchInput = document.getElementById('admin-gal-search-input');
+  const galFilterSec = document.getElementById('admin-gal-filter-seccion');
+  const galFilterTipo = document.getElementById('admin-gal-filter-tipo');
+
+  if (galSearchInput) galSearchInput.addEventListener('input', renderAdminGaleriaTable);
+  if (galFilterSec) galFilterSec.addEventListener('change', renderAdminGaleriaTable);
+  if (galFilterTipo) galFilterTipo.addEventListener('change', renderAdminGaleriaTable);
+
   window.addEventListener('agroCatalogUpdated', renderDashboardTable);
+  window.addEventListener('agroGaleriaUpdated', () => {
+    renderAdminSeccionesChips();
+    renderAdminGaleriaTable();
+  });
 });

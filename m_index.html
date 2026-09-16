@@ -52,6 +52,7 @@
         </li>
         <li><a href="#productos">Productos</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="m_galeria.html">Galería</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="m_login.html">Acceso <i class="fas fa-lock"></i></a></li>
       </ul>
@@ -325,7 +326,7 @@
 
   <!-- Sobre Nosotros Mobile -->
   <section id="nosotros" class="nosotros-section grass-field-section">
-    <div class="nosotros-intro container section">
+    <div class="nosotros-intro container">
       <div class="nosotros-split">
         <div class="nosotros-img-wrapper">
           <img src="https://res.cloudinary.com/pfskomq5/image/upload/v1786455504/ndmgt78pqca9fihxfu1e.jpg" alt="Campo Agroguardati" class="nosotros-img">
@@ -337,22 +338,43 @@
         
         <div class="nosotros-text">
           <span class="section-tag">Sobre Nosotros</span>
-          <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">Pasión por el <span class="text-gradient">crecimiento</span></h2>
-          <p class="nosotros-desc" style="color: var(--text-muted); font-size: 1rem;">Somos una empresa familiar dedicada a brindar soluciones integrales al productor agropecuario.</p>
+          <h2 class="nosotros-title">Más de dos décadas<br><span class="text-gradient">acompañando al campo</span></h2>
+          <p class="nosotros-desc">
+            Somos Agro Guardati, una empresa familiar ubicada en Galvez Santa fe. Desde nuestros inicios, trabajamos para acercarte maquinaria agrícola de calidad, pensada para acompañar cada desafío del campo.
+          </p>
+          <p class="nosotros-desc">
+            Tractores, cosechadoras, sembradoras y mucho más, con opciones nuevas y usadas para que encuentres la solución que mejor se adapte a tus necesidades.
+          </p>
+          <p class="nosotros-desc">
+            Te acompañamos en cada paso con asesoramiento personalizado, atención cercana y un servicio de posventa confiable.
+          </p>
+          <p class="nosotros-desc">
+            Porque sabemos que detrás de cada máquina hay trabajo, esfuerzo y proyectos.
+          </p>
+          <p class="nosotros-desc nosotros-highlight">
+            Tu campo avanza. Nosotros avanzamos con vos.
+          </p>
           
           <div class="valores-grid">
             <div class="valor-card">
-              <i class="fas fa-check-circle"></i>
-              <div>
-                <h4 style="font-size: 0.95rem;">Confianza</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Trato directo y honesto.</p>
+              <div class="valor-icon"><i class="fas fa-handshake"></i></div>
+              <div class="valor-info">
+                <h4>Confianza</h4>
+                <p>Construimos relaciones duraderas basadas en la honestidad y el trato justo.</p>
               </div>
             </div>
             <div class="valor-card">
-              <i class="fas fa-certificate"></i>
-              <div>
-                <h4 style="font-size: 0.95rem;">Calidad</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Maquinaria de primer nivel.</p>
+              <div class="valor-icon"><i class="fas fa-seedling"></i></div>
+              <div class="valor-info">
+                <h4>Compromiso</h4>
+                <p>Estamos presentes antes, durante y después de cada operación.</p>
+              </div>
+            </div>
+            <div class="valor-card">
+              <div class="valor-icon"><i class="fas fa-cogs"></i></div>
+              <div class="valor-info">
+                <h4>Calidad</h4>
+                <p>Solo trabajamos con maquinaria que cumple los más altos estándares del sector.</p>
               </div>
             </div>
           </div>
@@ -361,24 +383,32 @@
     </div>
 
     <!-- Stats Mobile -->
-    <div class="stats-bar section">
+    <div class="stats-bar">
       <div class="container">
         <div class="stats-grid">
           <div class="stat-item">
-            <span class="stat-number" data-target="20">0</span>
-            <span style="font-size: 0.8rem; opacity: 0.8;">Años</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="20">0</span>
+            </div>
+            <span class="stat-label">Años</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="500">0</span>
-            <span style="font-size: 0.8rem; opacity: 0.8;">Equipos</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="1000">0</span>
+            </div>
+            <span class="stat-label">Equipos</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="1200">0</span>
-            <span style="font-size: 0.8rem; opacity: 0.8;">Clientes</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="15">0</span>
+            </div>
+            <span class="stat-label">Marcas</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-target="5">0</span>
-            <span style="font-size: 0.8rem; opacity: 0.8;">Provincias</span>
+            <div class="stat-number-wrapper">
+              <span class="stat-prefix">+</span><span class="stat-number" data-target="5">0</span>
+            </div>
+            <span class="stat-label">Provincias</span>
           </div>
         </div>
       </div>
@@ -386,9 +416,9 @@
 
     <!-- Historia Mobile (Timeline) -->
     <div class="historia-block container section">
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <span class="section-tag">Nuestra Trayectoria</span>
-        <h2>Nuestra <span class="text-gradient">Historia</span></h2>
+      <div class="historia-header-card">
+        <span class="section-tag section-tag-solid">Nuestra Trayectoria</span>
+        <h2 class="historia-header-title">Una historia forjada<br><span class="text-gradient">en el campo argentino</span></h2>
       </div>
       
       <div class="timeline">
@@ -468,6 +498,9 @@
       </p>
     </div>
   </footer>
+
+  <!-- HEIC Image Support -->
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
   <!-- Firebase & Admin Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
