@@ -6,8 +6,14 @@ let currentModalVideo = '';
 
 // Helper for converting iPhone HEIC/HEIF images to JPEG before upload
 async function processHeicImage(file) {
-  if (typeof window.convertHeicIfNeeded === 'function') {
-    return await window.convertHeicIfNeeded(file);
+  if (!file) return file;
+  if (typeof window.convertHeicIfNeeded === 'function' && window.convertHeicIfNeeded !== processHeicImage) {
+    try {
+      return await window.convertHeicIfNeeded(file);
+    } catch (e) {
+      console.warn('Error in convertHeicIfNeeded, continuing with original file:', e);
+      return file;
+    }
   }
   return file;
 }
