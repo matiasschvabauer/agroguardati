@@ -4,10 +4,10 @@
  */
 
 (function () {
-  const STORAGE_KEY_ITEMS = 'agro_galeria_items_v4';
-  const STORAGE_KEY_SECCIONES = 'agro_galeria_secciones_v4';
-  const STORAGE_KEY_DELETED_ITEMS = 'agro_galeria_deleted_ids_v4';
-  const STORAGE_KEY_DELETED_SECCIONES = 'agro_galeria_deleted_sec_ids_v4';
+  const STORAGE_KEY_ITEMS = 'agro_galeria_items_v5';
+  const STORAGE_KEY_SECCIONES = 'agro_galeria_secciones_v5';
+  const STORAGE_KEY_DELETED_ITEMS = 'agro_galeria_deleted_ids_v5';
+  const STORAGE_KEY_DELETED_SECCIONES = 'agro_galeria_deleted_sec_ids_v5';
 
   // Micro-secciones iniciales por defecto
   const DEFAULT_SECCIONES = [
@@ -41,16 +41,14 @@
     }
   ];
 
-  // La galería inicia limpia sin contenido ficticio ni imágenes de prueba 404
+  // La galería inicia limpia
   const DEFAULT_ITEMS = [];
 
-  // Limpieza de claves antiguas con datos por defecto obsoletos (gal_01 a gal_06)
+  // Limpieza de claves obsoletas
   try {
     ['agro_galeria_items', 'agro_galeria_items_v2', 'agro_galeria_items_v3'].forEach(k => {
       localStorage.removeItem(k);
     });
-    const legacyDeleted = ['agro_galeria_deleted_ids', 'agro_galeria_deleted_ids_v2', 'agro_galeria_deleted_ids_v3'];
-    legacyDeleted.forEach(k => localStorage.removeItem(k));
   } catch (e) {}
 
   // Helper para inicializar Firebase Firestore de forma segura
@@ -68,7 +66,7 @@
         return firebase.firestore();
       }
     } catch (err) {
-      console.warn('Firestore not reachable (possible adblocker/client block):', err);
+      console.warn('Firestore not reachable:', err);
     }
     return null;
   }
@@ -161,7 +159,7 @@
     seccion._deleted = false;
     seccion._updatedAt = Date.now();
 
-    const existingIndex = secciones.findIndex(s => s.id === seccion.id);
+    const existingIndex = secciones.findIndex(s => String(s.id) === String(seccion.id));
     if (existingIndex >= 0) {
       secciones[existingIndex] = { ...secciones[existingIndex], ...seccion };
     } else {
@@ -204,6 +202,7 @@
     if (db) {
       try {
         await db.collection('galeria_secciones').doc(idStr).set({ id: idStr, _deleted: true, _updatedAt: Date.now() }, { merge: true });
+        console.log('✔ Sección marcada como eliminada en Firestore:', idStr);
       } catch (err) {
         console.warn('Firestore delete section error (deleted locally):', err);
       }
@@ -225,7 +224,6 @@
       if (stored !== null) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          // Filtrar items eliminados o que sean viejos gal_01 a gal_06 por defecto
           items = parsed.filter(i => i && !i._deleted && !deletedIds.has(String(i.id)) && !/^gal_0[1-6]$/.test(String(i.id)));
         }
       }
@@ -264,7 +262,7 @@
     item._updatedAt = Date.now();
     removeDeletedItemId(item.id);
 
-    const existingIndex = items.findIndex(i => i.id === item.id);
+    const existingIndex = items.findIndex(i => String(i.id) === String(item.id));
     if (existingIndex >= 0) {
       items[existingIndex] = { ...items[existingIndex], ...item };
     } else {
@@ -320,47 +318,68 @@
     return true;
   }
 
-  // Cargar y sincronizar en tiempo real desde Firestore
+  // Cargar y sincronizar en tiempo real desde Firestore con fusión inteligente (sin borrar items locales)
   function startRealtimeSync() {
     const db = getFirestoreDb();
     if (!db) return;
 
     try {
-      // Sincronizar secciones en tiempo real
+      // 1. Sincronizar secciones
       db.collection('galeria_secciones').onSnapshot((snapshot) => {
         const deletedSecIds = getDeletedSeccionIds();
-        const remoteSecs = [];
+        const remoteSecsMap = new Map();
 
         if (snapshot && !snapshot.empty) {
           snapshot.forEach(doc => {
             const data = doc.data();
-            const id = doc.id;
+            const id = String(doc.id);
             if (data._deleted === true || data._deleted === 'true') {
               addDeletedSeccionId(id);
-              deletedSecIds.add(String(id));
+              deletedSecIds.add(id);
             } else {
-              remoteSecs.push({ id, ...data });
+              remoteSecsMap.set(id, { id, ...data });
             }
           });
         }
 
-        // Fusionar base excluyendo borrados
-        const combinedSecs = [];
-        const secMap = new Map();
-        remoteSecs.forEach(s => secMap.set(String(s.id), s));
+        // Obtener secciones actuales en localStorage
+        let localSecs = [];
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_SECCIONES);
+          if (raw) localSecs = JSON.parse(raw) || [];
+        } catch (e) {}
 
-        DEFAULT_SECCIONES.forEach(baseSec => {
-          const idStr = String(baseSec.id);
-          if (!deletedSecIds.has(idStr)) {
-            const fsSec = secMap.get(idStr);
-            combinedSecs.push(fsSec || baseSec);
-            secMap.delete(idStr);
+        // Combinar: secciones remotas + secciones locales no enviadas + secciones por defecto
+        const combinedSecs = [];
+        const processedSecIds = new Set();
+
+        // Remotas activas
+        remoteSecsMap.forEach((sec, id) => {
+          if (!deletedSecIds.has(id)) {
+            combinedSecs.push(sec);
+            processedSecIds.add(id);
           }
         });
 
-        secMap.forEach(fsSec => {
-          if (!deletedSecIds.has(String(fsSec.id)) && !fsSec._deleted) {
-            combinedSecs.push(fsSec);
+        // Locales pendientes de sincronizar
+        localSecs.forEach(sec => {
+          const id = String(sec.id);
+          if (!processedSecIds.has(id) && !deletedSecIds.has(id) && !sec._deleted) {
+            combinedSecs.push(sec);
+            processedSecIds.add(id);
+            // Auto-subir a Firestore
+            try {
+              db.collection('galeria_secciones').doc(id).set(sec, { merge: true });
+            } catch (e) {}
+          }
+        });
+
+        // Secciones por defecto
+        DEFAULT_SECCIONES.forEach(sec => {
+          const id = String(sec.id);
+          if (!processedSecIds.has(id) && !deletedSecIds.has(id)) {
+            combinedSecs.push(sec);
+            processedSecIds.add(id);
           }
         });
 
@@ -376,34 +395,64 @@
         console.warn('Firestore galeria_secciones onSnapshot error:', err);
       });
 
-      // Sincronizar items en tiempo real
+      // 2. Sincronizar items
       db.collection('galeria_items').onSnapshot((snapshot) => {
         const deletedIds = getDeletedItemIds();
-        const remoteItems = [];
+        const remoteItemsMap = new Map();
 
         if (snapshot && !snapshot.empty) {
           snapshot.forEach(doc => {
             const data = doc.data();
-            const id = doc.id;
-            // Ignorar y marcar como eliminados los viejos gal_01 a gal_06 por defecto
-            if (/^gal_0[1-6]$/.test(String(id))) {
+            const id = String(doc.id);
+            if (/^gal_0[1-6]$/.test(id)) {
               addDeletedItemId(id);
-              deletedIds.add(String(id));
+              deletedIds.add(id);
               return;
             }
 
             if (data._deleted === true || data._deleted === 'true') {
               addDeletedItemId(id);
-              deletedIds.add(String(id));
+              deletedIds.add(id);
             } else {
-              remoteItems.push({ id, ...data });
+              remoteItemsMap.set(id, { id, ...data });
             }
           });
         }
 
-        const activeItems = remoteItems.filter(it => !deletedIds.has(String(it.id)) && !it._deleted && !/^gal_0[1-6]$/.test(String(it.id)));
+        // Obtener items actuales en localStorage
+        let localItems = [];
         try {
-          localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(activeItems));
+          const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
+          if (raw) localItems = JSON.parse(raw) || [];
+        } catch (e) {}
+
+        const combinedItems = [];
+        const processedItemIds = new Set();
+
+        // 1. Añadir items remotos que no estén eliminados
+        remoteItemsMap.forEach((item, id) => {
+          if (!deletedIds.has(id) && !item._deleted) {
+            combinedItems.push(item);
+            processedItemIds.add(id);
+          }
+        });
+
+        // 2. Añadir items creados en este navegador que aún no llegaron al snapshot de Firestore
+        localItems.forEach(item => {
+          const id = String(item.id);
+          if (!processedItemIds.has(id) && !deletedIds.has(id) && !item._deleted && !/^gal_0[1-6]$/.test(id)) {
+            combinedItems.push(item);
+            processedItemIds.add(id);
+            // Auto-subir a Firestore
+            try {
+              db.collection('galeria_items').doc(id).set(item, { merge: true });
+              console.log('✔ Auto-sincronizado item local a Firestore:', id);
+            } catch (e) {}
+          }
+        });
+
+        try {
+          localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(combinedItems));
         } catch (e) {}
 
         if (typeof window.onGaleriaDataChanged === 'function') {
@@ -419,7 +468,7 @@
 
   function getItemById(id) {
     const items = getGaleriaItems();
-    return items.find(i => i.id === id) || null;
+    return items.find(i => String(i.id) === String(id)) || null;
   }
 
   // Exportar al objeto global window
