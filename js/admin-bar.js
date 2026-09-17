@@ -5,7 +5,7 @@ let currentModalSpecs = {};
 let currentModalVideo = '';
 
 // Helper for converting iPhone HEIC/HEIF images to JPEG before upload
-async function convertHeicIfNeeded(file) {
+async function processHeicImage(file) {
   if (typeof window.convertHeicIfNeeded === 'function') {
     return await window.convertHeicIfNeeded(file);
   }
@@ -436,7 +436,7 @@ window.openAdminModal = function(id = null) {
             );
           }
 
-          file = await convertHeicIfNeeded(file);
+          file = await processHeicImage(file);
 
           uploadBox.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
 
@@ -934,7 +934,7 @@ window.openStoryUploaderModal = function() {
       }
 
       for (let rawFile of files) {
-        const file = await convertHeicIfNeeded(rawFile);
+        const file = await processHeicImage(rawFile);
         const isVideo = file.type.startsWith('video');
         const maxSize = isVideo ? 100 * 1024 * 1024 : 15 * 1024 * 1024;
 

@@ -5,7 +5,7 @@ let currentFormSpecs = [];
 let currentFormVideo = '';
 
 // Helper for converting iPhone HEIC/HEIF images to JPEG before upload
-async function convertHeicIfNeeded(file) {
+async function processHeicImage(file) {
   if (typeof window.convertHeicIfNeeded === 'function') {
     return await window.convertHeicIfNeeded(file);
   }
@@ -214,7 +214,7 @@ function initDashboardImageManager() {
           }
 
           // Convert HEIC if needed
-          file = await convertHeicIfNeeded(file);
+          file = await processHeicImage(file);
 
           dropzone.querySelector('p').textContent = `Subiendo ${i + 1}/${total}...`;
 
@@ -1034,7 +1034,7 @@ function initAdminGaleriaModals() {
             miniatura = manualUrl;
           } else if (photoInput && photoInput.files && photoInput.files[0]) {
             let file = photoInput.files[0];
-            file = await convertHeicIfNeeded(file);
+            file = await processHeicImage(file);
 
             if (window.showAgroUploadProgress) {
               window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Subiendo foto a Cloudinary...', 30);

@@ -2,7 +2,7 @@
  * AGROGUARDATI - Controlador de Galería Desktop (galeria.js)
  */
 
-async function convertHeicIfNeeded(file) {
+async function processHeicImage(file) {
   if (typeof window.convertHeicIfNeeded === 'function') {
     return await window.convertHeicIfNeeded(file);
   }
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const fileInput = document.getElementById('gal-foto-file');
           if (fileInput.files && fileInput.files[0]) {
             let file = fileInput.files[0];
-            file = await convertHeicIfNeeded(file);
+            file = await processHeicImage(file);
 
             if (window.showAgroUploadProgress) {
               window.showAgroUploadProgress('Subiendo Foto a la Nube', 'Conectando con Cloudinary...', 30);
