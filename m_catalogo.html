@@ -296,119 +296,6 @@
     </div>
 
     <!-- View Mode Switcher & PDF Download -->
-    <div class="view-mode-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap;">
-      <div>
-        <a href="Catalogo_Agroguardati_Completo.pdf" download="Catalogo_Agroguardati_Completo.pdf" class="btn-download-pdf" title="Descargar Catálogo Completo en PDF" style="display: inline-flex; align-items: center; gap: 8px; background: #ffffff !important; color: #153f71 !important; border: 1.5px solid #cbd5e1 !important; padding: 7px 16px !important; border-radius: 10px !important; font-size: 0.88rem !important; font-weight: 700 !important; text-decoration: none !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-          <i class="fas fa-file-pdf" style="color: #d32f2f;"></i> Descargar Catálogo (PDF)
-        </a>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Modo de Vista:</span>
-        <button id="view-mode-list" class="btn-view-mode active" title="Vista Lista"><i class="fas fa-bars"></i> Lista</button>
-        <button id="view-mode-grid" class="btn-view-mode" title="Vista Cuadrícula 2 por fila"><i class="fas fa-th-large"></i> Cuadrícula (2 por fila)</button>
-      </div>
-    </div>
-
-    <!-- Catalog List (Alternating Layout or Grid) -->
-    <div id="catalog-list" class="catalog-list">
-      <!-- Items injected via JS -->
-    </div>
-
-  </section>
-
-  <!-- Footer -->
-  <footer id="contacto">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <img src="AgroGuardatiLogo.png" alt="Agroguardati" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
-          <p>Potenciando el desarrollo agropecuario con soluciones integrales en maquinaria.</p>
-        </div>
-        <div class="footer-col">
-          <h3>Enlaces Rápidos</h3>
-          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <li><a href="index.html" style="color: #cbd5e1;">Inicio</a></li>
-            <li><a href="catalogo.html" style="color: #cbd5e1;">Catálogo de Máquinas</a></li>
-            <li><a href="index.html#nosotros" style="color: #cbd5e1;">Sobre Nosotros</a></li>
-            <li><a href="index.html#contacto" style="color: #cbd5e1;">Contacto</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3>Legales y Políticas</h3>
-          <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <li><a href="terminos.html#terminos" style="color: #cbd5e1;">Términos y Condiciones</a></li>
-            <li><a href="terminos.html#privacidad" style="color: #cbd5e1;">Políticas de Privacidad</a></li>
-            <li><a href="terminos.html#logistica" style="color: #cbd5e1;">Logística y Envíos</a></li>
-            <li><a href="terminos.html#equipos" style="color: #cbd5e1;">Maquinaria Usada</a></li>
-            <li><a href="terminos.html#defensa-consumidor" style="color: #cbd5e1;">Defensa del Consumidor</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3>Contacto</h3>
-          <p>📞 +54 9 3404 63-8524</p>
-          <p>📍 Av Jorge Newbery 526 bis</p>
-          <div class="social-links" style="margin-top: 1rem;">
-            <a href="https://www.facebook.com/profile.php?id=100063607388862" target="_blank" aria-label="Facebook">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-            </a>
-            <a href="https://www.instagram.com/agroguardati/" target="_blank" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            </a>
-            <a href="https://www.google.com/maps/place/AGROGUARDATI/@-32.0368264,-61.2019932,19.54z" target="_blank" aria-label="Google Maps">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 Agroguardati. Todos los derechos reservados.</p>
-        <p style="margin-top: 5px; font-size: 0.85rem; color: #94a3b8;">
-            Desarrollado por <a href="https://matiasschvabauer.github.io/portafolio/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: 500;">Schvabauer Matías</a>
-        </p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- HEIC Image Support -->
-  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-
-  <!-- Firebase & Admin Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=3.5"></script>
-  <script src="js/data.js?v=3.5"></script>
-  <script src="js/store.js?v=3.5"></script>
-  <script src="js/admin-bar.js?v=3.5"></script>
-  <script src="js/app.js?v=3.5"></script>
-  <script src="js/jspdf.umd.min.js"></script>
-  <script src="js/pdf-catalog-generator.js?v=3.5"></script>
-</body>
-</html>
-    </div>
-
-    <!-- Filtros Selectores Mobile -->
-    <div class="filters-bar">
-      <div class="filter-group">
-        <label><i class="fas fa-calendar-alt"></i> Fecha de publicación</label>
-        <select id="filter-fecha" class="filter-select">
-          <option value="reciente" selected>Publicación más reciente</option>
-          <option value="antigua">Publicación más antigua</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label><i class="fas fa-box-open"></i> Disponibilidad / Estado</label>
-        <select id="filter-estado" class="filter-select">
-          <option value="todos">Todos los productos</option>
-          <option value="Disponibles">Solo Disponibles</option>
-          <option value="Vendidos">Solo Vendidos</option>
-          <option value="Nuevo">Equipos Nuevos (0km)</option>
-          <option value="Usado">Usados Seleccionados</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- View Mode Switcher Mobile & PDF -->
     <div class="view-mode-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap;">
       <a href="Catalogo_Agroguardati_Completo.pdf" download="Catalogo_Agroguardati_Completo.pdf" class="btn-download-pdf-compact" style="display: inline-flex; align-items: center; gap: 6px; background: #ffffff !important; color: #153f71 !important; border: 1.5px solid #cbd5e1 !important; padding: 6px 12px !important; border-radius: 8px !important; font-size: 0.8rem !important; font-weight: 700 !important; text-decoration: none !important;">
         <i class="fas fa-file-pdf" style="color: #ef4444;"></i> Catálogo en PDF
@@ -420,9 +307,14 @@
       </div>
     </div>
 
-    <div id="catalog-list" class="catalog-list"></div>
-  </div>
+    <!-- Catalog List (Alternating Layout or Grid) -->
+    <div id="catalog-list" class="catalog-list">
+      <!-- Items injected via JS -->
+    </div>
 
+  </section>
+
+  <!-- Footer Mobile -->
   <footer>
     <div class="container" style="text-align: center; padding: 2.5rem 1rem; border-top: 1px solid rgba(0,0,0,0.05);">
       <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap;">

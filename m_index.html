@@ -462,7 +462,7 @@
     </div>
 
     <div class="contact-cards-grid">
-      <a href="https://wa.me/5493404638524" class="contact-card">
+      <a href="https://wa.me/5493404638524" target="_blank" class="contact-card">
         <i class="fab fa-whatsapp"></i>
         <h4>WhatsApp</h4>
       </a>
@@ -470,16 +470,49 @@
         <i class="fas fa-phone-alt"></i>
         <h4>Llamadas</h4>
       </a>
-      <div class="contact-card">
+      <a href="https://maps.google.com/maps?q=Av%20Jorge%20Newbery%20526%20bis" target="_blank" class="contact-card">
         <i class="fas fa-map-marker-alt"></i>
         <h4>Dirección</h4>
-      </div>
-      <div class="contact-card">
+      </a>
+      <div id="btn-open-horarios-modal" class="contact-card" style="cursor: pointer;">
         <i class="fas fa-clock"></i>
         <h4>Horarios</h4>
       </div>
     </div>
   </section>
+
+  <!-- Modal de Horarios Mobile Popup -->
+  <div id="modal-horarios" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.25rem;">
+    <div style="background: white; border-radius: 20px; max-width: 360px; width: 100%; padding: 1.75rem 1.5rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.25); position: relative;">
+      <button id="btn-close-horarios" type="button" style="position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; font-size: 1.25rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer;">&times;</button>
+      
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: var(--brand-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem;">
+        <i class="fas fa-clock"></i>
+      </div>
+
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">Horarios de Atención</h3>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Nuestros horarios de atención presencial y telefónica en Gálvez, Santa Fe:</p>
+
+      <div style="background: #f8fafc; border-radius: 14px; padding: 1rem; border: 1px solid #e2e8f0; margin-bottom: 1.25rem; text-align: left;">
+        <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0.75rem;">
+          <i class="fas fa-calendar-check" style="color: #16a34a; font-size: 1.1rem; margin-top: 2px;"></i>
+          <div>
+            <strong style="display: block; font-size: 0.92rem; color: #1e293b;">Lunes a Viernes</strong>
+            <span style="font-size: 0.85rem; color: #475569;">Mañana: <strong>08:00 a 12:00 hs</strong></span><br>
+            <span style="font-size: 0.85rem; color: #475569;">Tarde: <strong>16:00 a 20:00 hs</strong></span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; border-top: 1px dashed #cbd5e1; padding-top: 0.6rem;">
+          <i class="fas fa-store-slash" style="color: #dc2626; font-size: 1rem;"></i>
+          <span style="font-size: 0.82rem; color: #64748b;">Sábados y Domingos: <strong>Cerrado</strong></span>
+        </div>
+      </div>
+
+      <a href="https://wa.me/5493404638524" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.8rem; background: #25d366; color: white; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none;">
+        <i class="fab fa-whatsapp" style="font-size: 1.15rem;"></i> Escribir por WhatsApp
+      </a>
+    </div>
+  </div>
 
   <footer>
     <div class="container" style="text-align: center; padding: 2.5rem 1rem; border-top: 1px solid rgba(0,0,0,0.05);">

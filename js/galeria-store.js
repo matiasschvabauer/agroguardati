@@ -1,6 +1,6 @@
 /**
  * AGROGUARDATI - Gestor de Datos de Galería Multimedia y Micro-Secciones
- * Soporta fotos, videos subidos y videos de YouTube con persistencia en localStorage y Firestore.
+ * Soporta fotos, videos subidos y videos de YouTube con persistencia en localStorage y Firestore en tiempo real.
  */
 
 (function () {
@@ -85,8 +85,8 @@
       id: 'gal_05',
       seccionId: 'campo',
       tipo: 'youtube',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Placeholder de YouTube con ID de ejemplo
-      youtubeId: 'L_LUpnjgPso', // Video demostrativo agro
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      youtubeId: 'L_LUpnjgPso',
       titulo: 'Demostración de maquinaria agrícola en el campo',
       descripcion: 'Test drive y desempeño de equipos trabajando en condiciones reales de suelo.',
       fecha: '2024',
@@ -103,6 +103,22 @@
       destacado: false
     }
   ];
+
+  // Helper para inicializar Firebase Firestore
+  function getFirestoreDb() {
+    const config = window.AGRO_CONFIG?.firebase;
+    if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        try {
+          firebase.initializeApp(config);
+        } catch (e) {
+          console.warn('Firebase init in galeria-store:', e);
+        }
+      }
+      return firebase.firestore();
+    }
+    return null;
+  }
 
   // Helper para extraer ID de YouTube
   function extractYouTubeId(url) {
@@ -131,21 +147,18 @@
     } catch (e) {
       console.warn('Error reading galeria_secciones from localStorage', e);
     }
-    // Guardar por defecto
-    localStorage.setItem(STORAGE_KEY_SECCIONES, JSON.stringify(DEFAULT_SECCIONES));
     return DEFAULT_SECCIONES;
   }
 
   // --- GUARDAR SECCION ---
-  function saveGaleriaSeccion(seccion) {
+  async function saveGaleriaSeccion(seccion) {
     const secciones = getGaleriaSecciones();
-    const existingIndex = secciones.findIndex(s => s.id === seccion.id);
-    
     if (!seccion.id) {
       seccion.id = 'sec_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
     }
     if (!seccion.icono) seccion.icono = 'fa-folder';
 
+    const existingIndex = secciones.findIndex(s => s.id === seccion.id);
     if (existingIndex >= 0) {
       secciones[existingIndex] = { ...secciones[existingIndex], ...seccion };
     } else {
@@ -155,15 +168,12 @@
 
     localStorage.setItem(STORAGE_KEY_SECCIONES, JSON.stringify(secciones));
 
-    // Sincronizar con Firestore si está disponible
-    if (window.firebase && firebase.apps.length) {
+    const db = getFirestoreDb();
+    if (db) {
       try {
-        const db = firebase.firestore();
-        db.collection('galeria_secciones').doc(seccion.id).set(seccion, { merge: true }).catch(err => {
-          console.warn('Firestore sync error for section:', err);
-        });
+        await db.collection('galeria_secciones').doc(seccion.id).set(seccion, { merge: true });
       } catch (err) {
-        console.warn('Firestore err:', err);
+        console.warn('Firestore sync error for section:', err);
       }
     }
 
@@ -171,17 +181,17 @@
   }
 
   // --- ELIMINAR SECCION ---
-  function deleteGaleriaSeccion(seccionId) {
+  async function deleteGaleriaSeccion(seccionId) {
     let secciones = getGaleriaSecciones();
     secciones = secciones.filter(s => s.id !== seccionId);
     localStorage.setItem(STORAGE_KEY_SECCIONES, JSON.stringify(secciones));
 
-    if (window.firebase && firebase.apps.length) {
+    const db = getFirestoreDb();
+    if (db) {
       try {
-        const db = firebase.firestore();
-        db.collection('galeria_secciones').doc(seccionId).delete().catch(console.warn);
+        await db.collection('galeria_secciones').doc(seccionId).delete();
       } catch (err) {
-        console.warn(err);
+        console.warn('Firestore delete section error:', err);
       }
     }
     return true;
@@ -196,7 +206,6 @@
         items = JSON.parse(stored);
       } else {
         items = DEFAULT_ITEMS;
-        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(DEFAULT_ITEMS));
       }
     } catch (e) {
       items = DEFAULT_ITEMS;
@@ -216,7 +225,7 @@
   }
 
   // --- GUARDAR ITEM MULTIMEDIA ---
-  function saveGaleriaItem(item) {
+  async function saveGaleriaItem(item) {
     const items = getGaleriaItems();
     if (!item.id) {
       item.id = 'gal_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
@@ -236,20 +245,17 @@
     if (existingIndex >= 0) {
       items[existingIndex] = { ...items[existingIndex], ...item };
     } else {
-      items.unshift(item); // Al inicio para que aparezca primero
+      items.unshift(item);
     }
 
     localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
 
-    // Sincronizar con Firestore si está disponible
-    if (window.firebase && firebase.apps.length) {
+    const db = getFirestoreDb();
+    if (db) {
       try {
-        const db = firebase.firestore();
-        db.collection('galeria_items').doc(item.id).set(item, { merge: true }).catch(err => {
-          console.warn('Firestore sync error for galeria item:', err);
-        });
+        await db.collection('galeria_items').doc(item.id).set(item, { merge: true });
       } catch (err) {
-        console.warn('Firestore error:', err);
+        console.warn('Firestore error saving galeria item:', err);
       }
     }
 
@@ -257,71 +263,87 @@
   }
 
   // --- ELIMINAR ITEM MULTIMEDIA ---
-  function deleteGaleriaItem(itemId) {
+  async function deleteGaleriaItem(itemId) {
     let items = getGaleriaItems();
     items = items.filter(i => i.id !== itemId);
     localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
 
-    if (window.firebase && firebase.apps.length) {
+    const db = getFirestoreDb();
+    if (db) {
       try {
-        const db = firebase.firestore();
-        db.collection('galeria_items').doc(itemId).delete().catch(console.warn);
+        await db.collection('galeria_items').doc(itemId).delete();
       } catch (err) {
-        console.warn(err);
+        console.warn('Firestore delete galeria item error:', err);
       }
     }
     return true;
   }
 
-  // Cargar desde Firestore en background si hay conexión
-  function syncFromFirestore() {
-    if (!window.firebase || !firebase.apps.length) return;
-    try {
-      const db = firebase.firestore();
-      
-      // Sincronizar secciones
-      db.collection('galeria_secciones').get().then(snapshot => {
-        if (!snapshot.empty) {
-          const remoteSecs = [];
-          snapshot.forEach(doc => remoteSecs.push(doc.data()));
-          if (remoteSecs.length > 0) {
-            localStorage.setItem(STORAGE_KEY_SECCIONES, JSON.stringify(remoteSecs));
-            if (window.onGaleriaDataChanged) window.onGaleriaDataChanged();
-          }
-        }
-      }).catch(console.warn);
+  // Cargar y sincronizar en tiempo real desde Firestore
+  function startRealtimeSync() {
+    const db = getFirestoreDb();
+    if (!db) return;
 
-      // Sincronizar items
-      db.collection('galeria_items').get().then(snapshot => {
-        if (!snapshot.empty) {
-          const remoteItems = [];
-          snapshot.forEach(doc => remoteItems.push(doc.data()));
-          if (remoteItems.length > 0) {
-            localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(remoteItems));
-            if (window.onGaleriaDataChanged) window.onGaleriaDataChanged();
-          }
+    // Sincronizar secciones en tiempo real
+    db.collection('galeria_secciones').onSnapshot(snapshot => {
+      if (!snapshot.empty) {
+        const remoteSecs = [];
+        snapshot.forEach(doc => {
+          remoteSecs.push({ id: doc.id, ...doc.data() });
+        });
+        remoteSecs.sort((a, b) => (a.orden || 99) - (b.orden || 99));
+        localStorage.setItem(STORAGE_KEY_SECCIONES, JSON.stringify(remoteSecs));
+        if (typeof window.onGaleriaDataChanged === 'function') {
+          window.onGaleriaDataChanged();
         }
-      }).catch(console.warn);
-    } catch (err) {
-      console.warn('Firestore auto-sync error:', err);
-    }
+      }
+    }, err => {
+      console.warn('Firestore galeria_secciones onSnapshot error:', err);
+    });
+
+    // Sincronizar items en tiempo real
+    db.collection('galeria_items').onSnapshot(snapshot => {
+      if (!snapshot.empty) {
+        const remoteItems = [];
+        snapshot.forEach(doc => {
+          remoteItems.push({ id: doc.id, ...doc.data() });
+        });
+        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(remoteItems));
+        if (typeof window.onGaleriaDataChanged === 'function') {
+          window.onGaleriaDataChanged();
+        }
+      }
+    }, err => {
+      console.warn('Firestore galeria_items onSnapshot error:', err);
+    });
+  }
+
+  function getItemById(id) {
+    const items = getGaleriaItems();
+    return items.find(i => i.id === id) || null;
   }
 
   // Exportar al objeto global window
   window.AgroGaleriaStore = {
     getSecciones: getGaleriaSecciones,
+    getMicroSecciones: getGaleriaSecciones,
     saveSeccion: saveGaleriaSeccion,
+    saveMicroSeccion: saveGaleriaSeccion,
     deleteSeccion: deleteGaleriaSeccion,
+    deleteMicroSeccion: deleteGaleriaSeccion,
     getItems: getGaleriaItems,
+    getItemById: getItemById,
     saveItem: saveGaleriaItem,
     deleteItem: deleteGaleriaItem,
     extractYouTubeId: extractYouTubeId,
     getYouTubeThumbnail: getYouTubeThumbnail,
-    syncFromFirestore: syncFromFirestore
+    syncFromFirestore: startRealtimeSync
   };
 
-  // Inicializar sincronización si Firebase está presente
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(syncFromFirestore, 1500);
-  });
+  // Inicializar sincronización inmediata
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startRealtimeSync);
+  } else {
+    startRealtimeSync();
+  }
 })();

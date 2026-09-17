@@ -687,6 +687,33 @@ function initTimelineReveal() {
   items.forEach(item => observer.observe(item));
 }
 
+function initHorariosModal() {
+  const btnOpen = document.getElementById('btn-open-horarios-modal');
+  const btnClose = document.getElementById('btn-close-horarios');
+  const modal = document.getElementById('modal-horarios');
+
+  if (btnOpen && modal) {
+    btnOpen.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  }
+  if (btnClose && modal) {
+    btnClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+  }
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initGradientBackground();
   initMobileMenu();
@@ -695,4 +722,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initProductDetails();
   initCounters();
   initTimelineReveal();
+  initHorariosModal();
 });
