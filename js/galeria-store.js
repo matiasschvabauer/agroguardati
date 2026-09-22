@@ -41,15 +41,28 @@
     }
   ];
 
-  // La galería inicia limpia
-  const DEFAULT_ITEMS = [];
-
   // Limpieza de claves obsoletas
   try {
     ['agro_galeria_items', 'agro_galeria_items_v2', 'agro_galeria_items_v3'].forEach(k => {
       localStorage.removeItem(k);
     });
   } catch (e) {}
+
+  // Sanitizador estricto para Firestore (Firestore rechaza 'undefined')
+  function cleanForFirestore(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    const clean = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+          clean[key] = cleanForFirestore(value);
+        } else {
+          clean[key] = value;
+        }
+      }
+    }
+    return clean;
+  }
 
   // Helper para inicializar Firebase Firestore de forma segura
   function getFirestoreDb() {
@@ -63,7 +76,11 @@
             console.warn('Firebase init in galeria-store:', e);
           }
         }
-        return firebase.firestore();
+        const db = firebase.firestore();
+        try {
+          db.settings({ ignoreUndefinedProperties: true });
+        } catch (e) {}
+        return db;
       }
     } catch (err) {
       console.warn('Firestore not reachable:', err);
@@ -132,6 +149,9 @@
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   }
 
+  // Estado de carga inicial desde la nube
+  let _hasLoadedFromCloud = false;
+
   // --- OBTENER SECCIONES ---
   function getGaleriaSecciones() {
     const deletedSecIds = getDeletedSeccionIds();
@@ -174,7 +194,9 @@
     const db = getFirestoreDb();
     if (db) {
       try {
-        await db.collection('galeria_secciones').doc(seccion.id).set(seccion, { merge: true });
+        const cleanSec = cleanForFirestore(seccion);
+        await db.collection('galeria_secciones').doc(seccion.id).set(cleanSec, { merge: true });
+        console.log('✔ Sección guardada en Firestore:', seccion.id);
       } catch (err) {
         console.warn('Firestore sync error for section (saved locally):', err);
       }
@@ -257,6 +279,8 @@
       if (!item.thumbnail && yId) {
         item.thumbnail = getYouTubeThumbnail(yId);
       }
+    } else {
+      delete item.youtubeId;
     }
     item._deleted = false;
     item._updatedAt = Date.now();
@@ -276,10 +300,11 @@
     const db = getFirestoreDb();
     if (db) {
       try {
-        await db.collection('galeria_items').doc(item.id).set(item, { merge: true });
-        console.log('✔ Item guardado en Firestore:', item.id);
+        const cleanDoc = cleanForFirestore(item);
+        await db.collection('galeria_items').doc(item.id).set(cleanDoc, { merge: true });
+        console.log('✔ Item guardado exitosamente en Firestore:', item.id, item.titulo);
       } catch (err) {
-        console.warn('Firestore error saving galeria item (saved locally):', err);
+        console.warn('Firestore error saving galeria item (guardado localmente, pendiente de sincronización):', err);
       }
     }
 
@@ -318,10 +343,51 @@
     return true;
   }
 
-  // Cargar y sincronizar en tiempo real desde Firestore con fusión inteligente (sin borrar items locales)
-  function startRealtimeSync() {
+  // --- AUTO-SINCRONIZAR ÍTEMS LOCALES PENDIENTES A FIRESTORE ---
+  // Rescata y sube a Firestore cualquier ítem que esté guardado en este navegador
+  async function syncPendingLocalItemsToFirestore() {
     const db = getFirestoreDb();
     if (!db) return;
+
+    let localItems = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
+      if (raw) localItems = JSON.parse(raw) || [];
+    } catch (e) {}
+
+    if (!Array.isArray(localItems) || localItems.length === 0) return;
+    const deletedIds = getDeletedItemIds();
+
+    const pending = localItems.filter(i => i && !i._deleted && !deletedIds.has(String(i.id)) && !/^gal_0[1-6]$/.test(String(i.id)));
+    if (pending.length === 0) return;
+
+    console.log(`[GaleriaStore] Verificando respaldo en Firestore para ${pending.length} ítems locales...`);
+
+    for (const item of pending) {
+      try {
+        const clean = cleanForFirestore({ ...item });
+        if (clean.tipo !== 'youtube') delete clean.youtubeId;
+        clean._deleted = false;
+        clean._updatedAt = clean._updatedAt || Date.now();
+
+        await db.collection('galeria_items').doc(String(clean.id)).set(clean, { merge: true });
+        console.log('✔ Ítem local respaldado exitosamente en Firestore:', clean.id, clean.titulo);
+      } catch (err) {
+        console.warn('Pendiente de permiso o conexión para ítem:', item.id, err.message);
+      }
+    }
+  }
+
+  // Cargar y sincronizar en tiempo real desde Firestore con fusión inteligente
+  function startRealtimeSync() {
+    const db = getFirestoreDb();
+    if (!db) {
+      _hasLoadedFromCloud = true;
+      if (typeof window.onGaleriaDataChanged === 'function') {
+        window.onGaleriaDataChanged();
+      }
+      return;
+    }
 
     try {
       // 1. Sincronizar secciones
@@ -349,7 +415,6 @@
           if (raw) localSecs = JSON.parse(raw) || [];
         } catch (e) {}
 
-        // Combinar: secciones remotas + secciones locales no enviadas + secciones por defecto
         const combinedSecs = [];
         const processedSecIds = new Set();
 
@@ -367,9 +432,9 @@
           if (!processedSecIds.has(id) && !deletedSecIds.has(id) && !sec._deleted) {
             combinedSecs.push(sec);
             processedSecIds.add(id);
-            // Auto-subir a Firestore
             try {
-              db.collection('galeria_secciones').doc(id).set(sec, { merge: true });
+              const cleanSec = cleanForFirestore(sec);
+              db.collection('galeria_secciones').doc(id).set(cleanSec, { merge: true });
             } catch (e) {}
           }
         });
@@ -437,17 +502,23 @@
           }
         });
 
-        // 2. Añadir items creados en este navegador que aún no llegaron al snapshot de Firestore
-        localItems.forEach(item => {
+        // 2. Añadir items locales creados en este navegador que falten en Firestore y respaldarlos
+        localItems.forEach(async (item) => {
           const id = String(item.id);
           if (!processedItemIds.has(id) && !deletedIds.has(id) && !item._deleted && !/^gal_0[1-6]$/.test(id)) {
             combinedItems.push(item);
             processedItemIds.add(id);
-            // Auto-subir a Firestore
+            // Auto-subir a Firestore con sanitización
             try {
-              db.collection('galeria_items').doc(id).set(item, { merge: true });
-              console.log('✔ Auto-sincronizado item local a Firestore:', id);
-            } catch (e) {}
+              const clean = cleanForFirestore({ ...item });
+              if (clean.tipo !== 'youtube') delete clean.youtubeId;
+              clean._deleted = false;
+              clean._updatedAt = clean._updatedAt || Date.now();
+              await db.collection('galeria_items').doc(id).set(clean, { merge: true });
+              console.log('✔ Auto-sincronizado ítem local rescatado a Firestore:', id, clean.titulo);
+            } catch (e) {
+              console.warn('Auto-sync retry failed for:', id, e);
+            }
           }
         });
 
@@ -455,20 +526,46 @@
           localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(combinedItems));
         } catch (e) {}
 
+        _hasLoadedFromCloud = true;
+
         if (typeof window.onGaleriaDataChanged === 'function') {
           window.onGaleriaDataChanged();
         }
       }, err => {
         console.warn('Firestore galeria_items onSnapshot error:', err);
+        _hasLoadedFromCloud = true;
+        if (typeof window.onGaleriaDataChanged === 'function') {
+          window.onGaleriaDataChanged();
+        }
       });
     } catch (e) {
       console.warn('startRealtimeSync connection error:', e);
+      _hasLoadedFromCloud = true;
     }
+  }
+
+  // Escuchar cuando el usuario se autentica (ej: el admin inicia sesión) para forzar respaldo inmediato
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    try {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          console.log('[GaleriaStore] Usuario con sesión activa:', user.email, '-> sincronizando pendientes...');
+          syncPendingLocalItemsToFirestore();
+        }
+      });
+    } catch (e) {}
   }
 
   function getItemById(id) {
     const items = getGaleriaItems();
     return items.find(i => String(i.id) === String(id)) || null;
+  }
+
+  function isLoaded() {
+    // Si ya cargó de la nube O si ya tenemos items en caché local, podemos considerar listo
+    if (_hasLoadedFromCloud) return true;
+    const local = getGaleriaItems();
+    return local.length > 0;
   }
 
   // Exportar al objeto global window
@@ -485,13 +582,20 @@
     deleteItem: deleteGaleriaItem,
     extractYouTubeId: extractYouTubeId,
     getYouTubeThumbnail: getYouTubeThumbnail,
-    syncFromFirestore: startRealtimeSync
+    syncFromFirestore: startRealtimeSync,
+    forceCloudSync: syncPendingLocalItemsToFirestore,
+    isLoaded: isLoaded,
+    markLoaded: () => { _hasLoadedFromCloud = true; }
   };
 
-  // Inicializar sincronización inmediata
+  // Inicializar sincronización inmediata y rescate de datos locales
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startRealtimeSync);
+    document.addEventListener('DOMContentLoaded', () => {
+      startRealtimeSync();
+      syncPendingLocalItemsToFirestore();
+    });
   } else {
     startRealtimeSync();
+    syncPendingLocalItemsToFirestore();
   }
 })();

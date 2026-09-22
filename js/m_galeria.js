@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chipsContainer = document.getElementById('galeria-chips-container-m');
   const gridContainer = document.getElementById('galeria-items-grid-m');
   const emptyStateEl = document.getElementById('galeria-empty-state-m');
+  const loadingStateEl = document.getElementById('galeria-loading-state-m');
   const formatButtons = document.querySelectorAll('.btn-format-filter-m');
 
   // Modals
@@ -76,13 +77,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const secMap = {};
     secciones.forEach(s => secMap[s.id] = s.nombre);
 
+    const isLoaded = window.AgroGaleriaStore && typeof window.AgroGaleriaStore.isLoaded === 'function'
+      ? window.AgroGaleriaStore.isLoaded()
+      : true;
+
+    // Si aún está conectando y cargando desde Firestore y la caché local está vacía:
+    if (!isLoaded && items.length === 0) {
+      if (loadingStateEl) loadingStateEl.style.display = 'block';
+      gridContainer.style.display = 'none';
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+      return;
+    }
+
+    // Si ya cargó o hay ítems disponibles:
+    if (loadingStateEl) loadingStateEl.style.display = 'none';
+
     if (items.length === 0) {
       gridContainer.innerHTML = '';
+      gridContainer.style.display = 'none';
       if (emptyStateEl) emptyStateEl.style.display = 'block';
       return;
     }
 
     if (emptyStateEl) emptyStateEl.style.display = 'none';
+    gridContainer.style.display = 'flex';
 
     gridContainer.innerHTML = items.map(item => {
       const secName = secMap[item.seccionId] || 'Galería';
@@ -257,4 +275,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderSeccionChips();
   renderGalleryItems();
+
+  // Timeout de seguridad en mobile
+  setTimeout(() => {
+    if (loadingStateEl && loadingStateEl.style.display !== 'none') {
+      if (window.AgroGaleriaStore && window.AgroGaleriaStore.markLoaded) {
+        window.AgroGaleriaStore.markLoaded();
+      }
+      renderGalleryItems();
+    }
+  }, 3500);
 });

@@ -1090,16 +1090,18 @@ function initAdminGaleriaModals() {
         }
 
         const itemData = {
-          id: id,
           seccionId: seccionId,
           tipo: tipo,
           url: url,
-          youtubeId: youtubeId || undefined,
           miniatura: miniatura || url,
           titulo: titulo,
           descripcion: desc,
           fecha: fecha
         };
+        if (id) itemData.id = id;
+        if (tipo === 'youtube' && youtubeId) {
+          itemData.youtubeId = youtubeId;
+        }
 
         if (window.showAgroUploadProgress) {
           window.showAgroUploadProgress('Guardando Contenido', 'Guardando en la galería...', 90);
