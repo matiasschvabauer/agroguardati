@@ -372,30 +372,6 @@ const catalogo = [
     }
   },
   {
-    "id": 20,
-    "nombre": "Lancha Guadalupe 470 Inscripta con Tráiler",
-    "categoria": "Embarcaciones",
-    "marca": "Guadalupe",
-    "estado": "Usado",
-    "modelo3d": "https://res.cloudinary.com/pfskomq5/raw/upload/v1787353064/xpbgd1xkumzy43qnai9d.glb",
-    "imagen": "https://res.cloudinary.com/pfskomq5/image/upload/v1786402161/qnwi8kqll7iansypluys.jpg",
-    "imagenes": [
-      "https://res.cloudinary.com/pfskomq5/image/upload/v1786402161/qnwi8kqll7iansypluys.jpg",
-      "https://res.cloudinary.com/pfskomq5/image/upload/v1786402167/nftdq7qth1hstrug1f3k.jpg",
-      "https://res.cloudinary.com/pfskomq5/image/upload/v1786402193/xvdm1dcuq9z23bl6yoib.jpg"
-    ],
-    "descripcionCorta": "Tracker Guadalupe 470 Full año 2023 con tráiler completo, luces y posa cañas. Súper liviano y resistente.",
-    "descripcionLarga": "Tracker Guadalupe 470 Full en Honeycomb color rojo y blanco. Equipada con 6 posa cañas, bolsillos laterales, tráiler completo con paragolpes y luces. Embarcación super liviana, resistente e inscripta.",
-    "especificaciones": {
-      "Modelo": "Guadalupe 470 Full",
-      "Año": "2023",
-      "Material": "Honeycomb",
-      "Marca": "Guadalupe",
-      "Estado": "Usado",
-      "Equipamiento": "6 posa cañas, tráiler con luces"
-    }
-  },
-  {
     "id": 21,
     "nombre": "Inoculador Mezclador Micelli",
     "categoria": "Herramientas",

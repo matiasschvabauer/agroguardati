@@ -257,14 +257,18 @@ function initCatalog() {
           matchCat = itemCat.includes('sembrad') || itemName.includes('sembrad');
         } else if (sel === 'tolvas' || sel === 'acoplados' || sel === 'acoplado') {
           matchCat = itemCat.includes('acoplado') || itemName.includes('tolva') || itemName.includes('acoplado') || itemName.includes('tanque');
+        } else if (sel === 'desmalezadora' || sel === 'desmalezadoras') {
+          matchCat = itemCat.includes('desmalez') || itemName.includes('desmalez') || itemCat.includes('cortadora') || itemName.includes('corta');
+        } else if (sel === 'niveladora' || sel === 'niveladoras') {
+          matchCat = itemCat.includes('nivelad') || itemName.includes('nivelad');
+        } else if (sel === 'rastra' || sel === 'rastras') {
+          matchCat = itemCat.includes('rastra') || itemName.includes('rastra');
         } else if (sel === 'cortadoras' || sel === 'cortadora') {
           matchCat = itemName.includes('corta') || itemName.includes('desmalezadora') || itemName.includes('pasto') || itemName.includes('cesped') || itemName.includes('césped');
         } else if (sel === 'pulverizadores') {
           matchCat = itemCat.includes('pulveriz') || itemName.includes('pulveriz') || itemName.includes('fumig');
-        } else if (sel === 'lanchas') {
-          matchCat = itemCat.includes('embarca') || itemName.includes('lancha') || itemName.includes('guadalupe');
-        } else if (sel === 'herramientas') {
-          matchCat = itemCat.includes('herramienta');
+        } else if (sel === 'otros' || sel === 'herramientas') {
+          matchCat = itemCat.includes('herramienta') || itemCat.includes('otro') || (!itemCat.includes('tractor') && !itemCat.includes('cosecha') && !itemCat.includes('sembrad') && !itemCat.includes('acoplado') && !itemCat.includes('pulveriz') && !itemCat.includes('desmalez') && !itemCat.includes('nivelad') && !itemCat.includes('rastra'));
         } else {
           matchCat = itemCat.includes(sel) || itemName.includes(sel);
         }
@@ -411,6 +415,187 @@ function initCatalog() {
   });
 }
 
+// --- CARRUSEL DE OFERTAS MOBILE (Home Page) ---
+function initOfertasCarousel() {
+  const section = document.getElementById('ofertas-section');
+  const container = document.getElementById('ofertas-carousel-container');
+  const track = document.getElementById('ofertas-carousel-track');
+  const btnToggle = document.getElementById('ofertas-btn-toggle-play');
+
+  if (!section || !container || !track) return;
+
+  let isPaused = false;
+  let userManuallyPaused = false;
+  let animationFrameId = null;
+  const speed = 0.8;
+
+  function stopLoop() {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  function startLoop() {
+    stopLoop();
+    function step() {
+      if (!isPaused && !userManuallyPaused && track.children.length > 1) {
+        container.scrollLeft += speed;
+        const halfWidth = track.scrollWidth / 2;
+        if (halfWidth > 0 && container.scrollLeft >= halfWidth) {
+          container.scrollLeft -= halfWidth;
+        }
+      }
+      animationFrameId = requestAnimationFrame(step);
+    }
+    animationFrameId = requestAnimationFrame(step);
+  }
+
+  function renderOfertas() {
+    stopLoop();
+    const rawOfertas = window.getAgroOfertas ? window.getAgroOfertas() : [];
+    const catalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
+    const catalogMap = new Map(catalog.map(p => [String(p.id), p]));
+
+    const validOfertas = rawOfertas.filter(item => {
+      if (!item) return false;
+      if (item.tipo === 'producto') {
+        return catalogMap.has(String(item.productoId));
+      }
+      return !!(item.imagenUrl || item.videoUrl || item.titulo);
+    });
+
+    if (validOfertas.length === 0) {
+      section.style.display = 'none';
+      track.innerHTML = '';
+      return;
+    }
+
+    section.style.display = '';
+
+    function buildCard(item) {
+      const badge = item.mensajeOferta ? `<span class="oferta-badge"><i class="fas fa-tag"></i> ${item.mensajeOferta}</span>` : '';
+
+      if (item.tipo === 'producto') {
+        const prod = catalogMap.get(String(item.productoId));
+        if (!prod) return '';
+        const isSold = !!prod.vendido;
+        const priceTag = window.formatAgroPrice ? window.formatAgroPrice(prod) : '';
+        const soldRibbon = isSold ? `<span class="badge-sold-ribbon"><i class="fas fa-tag"></i> VENDIDO</span>` : '';
+        const title = item.titulo || prod.nombre;
+        const desc = item.descripcion || prod.descripcionCorta || `${prod.marca || ''} - ${prod.categoria}`;
+
+        return `
+          <div class="oferta-card-wrapper">
+            <a href="m_producto-detalle.html?id=${prod.id}" class="oferta-card oferta-card-product ${isSold ? 'is-sold' : ''}">
+              <div class="oferta-card-media">
+                ${badge}
+                ${soldRibbon}
+                <img src="${prod.imagen || 'AGLOGOCIRC.png'}" alt="${title}" class="oferta-card-img" loading="lazy">
+                <span class="oferta-product-state-pill">${prod.estado}</span>
+              </div>
+              <div class="oferta-card-content">
+                <div class="oferta-card-meta">
+                  <span class="oferta-card-cat">${prod.categoria}</span>
+                  ${priceTag}
+                </div>
+                <h3 class="oferta-card-title">${title}</h3>
+                <p class="oferta-card-desc">${desc}</p>
+                <div class="oferta-card-cta">
+                  <span>${isSold ? 'Ver Maquinaria' : 'Aprovechar Oferta'} &rarr;</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        `;
+      } else if (item.tipo === 'imagen') {
+        const link = item.enlaceUrl && item.enlaceUrl.trim() ? item.enlaceUrl.trim() : null;
+        const tag = link ? 'a' : 'div';
+        const hrefAttr = link ? `href="${link}" target="${link.startsWith('http') ? '_blank' : '_self'}"` : '';
+
+        return `
+          <div class="oferta-card-wrapper">
+            <${tag} ${hrefAttr} class="oferta-card oferta-card-banner ${link ? 'is-clickable' : ''}">
+              <div class="oferta-card-media oferta-card-media--full">
+                ${badge}
+                <img src="${item.imagenUrl}" alt="${item.titulo || 'Oferta'}" class="oferta-card-img" loading="lazy">
+                ${(item.titulo || item.descripcion) ? `
+                  <div class="oferta-card-gradient-overlay">
+                    ${item.titulo ? `<h3 class="oferta-banner-title">${item.titulo}</h3>` : ''}
+                    ${item.descripcion ? `<p class="oferta-banner-desc">${item.descripcion}</p>` : ''}
+                    ${link ? `<span class="oferta-card-cta-inline">Ver Más &rarr;</span>` : ''}
+                  </div>
+                ` : ''}
+              </div>
+            </${tag}>
+          </div>
+        `;
+      } else if (item.tipo === 'video') {
+        const link = item.enlaceUrl && item.enlaceUrl.trim() ? item.enlaceUrl.trim() : null;
+
+        return `
+          <div class="oferta-card-wrapper">
+            <div class="oferta-card oferta-card-video">
+              <div class="oferta-card-media oferta-card-media--full">
+                ${badge}
+                <video src="${item.videoUrl}" class="oferta-card-video-el" autoplay muted loop playsinline></video>
+                <div class="oferta-card-gradient-overlay">
+                  ${item.titulo ? `<h3 class="oferta-banner-title">${item.titulo}</h3>` : ''}
+                  ${item.descripcion ? `<p class="oferta-banner-desc">${item.descripcion}</p>` : ''}
+                  ${link ? `<a href="${link}" class="oferta-card-cta-inline" target="${link.startsWith('http') ? '_blank' : '_self'}">Ver Más &rarr;</a>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    const cardsHtml = validOfertas.map(buildCard).join('');
+
+    if (validOfertas.length > 1) {
+      track.innerHTML = cardsHtml + cardsHtml;
+      startLoop();
+    } else {
+      track.innerHTML = cardsHtml;
+    }
+  }
+
+  // Interacción táctil en móvil
+  let touchTimeout = null;
+  container.addEventListener('touchstart', () => {
+    isPaused = true;
+    if (touchTimeout) clearTimeout(touchTimeout);
+  }, { passive: true });
+
+  container.addEventListener('touchend', () => {
+    touchTimeout = setTimeout(() => {
+      if (!userManuallyPaused) isPaused = false;
+    }, 2000);
+  }, { passive: true });
+
+  // Botón toggle play/pausa
+  if (btnToggle) {
+    btnToggle.addEventListener('click', () => {
+      userManuallyPaused = !userManuallyPaused;
+      if (userManuallyPaused) {
+        btnToggle.innerHTML = '<i class="fas fa-play"></i>';
+        btnToggle.setAttribute('title', 'Reanudar carrusel');
+        btnToggle.classList.add('is-paused-btn');
+      } else {
+        btnToggle.innerHTML = '<i class="fas fa-pause"></i>';
+        btnToggle.setAttribute('title', 'Pausar carrusel');
+        btnToggle.classList.remove('is-paused-btn');
+      }
+    });
+  }
+
+  renderOfertas();
+  window.addEventListener('agroOfertasUpdated', renderOfertas);
+  window.addEventListener('agroCatalogUpdated', renderOfertas);
+}
+
 // --- FEATURED PRODUCTS ---
 function initFeatured() {
   const featuredContainer = document.getElementById('featured-grid');
@@ -420,8 +605,25 @@ function initFeatured() {
     const currentCatalog = window.getAgroCatalog ? window.getAgroCatalog() : (typeof catalogo !== 'undefined' ? catalogo : []);
     featuredContainer.innerHTML = '';
     const isAdmin = window.isAgroAdmin ? window.isAgroAdmin() : false;
-    const visibleFeatured = currentCatalog.filter(p => !p.oculto || isAdmin);
-    const featured = visibleFeatured.slice(0, 3);
+    
+    let featured = [];
+    if (window.getAgroDestacados) {
+      const customIds = window.getAgroDestacados();
+      customIds.forEach(id => {
+        const prod = currentCatalog.find(p => String(p.id) === String(id));
+        if (prod && (!prod.oculto || isAdmin)) {
+          featured.push(prod);
+        }
+      });
+    }
+
+    const sectionEl = document.getElementById('destacados') || featuredContainer.closest('section');
+    if (featured.length === 0) {
+      if (sectionEl) sectionEl.style.display = 'none';
+      return;
+    } else {
+      if (sectionEl) sectionEl.style.display = '';
+    }
     
     featured.forEach(item => {
       const priceTag = window.formatAgroPrice ? window.formatAgroPrice(item) : '';
@@ -458,6 +660,8 @@ function initFeatured() {
 
   renderFeatured();
   window.addEventListener('agroCatalogUpdated', renderFeatured);
+  window.addEventListener('agroDestacadosUpdated', renderFeatured);
+  window.initFeatured = renderFeatured;
 }
 
 // --- PRODUCT DETAILS ---
@@ -717,6 +921,7 @@ function initHorariosModal() {
 document.addEventListener('DOMContentLoaded', () => {
   initGradientBackground();
   initMobileMenu();
+  initOfertasCarousel();
   initFeatured();
   initCatalog();
   initProductDetails();

@@ -710,52 +710,570 @@ window.deleteDashboardProduct = async function(id) {
 
 let currentAdminGalEditItem = null;
 
-// Tab Switcher between Catálogo and Galería
+// Tab Switcher between Catálogo, Ofertas, Destacados y Galería
 function initAdminTabs() {
   const btnCat = document.getElementById('tab-btn-catalogo');
+  const btnOf = document.getElementById('tab-btn-ofertas');
+  const btnDest = document.getElementById('tab-btn-destacados');
   const btnGal = document.getElementById('tab-btn-galeria');
+
   const viewCat = document.getElementById('admin-view-catalogo');
+  const viewOf = document.getElementById('admin-view-ofertas');
+  const viewDest = document.getElementById('admin-view-destacados');
   const viewGal = document.getElementById('admin-view-galeria');
 
-  if (!btnCat || !btnGal || !viewCat || !viewGal) return;
+  const allTabs = [
+    { btn: btnCat, view: viewCat, id: 'catalogo' },
+    { btn: btnOf, view: viewOf, id: 'ofertas' },
+    { btn: btnDest, view: viewDest, id: 'destacados' },
+    { btn: btnGal, view: viewGal, id: 'galeria' }
+  ];
 
-  function switchTab(target) {
-    if (target === 'galeria') {
-      btnGal.classList.add('active');
-      btnGal.style.color = 'var(--brand-blue)';
-      btnGal.style.borderBottom = '3px solid var(--brand-blue)';
-      btnGal.style.marginBottom = '-2px';
+  function switchTab(targetId) {
+    allTabs.forEach(item => {
+      if (!item.btn || !item.view) return;
+      if (item.id === targetId) {
+        item.btn.classList.add('active');
+        item.btn.style.color = 'var(--brand-blue)';
+        item.btn.style.borderBottom = '3px solid var(--brand-blue)';
+        item.btn.style.marginBottom = '-2px';
+        item.view.style.display = 'block';
+      } else {
+        item.btn.classList.remove('active');
+        item.btn.style.color = '#64748b';
+        item.btn.style.borderBottom = 'none';
+        item.btn.style.marginBottom = '0';
+        item.view.style.display = 'none';
+      }
+    });
 
-      btnCat.classList.remove('active');
-      btnCat.style.color = '#64748b';
-      btnCat.style.borderBottom = 'none';
-      btnCat.style.marginBottom = '0';
-
-      viewCat.style.display = 'none';
-      viewGal.style.display = 'block';
-
+    if (targetId === 'catalogo') {
+      renderDashboardTable();
+    } else if (targetId === 'ofertas') {
+      renderAdminOfertasTable();
+    } else if (targetId === 'destacados') {
+      renderAdminDestacadosSlots();
+    } else if (targetId === 'galeria') {
       renderAdminSeccionesChips();
       renderAdminGaleriaTable();
-    } else {
-      btnCat.classList.add('active');
-      btnCat.style.color = 'var(--brand-blue)';
-      btnCat.style.borderBottom = '3px solid var(--brand-blue)';
-      btnCat.style.marginBottom = '-2px';
-
-      btnGal.classList.remove('active');
-      btnGal.style.color = '#64748b';
-      btnGal.style.borderBottom = 'none';
-      btnGal.style.marginBottom = '0';
-
-      viewGal.style.display = 'none';
-      viewCat.style.display = 'block';
-
-      renderDashboardTable();
     }
   }
 
-  btnCat.addEventListener('click', () => switchTab('catalogo'));
-  btnGal.addEventListener('click', () => switchTab('galeria'));
+  if (btnCat) btnCat.addEventListener('click', () => switchTab('catalogo'));
+  if (btnOf) btnOf.addEventListener('click', () => switchTab('ofertas'));
+  if (btnDest) btnDest.addEventListener('click', () => switchTab('destacados'));
+  if (btnGal) btnGal.addEventListener('click', () => switchTab('galeria'));
+}
+
+// --- GESTIÓN DE OFERTAS DEL CARRUSEL (ADMIN) ---
+let currentAdminOfertaEditId = null;
+
+function renderAdminOfertasTable() {
+  const tbody = document.getElementById('admin-ofertas-table-body');
+  const countEl = document.getElementById('ofertas-count-text');
+  if (!tbody) return;
+
+  const ofertas = window.getAgroOfertas ? window.getAgroOfertas() : [];
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const catalogMap = new Map(catalog.map(p => [String(p.id), p]));
+
+  if (countEl) {
+    countEl.textContent = ofertas.length === 1 
+      ? '1 oferta cargada en el carrusel' 
+      : `${ofertas.length} ofertas cargadas en el carrusel`;
+  }
+
+  if (ofertas.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; padding: 3rem 1rem; color: #64748b;">
+          <i class="fas fa-tags" style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 0.8rem; display: block;"></i>
+          <p style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.4rem;">No hay ofertas configuradas en el carrusel</p>
+          <p style="font-size: 0.85rem; color: #94a3b8; max-width: 420px; margin: 0 auto 1.2rem;">
+            El carrusel permanecerá oculto en el inicio hasta que agregues una imagen, video o producto con cartel de oferta.
+          </p>
+          <button type="button" class="btn-primary" onclick="document.getElementById('btn-admin-add-oferta').click()">
+            <i class="fas fa-plus"></i> Crear Primera Oferta
+          </button>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = '';
+  ofertas.forEach((item, index) => {
+    let previewHtml = '';
+    let tipoBadge = '';
+    let titleHtml = '';
+    const badgeText = item.mensajeOferta 
+      ? `<span class="badge-oferta-promo"><i class="fas fa-tag"></i> ${item.mensajeOferta}</span>` 
+      : '<span style="color:#94a3b8; font-size:0.8rem;">(Sin cartel)</span>';
+
+    if (item.tipo === 'producto') {
+      const prod = catalogMap.get(String(item.productoId));
+      const imgSrc = prod?.imagen || item.imagenUrl || 'AGLOGOCIRC.png';
+      previewHtml = `<img src="${imgSrc}" class="table-thumb" alt="Preview">`;
+      tipoBadge = `<span class="badge-tipo-pill"><i class="fas fa-tractor" style="color: var(--brand-blue);"></i> Producto</span>`;
+      titleHtml = `
+        <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${prod ? prod.nombre : (item.titulo || 'Producto')}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">${prod ? (prod.marca + ' &bull; ' + prod.categoria) : ''}</div>
+      `;
+    } else if (item.tipo === 'video') {
+      previewHtml = `<div style="width:55px; height:55px; border-radius:10px; overflow:hidden; border:1px solid #cbd5e1; background:#0f172a; display:flex; align-items:center; justify-content:center;">
+        <i class="fas fa-play" style="color:white; font-size:1.1rem;"></i>
+      </div>`;
+      tipoBadge = `<span class="badge-tipo-pill"><i class="fas fa-video" style="color: #dc2626;"></i> Video</span>`;
+      titleHtml = `
+        <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${item.titulo || 'Video Promocional'}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">${item.descripcion || ''}</div>
+      `;
+    } else {
+      const imgSrc = item.imagenUrl || 'AGLOGOCIRC.png';
+      previewHtml = `<img src="${imgSrc}" class="table-thumb" alt="Preview">`;
+      tipoBadge = `<span class="badge-tipo-pill"><i class="fas fa-image" style="color: #16a34a;"></i> Imagen</span>`;
+      titleHtml = `
+        <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${item.titulo || 'Banner Promocional'}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">${item.descripcion || ''}</div>
+      `;
+    }
+
+    const isFirst = index === 0;
+    const isLast = index === ofertas.length - 1;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="text-align: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+          <button type="button" class="btn-icon btn-oferta-move-up" data-id="${item.id}" ${isFirst ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''} title="Subir orden" style="width:26px; height:26px; font-size:0.75rem;">
+            <i class="fas fa-chevron-up"></i>
+          </button>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;">${index + 1}</span>
+          <button type="button" class="btn-icon btn-oferta-move-down" data-id="${item.id}" ${isLast ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''} title="Bajar orden" style="width:26px; height:26px; font-size:0.75rem;">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+      </td>
+      <td>${previewHtml}</td>
+      <td>${tipoBadge}</td>
+      <td>${titleHtml}</td>
+      <td>${badgeText}</td>
+      <td style="text-align: right; white-space: nowrap;">
+        <button type="button" class="btn-icon btn-icon-edit btn-edit-oferta" data-id="${item.id}" title="Editar Oferta">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button type="button" class="btn-icon btn-icon-delete btn-delete-oferta" data-id="${item.id}" title="Eliminar Oferta">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  tbody.querySelectorAll('.btn-edit-oferta').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openAdminOfertaModal(btn.getAttribute('data-id'));
+    });
+  });
+
+  tbody.querySelectorAll('.btn-delete-oferta').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      if (confirm('¿Estás seguro de que querés eliminar esta oferta del carrusel?')) {
+        await window.deleteAgroOferta(id);
+      }
+    });
+  });
+
+  tbody.querySelectorAll('.btn-oferta-move-up').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const idx = ofertas.findIndex(o => String(o.id) === String(id));
+      if (idx > 0) {
+        const newOrder = [...ofertas.map(o => o.id)];
+        const temp = newOrder[idx];
+        newOrder[idx] = newOrder[idx - 1];
+        newOrder[idx - 1] = temp;
+        await window.reorderAgroOfertas(newOrder);
+      }
+    });
+  });
+
+  tbody.querySelectorAll('.btn-oferta-move-down').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const idx = ofertas.findIndex(o => String(o.id) === String(id));
+      if (idx !== -1 && idx < ofertas.length - 1) {
+        const newOrder = [...ofertas.map(o => o.id)];
+        const temp = newOrder[idx];
+        newOrder[idx] = newOrder[idx + 1];
+        newOrder[idx + 1] = temp;
+        await window.reorderAgroOfertas(newOrder);
+      }
+    });
+  });
+}
+
+function openAdminOfertaModal(editId = null) {
+  const modal = document.getElementById('admin-oferta-modal');
+  const titleEl = document.getElementById('admin-oferta-modal-title');
+  const form = document.getElementById('admin-oferta-form');
+  const idInput = document.getElementById('admin-oferta-form-id');
+  const tipoSelect = document.getElementById('admin-oferta-form-tipo');
+  const prodSelect = document.getElementById('admin-oferta-form-producto-id');
+  const badgeInput = document.getElementById('admin-oferta-form-badge');
+  const tituloInput = document.getElementById('admin-oferta-form-titulo');
+  const descInput = document.getElementById('admin-oferta-form-desc');
+  const enlaceInput = document.getElementById('admin-oferta-form-enlace');
+  const imgUrlInput = document.getElementById('admin-oferta-form-img-url');
+  const videoUrlInput = document.getElementById('admin-oferta-form-video-url');
+
+  if (!modal || !form) return;
+  currentAdminOfertaEditId = editId;
+
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  if (prodSelect) {
+    prodSelect.innerHTML = '<option value="">-- Seleccionar maquinaria del catálogo --</option>';
+    catalog.forEach(p => {
+      prodSelect.innerHTML += `<option value="${p.id}">${p.nombre} (${p.marca || 'S/M'} - ${p.categoria})</option>`;
+    });
+  }
+
+  function updateTypeGroups() {
+    const val = tipoSelect ? tipoSelect.value : 'producto';
+    const groupProd = document.getElementById('admin-oferta-group-producto');
+    const groupImg = document.getElementById('admin-oferta-group-imagen');
+    const groupVid = document.getElementById('admin-oferta-group-video');
+
+    if (groupProd) groupProd.style.display = (val === 'producto') ? 'block' : 'none';
+    if (groupImg) groupImg.style.display = (val === 'imagen') ? 'block' : 'none';
+    if (groupVid) groupVid.style.display = (val === 'video') ? 'block' : 'none';
+  }
+
+  function updateProductPreview() {
+    const previewWrap = document.getElementById('admin-oferta-product-preview');
+    const imgEl = document.getElementById('admin-oferta-preview-img');
+    const nameEl = document.getElementById('admin-oferta-preview-nombre');
+    const catEl = document.getElementById('admin-oferta-preview-cat');
+    const priceEl = document.getElementById('admin-oferta-preview-precio');
+
+    if (!previewWrap) return;
+    const selectedId = prodSelect ? prodSelect.value : '';
+    const prod = catalog.find(p => String(p.id) === String(selectedId));
+
+    if (prod) {
+      previewWrap.style.display = 'flex';
+      if (imgEl) imgEl.src = prod.imagen || 'AGLOGOCIRC.png';
+      if (nameEl) nameEl.textContent = prod.nombre;
+      if (catEl) catEl.textContent = `${prod.categoria} &bull; ${prod.marca || ''} &bull; ${prod.estado || ''}`;
+      if (priceEl && window.formatAgroPrice) priceEl.innerHTML = window.formatAgroPrice(prod);
+    } else {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  if (prodSelect) {
+    prodSelect.onchange = updateProductPreview;
+  }
+  if (tipoSelect) {
+    tipoSelect.onchange = updateTypeGroups;
+  }
+
+  if (editId) {
+    const ofertas = window.getAgroOfertas ? window.getAgroOfertas() : [];
+    const item = ofertas.find(o => String(o.id) === String(editId));
+    if (item) {
+      if (titleEl) titleEl.textContent = 'Editar Oferta del Carrusel';
+      if (idInput) idInput.value = item.id;
+      if (tipoSelect) tipoSelect.value = item.tipo || 'producto';
+      if (prodSelect && item.productoId) prodSelect.value = item.productoId;
+      if (badgeInput) badgeInput.value = item.mensajeOferta || '';
+      if (tituloInput) tituloInput.value = item.titulo || '';
+      if (descInput) descInput.value = item.descripcion || '';
+      if (enlaceInput) enlaceInput.value = item.enlaceUrl || '';
+      if (imgUrlInput) imgUrlInput.value = item.imagenUrl || '';
+      if (videoUrlInput) videoUrlInput.value = item.videoUrl || '';
+    }
+  } else {
+    if (titleEl) titleEl.textContent = 'Agregar Oferta al Carrusel';
+    form.reset();
+    if (idInput) idInput.value = '';
+    if (tipoSelect) tipoSelect.value = 'producto';
+  }
+
+  updateTypeGroups();
+  updateProductPreview();
+  modal.style.display = 'flex';
+}
+
+function initAdminOfertas() {
+  const addBtn = document.getElementById('btn-admin-add-oferta');
+  const modal = document.getElementById('admin-oferta-modal');
+  const form = document.getElementById('admin-oferta-form');
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => openAdminOfertaModal());
+  }
+
+  if (modal) {
+    modal.querySelectorAll('.btn-close-oferta-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('admin-oferta-form-id').value;
+      const tipo = document.getElementById('admin-oferta-form-tipo').value;
+      const productoId = document.getElementById('admin-oferta-form-producto-id').value;
+      const badge = document.getElementById('admin-oferta-form-badge').value.trim();
+      const titulo = document.getElementById('admin-oferta-form-titulo').value.trim();
+      const desc = document.getElementById('admin-oferta-form-desc').value.trim();
+      const enlace = document.getElementById('admin-oferta-form-enlace').value.trim();
+      let imgUrl = document.getElementById('admin-oferta-form-img-url').value.trim();
+      let videoUrl = document.getElementById('admin-oferta-form-video-url').value.trim();
+
+      const fileImg = document.getElementById('admin-oferta-form-file')?.files[0];
+      const fileVid = document.getElementById('admin-oferta-form-video-file')?.files[0];
+
+      if (tipo === 'producto' && !productoId) {
+        alert('Por favor seleccioná una maquinaria del catálogo.');
+        return;
+      }
+
+      try {
+        if (tipo === 'imagen' && fileImg) {
+          if (window.showAgroUploadProgress) {
+            window.showAgroUploadProgress('Subiendo Imagen de Oferta', 'Cargando archivo a la nube...', 30);
+          }
+          const converted = window.convertHeicIfNeeded ? await window.convertHeicIfNeeded(fileImg) : fileImg;
+          const res = await window.uploadToCloudinaryWithProgress(converted, 'image', pct => {
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Imagen de Oferta', `Subiendo... ${pct}%`, pct);
+            }
+          });
+          imgUrl = res.secure_url;
+        }
+
+        if (tipo === 'video' && fileVid) {
+          if (window.showAgroUploadProgress) {
+            window.showAgroUploadProgress('Subiendo Video de Oferta', 'Cargando video a la nube...', 30);
+          }
+          const res = await window.uploadToCloudinaryWithProgress(fileVid, 'video', pct => {
+            if (window.showAgroUploadProgress) {
+              window.showAgroUploadProgress('Subiendo Video de Oferta', `Subiendo... ${pct}%`, pct);
+            }
+          });
+          videoUrl = res.secure_url;
+        }
+      } catch (err) {
+        if (window.hideAgroUploadProgress) window.hideAgroUploadProgress();
+        alert('Error al subir archivo a la nube: ' + err.message);
+        return;
+      } finally {
+        if (window.hideAgroUploadProgress) window.hideAgroUploadProgress();
+      }
+
+      const ofertaData = {
+        id: id || undefined,
+        tipo,
+        productoId: tipo === 'producto' ? productoId : null,
+        mensajeOferta: badge,
+        titulo,
+        descripcion: desc,
+        enlaceUrl: enlace,
+        imagenUrl: imgUrl,
+        videoUrl: videoUrl
+      };
+
+      await window.saveAgroOferta(ofertaData);
+      modal.style.display = 'none';
+      renderAdminOfertasTable();
+    });
+  }
+}
+
+// --- GESTIÓN DE MAQUINARIAS DESTACADAS (ADMIN) ---
+let currentDestacadoTargetSlot = 0;
+
+function renderAdminDestacadosSlots() {
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const catalogMap = new Map(catalog.map(p => [String(p.id), p]));
+  const currentDestacados = window.getAgroDestacados ? window.getAgroDestacados() : [];
+
+  for (let slotIndex = 0; slotIndex < 3; slotIndex++) {
+    const slotEl = document.getElementById(`destacado-slot-${slotIndex}`);
+    if (!slotEl) continue;
+
+    const prodId = currentDestacados[slotIndex];
+    const prod = prodId ? catalogMap.get(String(prodId)) : null;
+
+    if (prod) {
+      const priceTag = window.formatAgroPrice ? window.formatAgroPrice(prod) : '';
+      const isSold = !!prod.vendido;
+      slotEl.style.border = '1.5px solid #cbd5e1';
+      slotEl.style.background = '#ffffff';
+      slotEl.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <span style="font-weight: 800; font-size: 0.8rem; color: #1e3a8a; background: #dbeafe; padding: 3px 10px; border-radius: 20px;">
+            <i class="fas fa-star" style="color: #f59e0b;"></i> Destacado #${slotIndex + 1}
+          </span>
+          <button type="button" class="btn-icon btn-icon-delete btn-remove-destacado" data-slot="${slotIndex}" title="Quitar destacado">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div style="position: relative; width: 100%; height: 160px; border-radius: 12px; overflow: hidden; margin-bottom: 0.8rem; border: 1px solid #e2e8f0;">
+          <img src="${prod.imagen || 'AGLOGOCIRC.png'}" alt="${prod.nombre}" style="width: 100%; height: 100%; object-fit: cover;">
+          <span style="position: absolute; top: 8px; left: 8px; background: rgba(15,23,42,0.85); color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+            ${prod.estado}
+          </span>
+          ${isSold ? '<span style="position: absolute; bottom: 8px; right: 8px; background: #dc2626; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800;">VENDIDO</span>' : ''}
+        </div>
+
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; text-align: left;">${prod.nombre}</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: #64748b; margin-bottom: 0.8rem; text-align: left;">
+          <span>${prod.marca || 'S/M'} &bull; ${prod.categoria}</span>
+          ${priceTag}
+        </div>
+
+        <button type="button" class="btn-primary btn-open-destacado-modal" data-slot="${slotIndex}" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 8px;">
+          <i class="fas fa-exchange-alt"></i> Cambiar Producto
+        </button>
+      `;
+    } else {
+      slotEl.style.border = '2px dashed #cbd5e1';
+      slotEl.style.background = '#f8fafc';
+      slotEl.innerHTML = `
+        <div style="margin-bottom: 0.8rem;">
+          <span style="font-weight: 700; font-size: 0.8rem; color: #64748b; background: #e2e8f0; padding: 3px 10px; border-radius: 20px;">
+            Destacado #${slotIndex + 1} (Vacío)
+          </span>
+        </div>
+        <div style="padding: 2.2rem 1rem;">
+          <i class="fas fa-plus-circle" style="font-size: 2.4rem; color: #94a3b8; margin-bottom: 0.6rem; display: block;"></i>
+          <p style="font-weight: 600; font-size: 0.95rem; color: #334155; margin-bottom: 0.2rem;">Espacio Libre</p>
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1.2rem;">Elegí una maquinaria para que aparezca en esta posición.</p>
+          <button type="button" class="btn-primary btn-open-destacado-modal" data-slot="${slotIndex}" style="background: white; color: var(--brand-blue); border: 1.5px solid var(--brand-blue); box-shadow: none; font-size: 0.88rem; width: 100%; justify-content: center;">
+            <i class="fas fa-plus"></i> Elegir Maquinaria
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  document.querySelectorAll('.btn-open-destacado-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slot = Number(btn.getAttribute('data-slot'));
+      openAdminDestacadoModal(slot);
+    });
+  });
+
+  document.querySelectorAll('.btn-remove-destacado').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const slot = Number(btn.getAttribute('data-slot'));
+      let list = window.getAgroDestacados ? [...window.getAgroDestacados()] : [];
+      list.splice(slot, 1);
+      await window.saveAgroDestacados(list);
+      renderAdminDestacadosSlots();
+    });
+  });
+}
+
+function openAdminDestacadoModal(slotIndex) {
+  currentDestacadoTargetSlot = slotIndex;
+  const modal = document.getElementById('admin-destacado-modal');
+  const titleEl = document.getElementById('admin-destacado-modal-title');
+  const searchInput = document.getElementById('admin-destacado-search');
+  const listContainer = document.getElementById('admin-destacado-products-list');
+
+  if (!modal || !listContainer) return;
+  if (titleEl) titleEl.textContent = `Seleccionar Maquinaria para Destacado #${slotIndex + 1}`;
+  if (searchInput) searchInput.value = '';
+
+  function renderList(query = '') {
+    const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+    const q = query.toLowerCase().trim();
+    const filtered = catalog.filter(p => {
+      if (!q) return true;
+      return (p.nombre || '').toLowerCase().includes(q) ||
+             (p.marca || '').toLowerCase().includes(q) ||
+             (p.categoria || '').toLowerCase().includes(q);
+    });
+
+    listContainer.innerHTML = '';
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="text-align:center; padding:2rem; color:#94a3b8;">No se encontraron maquinarias con esa búsqueda.</div>';
+      return;
+    }
+
+    filtered.forEach(p => {
+      const itemEl = document.createElement('div');
+      itemEl.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0.8rem 1rem; border:1px solid #e2e8f0; border-radius:12px; background:white; transition:all 0.2s;';
+      itemEl.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img src="${p.imagen || 'AGLOGOCIRC.png'}" style="width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid #cbd5e1;">
+          <div>
+            <div style="font-weight:700; font-size:0.92rem; color:#0f172a;">${p.nombre}</div>
+            <div style="font-size:0.78rem; color:#64748b;">${p.marca || 'S/M'} &bull; ${p.categoria} &bull; ${p.estado}</div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary btn-select-this-destacado" data-id="${p.id}" style="font-size:0.82rem; padding:6px 14px; white-space:nowrap;">
+          Seleccionar
+        </button>
+      `;
+      listContainer.appendChild(itemEl);
+    });
+
+    listContainer.querySelectorAll('.btn-select-this-destacado').forEach(b => {
+      b.addEventListener('click', async () => {
+        const prodId = b.getAttribute('data-id');
+        let list = window.getAgroDestacados ? [...window.getAgroDestacados()] : [];
+        list[currentDestacadoTargetSlot] = String(prodId);
+        list = list.filter(Boolean).slice(0, 3);
+        await window.saveAgroDestacados(list);
+        modal.style.display = 'none';
+        renderAdminDestacadosSlots();
+      });
+    });
+  }
+
+  if (searchInput) {
+    searchInput.oninput = (e) => renderList(e.target.value);
+  }
+
+  renderList();
+  modal.style.display = 'flex';
+}
+
+function initAdminDestacados() {
+  const modal = document.getElementById('admin-destacado-modal');
+  const btnSave = document.getElementById('btn-save-destacados');
+
+  if (modal) {
+    modal.querySelectorAll('.btn-close-destacado-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+
+  if (btnSave) {
+    btnSave.addEventListener('click', () => {
+      const list = window.getAgroDestacados ? window.getAgroDestacados() : [];
+      window.saveAgroDestacados(list);
+      alert('✔ Configuración de Maquinarias Destacadas guardada correctamente.');
+    });
+  }
 }
 
 // Render Micro-Sections Chips in Admin
@@ -1189,6 +1707,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initDashboardModal();
   initAdminTabs();
   initAdminGaleriaModals();
+  initAdminOfertas();
+  initAdminDestacados();
 
   const searchInput = document.getElementById('admin-search-input');
   const catSelect = document.getElementById('admin-filter-categoria');
@@ -1206,9 +1726,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (galFilterSec) galFilterSec.addEventListener('change', renderAdminGaleriaTable);
   if (galFilterTipo) galFilterTipo.addEventListener('change', renderAdminGaleriaTable);
 
-  window.addEventListener('agroCatalogUpdated', renderDashboardTable);
+  window.addEventListener('agroCatalogUpdated', () => {
+    renderDashboardTable();
+    renderAdminOfertasTable();
+    renderAdminDestacadosSlots();
+  });
   window.addEventListener('agroGaleriaUpdated', () => {
     renderAdminSeccionesChips();
     renderAdminGaleriaTable();
   });
+  window.addEventListener('agroOfertasUpdated', renderAdminOfertasTable);
+  window.addEventListener('agroDestacadosUpdated', renderAdminDestacadosSlots);
 });

@@ -254,10 +254,12 @@ window.openAdminModal = function(id = null) {
                 <option value="Tractores">Tractores</option>
                 <option value="Cosechadoras">Cosechadoras</option>
                 <option value="Sembradoras">Sembradoras</option>
-                <option value="Pulverizadores">Pulverizadores</option>
-                <option value="Herramientas">Herramientas</option>
                 <option value="Acoplados">Acoplados</option>
-                <option value="Embarcaciones">Embarcaciones</option>
+                <option value="Pulverizadores">Pulverizadores</option>
+                <option value="Desmalezadora">Desmalezadora</option>
+                <option value="Niveladora">Niveladora</option>
+                <option value="Rastra">Rastra</option>
+                <option value="Otros">Otros</option>
               </select>
             </div>
             <div>

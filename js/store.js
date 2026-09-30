@@ -267,6 +267,15 @@ window.deleteAgroProduct = async function(id) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
 
+  // Limpieza reactiva en Ofertas y Destacados
+  if (typeof window.cleanProductFromOfertasAndDestacados === 'function') {
+    try {
+      await window.cleanProductFromOfertasAndDestacados(idStr);
+    } catch(e) {
+      console.warn("Error limpiando producto de ofertas/destacados:", e);
+    }
+  }
+
   if (typeof firebase !== 'undefined') {
     const config = window.AGRO_CONFIG?.firebase;
     if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && !firebase.apps.length) {
@@ -557,13 +566,283 @@ window.uploadToCloudinaryWithProgress = function(file, resourceType = 'image', o
   });
 };
 
-// Sincronizar catálogo inicial desde Firestore si está disponible (con fusión inteligente)
+// --- GESTIÓN DE OFERTAS Y MAQUINARIAS DESTACADAS ---
+const OFERTAS_STORAGE_KEY = 'agroguardati_ofertas_v2';
+const DESTACADOS_STORAGE_KEY = 'agroguardati_destacados_v2';
+
+// Purga automática preventiva del producto 20 (Lancha eliminada)
+try {
+  const delSet = window.getAgroDeletedIds();
+  if (!delSet.has('20')) {
+    window.addAgroDeletedId('20');
+  }
+} catch (e) {}
+
+// Helper para limpiar productos borrados tanto de Ofertas como de Destacados
+window.cleanProductFromOfertasAndDestacados = async function(productId) {
+  const idStr = String(productId);
+
+  // 1. Limpiar Ofertas asociadas a este producto
+  const rawOfertas = localStorage.getItem(OFERTAS_STORAGE_KEY);
+  if (rawOfertas) {
+    try {
+      let ofertas = JSON.parse(rawOfertas);
+      if (Array.isArray(ofertas)) {
+        const matching = ofertas.filter(o => o && o.tipo === 'producto' && String(o.productoId) === idStr);
+        if (matching.length > 0) {
+          ofertas = ofertas.filter(o => !(o && o.tipo === 'producto' && String(o.productoId) === idStr));
+          localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(ofertas));
+
+          if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            try {
+              const db = firebase.firestore();
+              for (const m of matching) {
+                await db.collection('ofertas').doc(String(m.id)).delete();
+              }
+            } catch (e) {}
+          }
+          window.dispatchEvent(new CustomEvent('agroOfertasUpdated', { detail: ofertas }));
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Limpiar Maquinarias Destacadas
+  const rawDestacados = localStorage.getItem(DESTACADOS_STORAGE_KEY);
+  if (rawDestacados) {
+    try {
+      let destacados = JSON.parse(rawDestacados);
+      if (Array.isArray(destacados) && destacados.map(String).includes(idStr)) {
+        destacados = destacados.map(String).filter(id => id !== idStr);
+        localStorage.setItem(DESTACADOS_STORAGE_KEY, JSON.stringify(destacados));
+
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+          try {
+            await firebase.firestore().collection('config').doc('destacados').set({
+              productIds: destacados,
+              updatedAt: Date.now()
+            });
+          } catch(e) {}
+        }
+        window.dispatchEvent(new CustomEvent('agroDestacadosUpdated', { detail: destacados }));
+      }
+    } catch (e) {}
+  }
+};
+
+// 7. OFERTAS: Obtener todas las ofertas activas
+window.getAgroOfertas = function() {
+  const raw = localStorage.getItem(OFERTAS_STORAGE_KEY);
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const validCatalogIds = new Set(catalog.map(p => String(p.id)));
+  let list = [];
+
+  if (raw !== null) {
+    try {
+      list = JSON.parse(raw);
+    } catch(e) {}
+  } else {
+    // Semilla inicial por defecto utilizando productos reales del catálogo
+    const prod1 = catalog[0] || null;
+    const prod2 = catalog[1] || null;
+    list = [];
+    if (prod1) {
+      list.push({
+        id: 'oferta_seed_1',
+        tipo: 'producto',
+        productoId: String(prod1.id),
+        mensajeOferta: 'OFERTA DESTACADA - PRECIO ESPECIAL',
+        titulo: prod1.nombre,
+        descripcion: prod1.descripcionCorta || 'Financiación directa disponible en cuotas fijas.',
+        enlaceUrl: '',
+        orden: 1
+      });
+    }
+    if (prod2) {
+      list.push({
+        id: 'oferta_seed_2',
+        tipo: 'producto',
+        productoId: String(prod2.id),
+        mensajeOferta: 'OPORTUNIDAD ÚNICA',
+        titulo: prod2.nombre,
+        descripcion: prod2.descripcionCorta || 'Excelente estado general. Entrega inmediata.',
+        enlaceUrl: '',
+        orden: 2
+      });
+    }
+    localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(list));
+  }
+  if (!Array.isArray(list)) list = [];
+
+  const validList = list.filter(o => {
+    if (!o) return false;
+    if (o.tipo === 'producto') {
+      return validCatalogIds.has(String(o.productoId));
+    }
+    return true; // imagen o video
+  });
+
+  if (validList.length !== list.length) {
+    localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(validList));
+  }
+
+  validList.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
+  return validList;
+};
+
+// 8. OFERTAS: Guardar o actualizar una oferta
+window.saveAgroOferta = async function(ofertaData) {
+  let ofertas = window.getAgroOfertas();
+  if (!ofertaData.id) {
+    ofertaData.id = 'oferta_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+  ofertaData.updatedAt = Date.now();
+
+  const idx = ofertas.findIndex(o => String(o.id) === String(ofertaData.id));
+  if (idx !== -1) {
+    ofertas[idx] = { ...ofertas[idx], ...ofertaData };
+  } else {
+    ofertaData.orden = ofertas.length + 1;
+    ofertas.push(ofertaData);
+  }
+
+  localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(ofertas));
+
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    try {
+      const db = firebase.firestore();
+      await db.collection('ofertas').doc(String(ofertaData.id)).set(ofertaData);
+      console.log("✔ Oferta sincronizada en Firestore:", ofertaData.id);
+    } catch (e) {
+      console.warn("Error guardando oferta en Firestore:", e.message);
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroOfertasUpdated', { detail: ofertas }));
+  return ofertaData;
+};
+
+// 9. OFERTAS: Eliminar oferta
+window.deleteAgroOferta = async function(id) {
+  const idStr = String(id);
+  let ofertas = window.getAgroOfertas();
+  ofertas = ofertas.filter(o => String(o.id) !== idStr);
+  localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(ofertas));
+
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    try {
+      const db = firebase.firestore();
+      await db.collection('ofertas').doc(idStr).delete();
+      console.log("✔ Oferta eliminada en Firestore:", idStr);
+    } catch (e) {
+      console.warn("Error eliminando oferta en Firestore:", e.message);
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroOfertasUpdated', { detail: ofertas }));
+  return true;
+};
+
+// 10. OFERTAS: Reordenar ofertas
+window.reorderAgroOfertas = async function(orderedIds) {
+  let ofertas = window.getAgroOfertas();
+  const map = new Map(ofertas.map(o => [String(o.id), o]));
+  const reordered = [];
+
+  orderedIds.forEach((id, index) => {
+    const item = map.get(String(id));
+    if (item) {
+      item.orden = index + 1;
+      reordered.push(item);
+      map.delete(String(id));
+    }
+  });
+
+  map.forEach(item => {
+    item.orden = reordered.length + 1;
+    reordered.push(item);
+  });
+
+  localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(reordered));
+
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    try {
+      const db = firebase.firestore();
+      const batch = db.batch();
+      reordered.forEach(item => {
+        batch.set(db.collection('ofertas').doc(String(item.id)), { orden: item.orden }, { merge: true });
+      });
+      await batch.commit();
+    } catch(e) {
+      console.warn("Error reordenando ofertas en Firestore:", e.message);
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroOfertasUpdated', { detail: reordered }));
+  return reordered;
+};
+
+// 11. DESTACADOS: Obtener los hasta 3 productos destacados
+window.getAgroDestacados = function() {
+  const raw = localStorage.getItem(DESTACADOS_STORAGE_KEY);
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const validCatalogIds = new Set(catalog.map(p => String(p.id)));
+
+  if (raw !== null) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        // Filtrar productos eliminados o que ya no existen, máximo 3
+        const valid = parsed.map(String).filter(id => validCatalogIds.has(id)).slice(0, 3);
+        if (valid.length !== parsed.length) {
+          localStorage.setItem(DESTACADOS_STORAGE_KEY, JSON.stringify(valid));
+        }
+        return valid;
+      }
+    } catch(e) {}
+  }
+
+  // Si aún no se configuró por primera vez, sugerir los primeros 3 productos visibles
+  const defaultDestacados = catalog.filter(p => !p.oculto).slice(0, 3).map(p => String(p.id));
+  return defaultDestacados;
+};
+
+// 12. DESTACADOS: Guardar selección de hasta 3 productos destacados
+window.saveAgroDestacados = async function(productIds) {
+  const catalog = window.getAgroCatalog ? window.getAgroCatalog() : [];
+  const validCatalogIds = new Set(catalog.map(p => String(p.id)));
+  const cleanIds = Array.isArray(productIds) 
+    ? productIds.map(String).filter(id => validCatalogIds.has(id)).slice(0, 3) 
+    : [];
+
+  localStorage.setItem(DESTACADOS_STORAGE_KEY, JSON.stringify(cleanIds));
+
+  if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    try {
+      const db = firebase.firestore();
+      await db.collection('config').doc('destacados').set({
+        productIds: cleanIds,
+        updatedAt: Date.now()
+      });
+      console.log("✔ Destacados sincronizados en Firestore:", cleanIds);
+    } catch(e) {
+      console.warn("Error guardando destacados en Firestore:", e.message);
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('agroDestacadosUpdated', { detail: cleanIds }));
+  return cleanIds;
+};
+
+// Sincronizar catálogo inicial, ofertas y destacados desde Firestore
 document.addEventListener('DOMContentLoaded', () => {
   const config = window.AGRO_CONFIG?.firebase;
   if (config && config.apiKey && !config.apiKey.includes('TU_API_KEY') && typeof firebase !== 'undefined') {
     if (!firebase.apps.length) firebase.initializeApp(config);
-    
-    firebase.firestore().collection('productos').onSnapshot(snapshot => {
+    const db = firebase.firestore();
+
+    // 1. Escuchar catálogo de productos
+    db.collection('productos').onSnapshot(snapshot => {
       const fsItems = [];
       if (!snapshot.empty) {
         snapshot.forEach(doc => {
@@ -574,8 +853,39 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedCatalog));
       window.dispatchEvent(new CustomEvent('agroCatalogUpdated', { detail: mergedCatalog }));
     }, err => {
-      console.warn("Snapshot listener offline/unauthorized, usando catálogo local.");
+      console.warn("Snapshot listener productos offline/unauthorized, usando catálogo local.");
+    });
+
+    // 2. Escuchar colección de ofertas en tiempo real
+    db.collection('ofertas').onSnapshot(snapshot => {
+      const fsOfertas = [];
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          fsOfertas.push({ id: doc.id, ...doc.data() });
+        });
+      }
+      if (fsOfertas.length > 0) {
+        fsOfertas.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
+        localStorage.setItem(OFERTAS_STORAGE_KEY, JSON.stringify(fsOfertas));
+        window.dispatchEvent(new CustomEvent('agroOfertasUpdated', { detail: fsOfertas }));
+      }
+    }, err => {
+      console.warn("Snapshot listener ofertas offline/unauthorized.");
+    });
+
+    // 3. Escuchar documento de maquinarias destacadas
+    db.collection('config').doc('destacados').onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        if (data && Array.isArray(data.productIds)) {
+          localStorage.setItem(DESTACADOS_STORAGE_KEY, JSON.stringify(data.productIds));
+          window.dispatchEvent(new CustomEvent('agroDestacadosUpdated', { detail: data.productIds }));
+        }
+      }
+    }, err => {
+      console.warn("Snapshot listener destacados offline/unauthorized.");
     });
   }
 });
+
 

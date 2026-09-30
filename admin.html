@@ -286,6 +286,36 @@
       border: 1px solid #fde68a !important;
     }
 
+    /* Ofertas & Destacados Admin Styling */
+    .badge-oferta-promo {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+    }
+    .badge-tipo-pill {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .destacado-slot-card:hover {
+      border-color: var(--brand-blue) !important;
+      box-shadow: 0 8px 25px rgba(29, 84, 151, 0.08);
+    }
+
     /* Modal Form */
     .modal-backdrop {
       position: fixed;
@@ -644,12 +674,18 @@
     <div id="admin-dashboard" style="display: none;">
       
       <!-- Tab Switcher -->
-      <div class="admin-tab-nav" style="display: flex; gap: 12px; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; flex-wrap: wrap;">
-        <button id="tab-btn-catalogo" class="admin-tab-btn active" style="background: none; border: none; font-size: 1.05rem; font-weight: 700; color: var(--brand-blue); padding: 8px 16px; cursor: pointer; border-bottom: 3px solid var(--brand-blue); margin-bottom: -2px; display: flex; align-items: center; gap: 8px;">
+      <div class="admin-tab-nav" style="display: flex; gap: 10px; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; flex-wrap: wrap;">
+        <button id="tab-btn-catalogo" class="admin-tab-btn active" style="background: none; border: none; font-size: 1rem; font-weight: 700; color: var(--brand-blue); padding: 8px 16px; cursor: pointer; border-bottom: 3px solid var(--brand-blue); margin-bottom: -2px; display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-tractor"></i> Catálogo de Maquinarias
         </button>
-        <button id="tab-btn-galeria" class="admin-tab-btn" style="background: none; border: none; font-size: 1.05rem; font-weight: 700; color: #64748b; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-photo-video"></i> Galería y Micro-Secciones
+        <button id="tab-btn-ofertas" class="admin-tab-btn" style="background: none; border: none; font-size: 1rem; font-weight: 700; color: #64748b; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-tags" style="color: #ef4444;"></i> Carrusel de Ofertas
+        </button>
+        <button id="tab-btn-destacados" class="admin-tab-btn" style="background: none; border: none; font-size: 1rem; font-weight: 700; color: #64748b; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-star" style="color: #f59e0b;"></i> Maquinarias Destacadas
+        </button>
+        <button id="tab-btn-galeria" class="admin-tab-btn" style="background: none; border: none; font-size: 1rem; font-weight: 700; color: #64748b; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-photo-video"></i> Galería Multimedia
         </button>
       </div>
 
@@ -681,10 +717,12 @@
             <option value="Tractores">Tractores</option>
             <option value="Cosechadoras">Cosechadoras</option>
             <option value="Sembradoras">Sembradoras</option>
-            <option value="Pulverizadores">Pulverizadores</option>
-            <option value="Herramientas">Herramientas</option>
             <option value="Acoplados">Acoplados</option>
-            <option value="Embarcaciones">Embarcaciones</option>
+            <option value="Pulverizadores">Pulverizadores</option>
+            <option value="Desmalezadora">Desmalezadora</option>
+            <option value="Niveladora">Niveladora</option>
+            <option value="Rastra">Rastra</option>
+            <option value="Otros">Otros</option>
           </select>
           <select id="admin-filter-disponibilidad" class="filter-select">
             <option value="todos">Todos los estados</option>
@@ -716,7 +754,83 @@
         </div>
       </div>
 
-      <!-- VISTA 2: GESTIÓN DE GALERÍA Y MICRO-SECCIONES -->
+      <!-- VISTA 2: GESTIÓN DEL CARRUSEL DE OFERTAS -->
+      <div id="admin-view-ofertas" style="display: none;">
+        <div class="dashboard-topbar">
+          <div>
+            <h1 style="font-size: 1.7rem;">Carrusel de Ofertas y Promociones</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" id="ofertas-count-text">Cargando ofertas...</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-admin-add-oferta" type="button" class="btn-primary">
+              <i class="fas fa-plus-circle"></i> Agregar Oferta al Carrusel
+            </button>
+          </div>
+        </div>
+
+        <div style="background: #eff6ff; border-left: 4px solid var(--brand-blue); padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.88rem; color: #1e3a8a; line-height: 1.5;">
+          <strong style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <i class="fas fa-info-circle"></i> Carrusel de Ofertas en el Inicio:
+          </strong>
+          Aparece en la portada principal arriba de "Maquinarias Destacadas". Rueda continuamente y se frena cuando el usuario pasa el mouse o toca la pantalla. Podés agregar fotos, videos o destacar una maquinaria cargada con un cartel llamativo de oferta por arriba. Si queda vacío, se ocultará automáticamente.
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">Orden</th>
+                <th>Vista Previa</th>
+                <th>Tipo</th>
+                <th>Título / Maquinaria</th>
+                <th>Mensaje de Oferta</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-ofertas-table-body">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VISTA 3: GESTIÓN DE MAQUINARIAS DESTACADAS -->
+      <div id="admin-view-destacados" style="display: none;">
+        <div class="dashboard-topbar">
+          <div>
+            <h1 style="font-size: 1.7rem;">Maquinarias Destacadas del Inicio</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Elegí exactamente los 3 productos cargados que querés que salgan destacados en la portada de la web.</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-save-destacados" type="button" class="btn-primary" style="background: #16a34a;">
+              <i class="fas fa-check-circle"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+
+        <div style="background: #fefce8; border-left: 4px solid #ca8a04; padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 2rem; font-size: 0.88rem; color: #854d0e; line-height: 1.5;">
+          <strong style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <i class="fas fa-star"></i> Configuración de los 3 Destacados:
+          </strong>
+          Hacé clic en cualquiera de los 3 slots para seleccionar o cambiar la maquinaria. Si borrás un producto de tu catálogo, se eliminará automáticamente de los destacados. La sección puede quedar con 1, 2, 3 o vacía si no seleccionás ninguno.
+        </div>
+
+        <div class="destacados-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+          <!-- Slot 1 -->
+          <div id="destacado-slot-0" class="destacado-slot-card" data-slot="0" style="background: white; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 1.5rem; text-align: center; transition: all 0.2s ease;">
+          </div>
+
+          <!-- Slot 2 -->
+          <div id="destacado-slot-1" class="destacado-slot-card" data-slot="1" style="background: white; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 1.5rem; text-align: center; transition: all 0.2s ease;">
+          </div>
+
+          <!-- Slot 3 -->
+          <div id="destacado-slot-2" class="destacado-slot-card" data-slot="2" style="background: white; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 1.5rem; text-align: center; transition: all 0.2s ease;">
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA 4: GESTIÓN DE GALERÍA Y MICRO-SECCIONES -->
       <div id="admin-view-galeria" style="display: none;">
         <div class="dashboard-topbar">
           <div>
@@ -810,10 +924,12 @@
               <option value="Tractores">Tractores</option>
               <option value="Cosechadoras">Cosechadoras</option>
               <option value="Sembradoras">Sembradoras</option>
-              <option value="Pulverizadores">Pulverizadores</option>
-              <option value="Herramientas">Herramientas</option>
               <option value="Acoplados">Acoplados</option>
-              <option value="Embarcaciones">Embarcaciones</option>
+              <option value="Pulverizadores">Pulverizadores</option>
+              <option value="Desmalezadora">Desmalezadora</option>
+              <option value="Niveladora">Niveladora</option>
+              <option value="Rastra">Rastra</option>
+              <option value="Otros">Otros</option>
             </select>
           </div>
 
@@ -1091,6 +1207,117 @@
           <button type="submit" class="btn-primary">Crear Sección</button>
         </div>
       </form>
+    </div>
+  <!-- MODAL ADMIN: AGREGAR / EDITAR OFERTA AL CARRUSEL -->
+  <div id="admin-oferta-modal" class="modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="modal-card" style="background: white; border-radius: 20px; max-width: 650px; width: 100%; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.8rem;">
+        <h3 id="admin-oferta-modal-title" style="font-size: 1.3rem; color: #0f172a; margin: 0;">Agregar Oferta al Carrusel</h3>
+        <button type="button" class="btn-close-oferta-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+
+      <form id="admin-oferta-form">
+        <input type="hidden" id="admin-oferta-form-id">
+
+        <div class="form-group">
+          <label style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; display: block;">Tipo de Slide</label>
+          <select id="admin-oferta-form-tipo" class="form-control" required style="font-weight: 600;">
+            <option value="producto">🚜 Producto del Catálogo (Seleccionar maquinaria existente)</option>
+            <option value="imagen">🖼️ Banner / Imagen Personalizada</option>
+            <option value="video">🎥 Video Promocional (.mp4 o YouTube)</option>
+          </select>
+        </div>
+
+        <!-- Grupo 1: Si es Producto -->
+        <div id="admin-oferta-group-producto" class="form-group" style="background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1.5px solid #cbd5e1;">
+          <label style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; display: block;">Elegir Maquinaria del Catálogo</label>
+          <select id="admin-oferta-form-producto-id" class="form-control" style="font-size: 0.95rem;"></select>
+          
+          <!-- Vista previa del producto seleccionado -->
+          <div id="admin-oferta-product-preview" style="margin-top: 1rem; display: none; background: white; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0; align-items: center; gap: 1rem;">
+            <img id="admin-oferta-preview-img" src="" alt="Preview" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid #cbd5e1;">
+            <div style="flex: 1;">
+              <h4 id="admin-oferta-preview-nombre" style="font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;"></h4>
+              <p id="admin-oferta-preview-cat" style="font-size: 0.8rem; color: #64748b; margin-bottom: 4px;"></p>
+              <div id="admin-oferta-preview-precio" style="font-size: 0.88rem; font-weight: 700; color: var(--brand-blue);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupo 2: Si es Imagen -->
+        <div id="admin-oferta-group-imagen" class="form-group" style="display: none; background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1.5px solid #cbd5e1;">
+          <label style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; display: block;">Subir Imagen Promocional (JPG, PNG, WebP, HEIC)</label>
+          <input type="file" id="admin-oferta-form-file" accept="image/*,.heic,.HEIC" class="form-control">
+          <input type="url" id="admin-oferta-form-img-url" class="form-control" placeholder="O pega una URL de imagen directa aquí..." style="margin-top: 8px;">
+          <div id="admin-oferta-img-preview-wrap" style="display: none; margin-top: 0.8rem;">
+            <img id="admin-oferta-img-preview" src="" alt="Preview" style="max-height: 140px; border-radius: 10px; border: 1px solid #cbd5e1;">
+          </div>
+        </div>
+
+        <!-- Grupo 3: Si es Video -->
+        <div id="admin-oferta-group-video" class="form-group" style="display: none; background: #f8fafc; padding: 1.2rem; border-radius: 12px; border: 1.5px solid #cbd5e1;">
+          <label style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; display: block;">Seleccionar Video o Pegar URL</label>
+          <input type="file" id="admin-oferta-form-video-file" accept="video/*" class="form-control">
+          <input type="url" id="admin-oferta-form-video-url" class="form-control" placeholder="O URL de video MP4 / YouTube..." style="margin-top: 8px;">
+        </div>
+
+        <!-- Mensaje de Oferta / Cartel por arriba -->
+        <div class="form-group" style="background: #fff1f2; padding: 1.1rem; border-radius: 12px; border: 1.5px solid #fecdd3; margin-top: 1rem;">
+          <label style="font-weight: 700; color: #be123c; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-tag"></i> Mensaje de Oferta / Cartel Destacado
+          </label>
+          <input type="text" id="admin-oferta-form-badge" class="form-control" placeholder="Ej: ¡20% OFF CONTADO! 🔥 o ¡SÚPER PRECIO DE CONTADO!" style="border-color: #fda4af;">
+          <p style="font-size: 0.78rem; color: #9f1239; margin-top: 4px;">
+            Este texto aparecerá en un cartel llamativo encima de la foto o video en el carrusel.
+          </p>
+        </div>
+
+        <!-- Título Opcional -->
+        <div class="form-group" style="margin-top: 1rem;">
+          <label style="font-weight: 600; color: #1e293b; margin-bottom: 0.4rem; display: block;">Título / Encabezado (Opcional si es producto)</label>
+          <input type="text" id="admin-oferta-form-titulo" class="form-control" placeholder="Ej: Oportunidad Especial John Deere 6J">
+        </div>
+
+        <!-- Subtítulo o Descripción breve -->
+        <div class="form-group">
+          <label style="font-weight: 600; color: #1e293b; margin-bottom: 0.4rem; display: block;">Descripción o Detalle de la Oferta (Opcional)</label>
+          <input type="text" id="admin-oferta-form-desc" class="form-control" placeholder="Ej: Financiación directa de fábrica en pesos o dólares. Entrega inmediata.">
+        </div>
+
+        <!-- Enlace Personalizado -->
+        <div class="form-group">
+          <label style="font-weight: 600; color: #1e293b; margin-bottom: 0.4rem; display: block;">Enlace de Destino (Opcional)</label>
+          <input type="url" id="admin-oferta-form-enlace" class="form-control" placeholder="Ej: https://wa.me/... o dejar vacío para ir al producto automático">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem;">
+          <button type="button" class="btn-close-oferta-modal form-control" style="width: auto; background: #e2e8f0; border: none; font-weight: 600; cursor: pointer;">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Oferta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ADMIN: SELECCIONAR MAQUINARIA PARA DESTACADO -->
+  <div id="admin-destacado-modal" class="modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div class="modal-card" style="background: white; border-radius: 20px; max-width: 650px; width: 100%; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.8rem;">
+        <h3 id="admin-destacado-modal-title" style="font-size: 1.3rem; color: #0f172a; margin: 0;">Seleccionar Producto para Destacar</h3>
+        <button type="button" class="btn-close-destacado-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+
+      <div class="search-filter-bar" style="margin-bottom: 1.2rem; width: 100%; max-width: 100%;">
+        <i class="fas fa-search" style="color: #94a3b8;"></i>
+        <input type="text" id="admin-destacado-search" class="search-input" placeholder="Buscar por nombre, marca o categoría...">
+      </div>
+
+      <div id="admin-destacado-products-list" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Injected list of products -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn-close-destacado-modal form-control" style="width: auto; background: #e2e8f0; border: none; font-weight: 600; cursor: pointer;">Cerrar</button>
+      </div>
     </div>
   </div>
 
