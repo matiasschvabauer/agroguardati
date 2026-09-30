@@ -278,6 +278,8 @@ window.openAdminModal = function(id = null) {
                 <option value="Monumental"></option>
                 <option value="El Ranchero"></option>
                 <option value="TOOLKING"></option>
+                <option value="UNIA"></option>
+                <option value="SAMASZ"></option>
               </datalist>
             </div>
           </div>
