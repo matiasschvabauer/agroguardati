@@ -2411,5 +2411,913 @@ const catalogo = [
       "Incluye": "Banda vulcanizada + Rolos engomados + Boca",
       "Compatibilidad": "Universal"
     }
+  },
+  {
+    "id": 201,
+    "nombre": "Fertilizadora de Arrastre SYRA F 2.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/F2000-Syra-Portada1.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/F2000-Syra-Portada1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/05/Detalle-F2000-1.png",
+      "https://syra.com.ar/wp-content/uploads/2023/05/Detalle-F2000-2.png",
+      "https://syra.com.ar/wp-content/uploads/2023/05/Detalle-F2000-3.png"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 1.500 / 2.000 Lts con distribución bidisco en acero inoxidable y ancho de labor de hasta 36 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA F 2.000 con capacidad de 1.500 a 2.000 litros (1,5 a 2 toneladas). Distribución bidisco donde cada plato consta de 4 paletas de diseño especial en acero inoxidable AISI 304 para una descarga continua que permite arrojar altas dosis sin inconvenientes. Equipada con caja en baño de aceite reforzada con engranajes de acero tratados, apertura y cierre hidráulico desde el tractor, rejilla interna con conos regulables en altura y pintura con fondo epoxi y terminación poliuretánica.",
+    "especificaciones": {
+      "Capacidad": "1.500 / 2.000 Lts (1,5 / 2 Tn)",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Distribución": "Bidisco (4 paletas c/u en Acero Inox AISI 304)",
+      "Control": "Apertura y cierre hidráulico desde el tractor",
+      "Trocha": "Variable de 1,60 a 2,10 mts",
+      "Rodados": "Llantas para cubiertas 11L16 o 17",
+      "Potencia Mínima": "30 HP"
+    }
+  },
+  {
+    "id": 202,
+    "nombre": "Fertilizadora de Arrastre SYRA F 3.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/F3000-Syra-Portada.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/F3000-Syra-Portada.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/fertilizadora-syra-f-3000-zaranda.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-f-3000-detalle-piston.gif",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-f-3000-detalle-platos.gif",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-f-3000-detalle-eje.gif"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 3.000 Lts / 3.000 Kg con distribución bidisco en acero inoxidable y ancho de labor de hasta 36 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA F 3.000 con capacidad de 3.000 litros (3.000 kg) y ancho de labor de hasta 36 metros. Cuenta con distribución bidisco de 4 paletas por plato en acero inoxidable AISI 304, boquillas de dosificación regulables, caja en baño de aceite reforzada con engranajes tratados, rejilla interna con conos regulables en altura, visor delantero de tolva y apertura/cierre hidráulico desde el tractor. Pintura íntegra con fondo epoxi y terminación poliuretánica.",
+    "especificaciones": {
+      "Capacidad": "3.000 Lts – 3.000 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Distribución": "Bidisco en Acero Inoxidable AISI 304",
+      "Control": "Apertura y cierre hidráulico desde el tractor",
+      "Trocha Variable": "1,60 a 2,10 mts",
+      "Rodados": "Llantas para cubiertas 11L16 o 17",
+      "Potencia Mínima": "40 HP"
+    }
+  },
+  {
+    "id": 203,
+    "nombre": "Fertilizadora de Arrastre SYRA F 4.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/F4000-Syra-Portada.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/F4000-Syra-Portada.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/05/Detalles-F4000_1.png",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-f-4000-detalle-eje.gif",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-f-4000-detalle-platos.gif"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 4.000 Lts / 4.000 Kg con distribución bidisco en acero inoxidable y ancho de labor de hasta 36 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA F 4.000 con capacidad de 4.000 litros (4.000 kg) y ancho de labor de hasta 36 metros. Equipada con sistema de distribución bidisco de 4 paletas por plato en acero inoxidable AISI 304, boquillas de dosificación regulables, caja reforzada en baño de aceite con engranajes tratados, rejilla interna con conos regulables en altura, visor delantero de tolva y apertura/cierre hidráulico desde el tractor.",
+    "especificaciones": {
+      "Capacidad": "4.000 Lts – 4.000 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Distribución": "Bidisco en Acero Inoxidable AISI 304",
+      "Control": "Apertura y cierre hidráulico desde el tractor",
+      "Trocha": "1,60 a 2,10 mts",
+      "Rodados": "Llantas para cubiertas 11L16 o 17",
+      "Potencia Mínima": "60 HP"
+    }
+  },
+  {
+    "id": 204,
+    "nombre": "Fertilizadora de Arrastre SYRA F 4.000 Intense Variable",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/Intense-4-tt-Acero-Portada.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/Intense-4-tt-Acero-Portada.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/2-Detalle-Intense-Syra.png",
+      "https://syra.com.ar/wp-content/uploads/2022/05/5-Detalle-Intense-Syra.png",
+      "https://syra.com.ar/wp-content/uploads/2022/05/3-Detalle-Intense-Syra.png",
+      "https://syra.com.ar/wp-content/uploads/2022/05/4-Detalle-Intense-Syra.png"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 4.000 Lts en Acero Inoxidable con Controlador Electrónico de Cinta (CEC) y ancho de labor hasta 44 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA F 4.000 Intense Variable con capacidad de 4.000 litros / 4.000 kg y ancho de labor de hasta 44 metros. Accionamiento de cintas y discos distribuidores mediante motores hidráulicos, con Controlador Electrónico de Cinta (CEC) que mantiene la dosis constante ante cambios de velocidad sin patinar, apta para Dosis Variable por Mapeo Satelital, ISOBUS y Guiador Satelital. Tolva, dosificadores, platos, paletas y cobertor en Acero Inoxidable AISI 304, con indicador digital de RPM en cabina.",
+    "especificaciones": {
+      "Capacidad": "4.000 Lts – 4.000 Kg",
+      "Ancho de Labor": "Hasta 44 mts",
+      "Control": "Hidráulico con CEC (Controlador Electrónico de Cinta)",
+      "Construcción": "Tolva, dosificadores, platos y paletas en Acero Inox AISI 304",
+      "Rodados": "Eje Rígido (340/85 x 24) o Balancín (11L16/17)",
+      "Trocha": "1,60 a 2,10 mts",
+      "Potencia Mínima": "60 HP",
+      "Opcionales": "Kit Dosis Variable, conexión ISOBUS, Guiador Satelital, Celdas de Pesaje"
+    }
+  },
+  {
+    "id": 205,
+    "nombre": "Fertilizadora de Arrastre SYRA Motion F4500",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/05/Motion-F4500-Portada.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/05/Motion-F4500-Portada.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/detalle-motion-4500-b_.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/detalle-motion-4500-c.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/3-Motion-F4500-Detalle-Syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/2-Motion-F4500-Detalle-Syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/fetilizadora-syra-motion-4500-chapa-web-ok.png"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 4.500 Lts / 6.000 Kg con dosificación por cinta transportadora y ancho de labor de hasta 36 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA Motion F4500 con capacidad de 4.500 litros (6.000 kg) y ancho de labor de hasta 36 metros. Dosificación mediante cinta transportadora y regulación de compuerta trasera. Distribución bidisco con cinta accionada a través de rueda de acople que mantiene la dosis constante ante cambios de velocidad y platos distribuidores accionados por barra cardánica. Chasis en acero SAE 1010 con lanza articulada con suspensión mecánica. Incluye lona enrollable y rejilla.",
+    "especificaciones": {
+      "Capacidad": "4.500 Lts – 6.000 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Dosificación": "Cinta transportadora y compuerta trasera regulable",
+      "Distribución": "Bidisco con rueda de acople y barra cardánica",
+      "Lanza": "Articulada con suspensión mecánica",
+      "Potencia Mínima": "80 HP",
+      "Incluye": "Lona enrollable y rejilla interna",
+      "Opcionales": "Kit Dosis Variable, conexión ISOBUS, Guiador Satelital"
+    }
+  },
+  {
+    "id": 206,
+    "nombre": "Fertilizadora de Arrastre SYRA Motion F6000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2023/03/fertilizadora_arrastre_syra_Motion_6000.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2023/03/fertilizadora_arrastre_syra_Motion_6000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/ejes-reformados.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/dosificcion-variable.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/Motion-F6000-Detalle-Syra-discos-y-cinta-copia.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/Motion-F6000-Detalle-Syra.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 6.000 Lts / 7.500 Kg con cinta transportadora, versiones mecánica o hidráulica variable.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA Motion F6000 con capacidad de 6.000 litros (7.500 kg) y ancho de labor de hasta 36 metros. Dosificación mediante cinta transportadora y regulación de compuerta trasera. Disponible en versión Mecánica (rueda de acople con mantención de dosis) o Hidráulica (con Kit para Dosis Variable), y con tolva en acero SAE 1010 o en acero inoxidable AISI 304. Incluye lanza articulada con suspensión mecánica, lona enrollable y rejilla.",
+    "especificaciones": {
+      "Capacidad": "6.000 Lts – 7.500 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Dosificación": "Cinta transportadora y compuerta trasera",
+      "Versiones": "Mecánica (rueda de acople) / Hidráulica (Dosis Variable)",
+      "Material Tolva": "Acero SAE 1010 o Acero Inoxidable AISI 304",
+      "Potencia Mínima": "90 HP",
+      "Incluye": "Lona enrollable y rejilla"
+    }
+  },
+  {
+    "id": 207,
+    "nombre": "Fertilizadora de Arrastre SYRA Motion F7500",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/05/Motion-F7500-Portada.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/05/Motion-F7500-Portada.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/fertilizdora-syra-motion-7500-cintas-y-platos.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/fertilizdora-syra-motion-7500-rueda-de-apoyo.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-motion-7500-interior.gif",
+      "https://syra.com.ar/wp-content/uploads/2022/05/Fertilizadora-syra-motion-7500-ajustes.gif"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de 7.500 Lts / 9.000 Kg con dosificación por cinta transportadora y ancho de labor de hasta 36 m.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA Motion F7500 con capacidad de 7.500 litros (9.000 kg) y ancho de labor de hasta 36 metros. Dosificación mediante cinta transportadora y regulación de compuerta trasera. Distribución bidisco con mantención de dosis ante cambios de velocidad mediante rueda de acople y accionamiento de platos distribuidores por barra cardánica. Chasis en acero SAE 1010 con lanza articulada con suspensión mecánica. Incluye lona enrollable y rejilla.",
+    "especificaciones": {
+      "Capacidad": "7.500 Lts – 9.000 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Dosificación": "Cinta transportadora y compuerta trasera",
+      "Distribución": "Bidisco con rueda de acople y barra cardánica",
+      "Lanza": "Articulada con suspensión mecánica",
+      "Potencia Mínima": "100 HP",
+      "Incluye": "Lona enrollable y rejilla",
+      "Opcionales": "Kit Dosis Variable, conexión ISOBUS, Guiador Satelital"
+    }
+  },
+  {
+    "id": 208,
+    "nombre": "Fertilizadora de Arrastre SYRA Motion F9000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2023/03/slider-fertilizadora-syra-motion-9000.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2023/03/slider-fertilizadora-syra-motion-9000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/ejes-reformados.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/dosificcion-variable.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/Motion-F6000-Detalle-Syra-discos-y-cinta-copia.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/Motion-F6000-Detalle-Syra.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora de arrastre de gran autonomía (9.000 Lts / 10.500 Kg) con dosificación por cinta transportadora.",
+    "descripcionLarga": "Fertilizadora de arrastre SYRA Motion F9000 con capacidad de 9.000 litros (10.500 kg) y ancho de labor de hasta 36 metros. Dosificación mediante cinta transportadora y regulación de compuerta trasera. Disponible en versión Mecánica (rueda de acople con mantención de dosis) o Hidráulica (con Kit para Dosis Variable), y con tolva en acero SAE 1010 o en acero inoxidable AISI 304. Equipada con lanza articulada con suspensión mecánica, lona enrollable y rejilla.",
+    "especificaciones": {
+      "Capacidad": "9.000 Lts – 10.500 Kg",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Dosificación": "Cinta transportadora y compuerta trasera",
+      "Versiones": "Mecánica (rueda de acople) / Hidráulica (Dosis Variable)",
+      "Material Tolva": "Acero SAE 1010 o Acero Inoxidable AISI 304",
+      "Potencia Mínima": "110 HP",
+      "Incluye": "Lona enrollable y rejilla"
+    }
+  },
+  {
+    "id": 209,
+    "nombre": "Fertilizadora Incorporadora de Arrastre SYRA ROW 6.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/03/Portada-incorporadora-row-6000-syra.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/03/Portada-incorporadora-row-6000-syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-ROW-6000-a-campo-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-ROW-6000-a-campo.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-18.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-17.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/dimensiones-fertilizadora-incorporadoras-row-syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-01.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-02.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-03.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-04.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora incorporadora de arrastre de 6.000 L con cuerpos de doble disco, doble fertilización y ancho de trabajo de 8,40 m.",
+    "descripcionLarga": "Fertilizadora incorporadora de arrastre SYRA ROW 6.000 con tolva de 6.000 litros en acero SAE 1010 y fondo en acero inoxidable. Sistema de doble tolva que habilita la aplicación simultánea de dos tipos de fertilizantes. Equipada con cuerpos incorporadores con doble disco y rueda camellón sobre doble barra porta herramientas, lanza hidráulica y gran despeje para refertilización en cultivos avanzados. Opcionales de dosificación variable (electrohidráulica o eléctrica) compatible con ISOBUS, cortes por sección y banderillero satelital GPS.",
+    "especificaciones": {
+      "Capacidad Tolva": "6.000 Lts (Doble fertilización en SAE 1010 e Inox)",
+      "Ancho de Trabajo": "8.400 mm",
+      "Configuraciones": "12 a 700 mm / 16 a 525 mm / 20 a 430 mm / 24 a 350 mm / 32 a 262 mm",
+      "Cuerpos Incorporadores": "Doble disco y rueda camellón en doble barra",
+      "Dimensiones Traslado": "Largo 10.620 mm / Ancho 3.000 mm / Alto 3.450 mm",
+      "Trocha y Despeje": "Trocha 2.520 mm / Despeje 390 mm",
+      "Tecnología": "Dosis variable ISOBUS, Cortes por sección, GPS"
+    }
+  },
+  {
+    "id": 210,
+    "nombre": "Fertilizadora Incorporadora de Arrastre SYRA ROW 8.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/03/Portada-incorporadora-row-8000-syra.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/03/Portada-incorporadora-row-8000-syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-row-8000-detalle2.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-row-8000-detalle1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-18.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-row-8000-detalle.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/dimensiones-fertilizadora-incorporadoras-row-syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-01.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-02.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-03.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-04.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora incorporadora de arrastre de 8.000 L con cuerpos de doble disco, doble fertilización y ancho de trabajo de 8,40 m.",
+    "descripcionLarga": "Fertilizadora incorporadora de arrastre SYRA ROW 8.000 con capacidad de 8.000 litros en acero SAE 1010 y fondo en acero inoxidable. Permite doble fertilización simultánea mediante sistema de doble tolva, e incorpora cuerpos con doble disco y rueda camellón montados en doble barra porta herramientas. Cuenta con lanza hidráulica, gran despeje para refertilización tardía y compatibilidad con dosificación variable (electrohidráulica o eléctrica) ISOBUS, cortes por sección y guiado satelital GPS.",
+    "especificaciones": {
+      "Capacidad Tolva": "8.000 Lts (Doble fertilización en SAE 1010 e Inox)",
+      "Ancho de Trabajo": "8.400 mm",
+      "Configuraciones": "12 a 700 mm / 16 a 525 mm / 20 a 430 mm / 24 a 350 mm / 32 a 262 mm",
+      "Cuerpos Incorporadores": "Doble disco y rueda camellón en doble barra",
+      "Dimensiones Traslado": "Largo 13.820 mm / Ancho 3.000 mm / Alto 3.330 mm",
+      "Trocha y Despeje": "Trocha 2.520 mm / Despeje 390 mm",
+      "Tecnología": "Dosis variable ISOBUS, Cortes por sección, GPS"
+    }
+  },
+  {
+    "id": 211,
+    "nombre": "Fertilizadora Incorporadora de Arrastre SYRA ROW 10.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/03/Portada-fertilizadroas-incorporadoras-row-syra-web.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/03/Portada-fertilizadroas-incorporadoras-row-syra-web.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-ROW-6000-a-campo-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/incorporadora-syra-ROW-6000-a-campo.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-18.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-15.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-16.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-17.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/dimensiones-fertilizadora-incorporadoras-row-syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-01.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-02.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-03.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/Detalles-fertilizadora-incorporadora-syra-modelo-row-04.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora incorporadora de arrastre de máxima autonomía (10.000 L) con doble tolva y ancho de trabajo de 8,40 m.",
+    "descripcionLarga": "Fertilizadora incorporadora de arrastre SYRA ROW 10.000 con tolvas de 10.000 litros en acero SAE 1010 y fondo en acero inoxidable para doble fertilización simultánea. Diseñada con cuerpos incorporadores de doble disco y rueda camellón sobre doble barra porta herramientas, lanza hidráulica y gran despeje para refertilización en cultivos avanzados. Admite dosificación variable (electrohidráulica o eléctrica) con conectividad ISOBUS, cortes automáticos por sección y banderillero satelital GPS.",
+    "especificaciones": {
+      "Capacidad Tolva": "10.000 Lts (Doble fertilización en SAE 1010 e Inox)",
+      "Ancho de Trabajo": "8.400 mm",
+      "Configuraciones": "12 a 700 mm / 16 a 525 mm / 20 a 430 mm / 24 a 350 mm / 32 a 262 mm",
+      "Cuerpos Incorporadores": "Doble disco y rueda camellón en doble barra",
+      "Dimensiones Traslado": "Largo 16.600 mm / Ancho 3.000 mm / Alto 3.330 mm",
+      "Trocha y Despeje": "Trocha 2.520 mm / Despeje 390 mm",
+      "Tecnología": "Dosis variable ISOBUS, Cortes por sección, GPS"
+    }
+  },
+  {
+    "id": 212,
+    "nombre": "Unificador de Andanas SYRA Merger",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/06/Unificador_de_andanas_merger_syra.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/06/Unificador_de_andanas_merger_syra.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/unificador-de-andaas-syra_Mesa-de-trabajo-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/100_3875.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/100_3897.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/100_6264.jpg"
+    ],
+    "descripcionCorta": "Unificador de andanas adaptable a cualquier segadora de arrastre para juntar hileras durante el corte sin pérdida de hojas.",
+    "descripcionLarga": "Unificador de Andanas SYRA Merger aplicable a cualquier tipo o marca de segadoras de arrastre sin modificar su estructura. Permite acoplar y desacoplar rápidamente el equipo, copiando los desniveles del terreno y siguiendo a la segadora en cualquier maniobra. Posee desplazamiento lateral y variación de velocidad de la cinta transportadora para ubicar las andanas encimadas o una al lado de la otra al mismo tiempo que se realiza el corte, eliminando el uso posterior de rastrillos, reduciendo costos de combustible y logrando hileras libres de impurezas sin pérdida de hojas ni proteínas.",
+    "especificaciones": {
+      "Compatibilidad": "Universal para segadoras de arrastre",
+      "Regulación": "Desplazamiento lateral y velocidad variable de cinta",
+      "Hilerado": "Andanas encimadas o contiguas en simultáneo con el corte",
+      "Beneficio": "Preserva hasta 70% de proteína en hojas sin contaminar con tierra"
+    }
+  },
+  {
+    "id": 213,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 6.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2023/03/slider-syra-esparcidora-estercolera-organica-estiercol-ea6000.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2023/03/slider-syra-esparcidora-estercolera-organica-estiercol-ea6000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/caja-sistema-hidraulico1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/acarreador.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/sistema-hidraulico.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/EA6000-atras-distribuidorpng.png"
+    ],
+    "descripcionCorta": "Esparcidor de estiércol y abonos orgánicos sólidos de 6.000 Lts con dos rotores verticales y ancho de labor de 10 a 16 m.",
+    "descripcionLarga": "Esparcidor de estiércol y orgánicos sólidos SYRA EA 6.000 con capacidad de 6.000 litros y ancho de labor de 10 a 16 metros, ideal para avícolas, tambos y feedlots. Construido con chasis reforzado con lanza abulonada, tolva totalmente abulonada con bulonería de acero inoxidable, acarreador de cadenas reforzadas y barrotes de acero abulonados con accionamiento hidráulico a través de reductor, y distribución homogénea mediante dos rotores verticales.",
+    "especificaciones": {
+      "Capacidad": "6.000 Lts",
+      "Ancho de Labor": "10 a 16 mts",
+      "Distribución": "Dos rotores verticales acondicionadores",
+      "Acarreador": "Cadenas reforzadas con accionamiento hidráulico y reductor",
+      "Tolva": "Abulonada con bulonería de Acero Inoxidable",
+      "Rodados": "Eje rígido con llantas para cubiertas 400/60 x 15.5"
+    }
+  },
+  {
+    "id": 214,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 6.5",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/EA6500_Mesa-de-trabajo-1-scaled.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/EA6500_Mesa-de-trabajo-1-scaled.jpg"
+    ],
+    "descripcionCorta": "Esparcidor de estiércol y orgánicos sólidos de 6.500 Lts con cajas en baño de aceite y ancho de labor de 10 a 16 m.",
+    "descripcionLarga": "Esparcidor de estiércol y orgánicos sólidos SYRA 6.5 con capacidad de 6.500 litros y ancho de labor de 10 a 16 metros. Cuenta con acarreador con cadenas reforzadas y barrotes cambiables de grueso espesor de accionamiento hidráulico con reductor, cajas SYRA en baño de aceite con engranajes forjados y tratamiento térmico accionadas por barra de mando, tolva de chapas abulonadas y regulación de dosis mediante compuerta trasera.",
+    "especificaciones": {
+      "Capacidad": "6.500 Lts",
+      "Ancho de Labor": "10 a 16 mts",
+      "Acarreador": "Cadenas reforzadas con accionamiento hidráulico y reductor",
+      "Cajas": "SYRA en baño de aceite con engranajes forjados",
+      "Rodados": "Llantas para rodados 12.5 x 18 / 12.4 x 16"
+    }
+  },
+  {
+    "id": 215,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 8.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/07/Estercolera_Syra_EA8000_2ruedas_web.jpg.jpeg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/07/Estercolera_Syra_EA8000_2ruedas_web.jpg.jpeg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/caja-sistema-hidraulico1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/acarreador.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/lanza-estercolra-syra-ea8000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2023/03/ejs-estercolera-syra-ea8000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/07/Estercolera_organica_syra_ea8000.png"
+    ],
+    "descripcionCorta": "Estercolera orgánica para sólidos de 8.000 Lts con suspensión a balancín, dos rotores verticales y ancho de labor de 10 a 16 m.",
+    "descripcionLarga": "Esparcidor de estiércol y orgánicos sólidos SYRA EA 8.000 con capacidad de 8.000 litros y ancho de labor de 10 a 16 metros. Posee chasis reforzado con lanza abulonada, suspensión a balancín, tolva totalmente abulonada con bulonería de acero inoxidable, acarreador con cadenas reforzadas y barrotes de acero abulonados accionado hidráulicamente a través de reductor, y distribución homogénea mediante dos rotores verticales.",
+    "especificaciones": {
+      "Capacidad": "8.000 Lts",
+      "Ancho de Labor": "10 a 16 mts",
+      "Suspensión": "Balancín con llantas para cubiertas 400/60 x 15.5",
+      "Distribución": "Dos rotores verticales acondicionadores",
+      "Acarreador": "Cadenas reforzadas con accionamiento hidráulico y reductor",
+      "Tolva": "Abulonada con bulonería de Acero Inoxidable"
+    }
+  },
+  {
+    "id": 216,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 12.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2024/07/Portada-EA-12000.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2024/07/Portada-EA-12000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/03/Ficha-tecnica-Estercolera-Syra-EA12000.jpeg",
+      "https://syra.com.ar/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-19-at-11.24.35-AM.jpeg",
+      "https://syra.com.ar/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-19-at-11.24.36-AM.jpeg"
+    ],
+    "descripcionCorta": "Esparcidor de estiércol sólido de 12.000 Lts con rotores verticales, chasis reforzado y rodados de alta flotación.",
+    "descripcionLarga": "Esparcidor de estiércol y orgánicos sólidos SYRA EA 12.000 con capacidad de 12.000 litros y ancho de labor de 5 a 12 metros. Equipado con chasis reforzado con lanza abulonada, eje rígido para cubiertas de alta flotación 550/60 x 22,5, tolva totalmente abulonada con bulonería de acero inoxidable, acarreador de cadenas reforzadas con accionamiento hidráulico mediante reductor y distribución homogénea por rotores verticales.",
+    "especificaciones": {
+      "Capacidad": "12.000 Lts",
+      "Ancho de Labor": "5 a 12 mts",
+      "Distribución": "Rotores verticales acondicionadores",
+      "Acarreador": "Cadenas reforzadas y barrotes de acero abulonados",
+      "Rodados": "Eje rígido con llantas para cubiertas 550/60 x 22,5",
+      "Terminación": "Fondo epoxi y pintura poliuretánica con bulonería Inox"
+    }
+  },
+  {
+    "id": 217,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 18.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2026/03/Portada-estercolera-ea-18000-web.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2026/03/Portada-estercolera-ea-18000-web.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/estercolera-organica-ea-18000-web.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/estercolera-organica-ea-18000-web2-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/07/20240604_104738-scaled.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/estercolera-organica-ea-18000-web-detalle1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2026/03/estercolera-organica-ea-18000-web-detalle.jpg"
+    ],
+    "descripcionCorta": "Estercolera orgánica para sólidos de 18.000 Lts (18 Tn) con 2 ejes tándem, eje trasero autodireccional y ancho de 10 a 16 m.",
+    "descripcionLarga": "Esparcidor de estiércol y abonos orgánicos sólidos SYRA EA 18.000 con capacidad de 18.000 litros (16.500 / 18.000 kg) y ancho de labor de 10 a 16 metros. Cuenta con chasis reforzado con lanza abulonada, 2 ejes tándem con suspensión a elásticos y eje trasero autodireccional, tolva abulonada con bulones de acero inoxidable, acarreador accionado hidráulicamente a través de reductor y distribución homogénea mediante dos rotores verticales.",
+    "especificaciones": {
+      "Capacidad": "18.000 Lts / 18 Tn",
+      "Ancho de Labor": "10 a 16 mts",
+      "Ejes y Suspensión": "2 Ejes Tándem con elásticos y eje trasero autodireccional",
+      "Rodados": "4 Llantas para cubiertas AF 550/60 x 22,5",
+      "Dimensiones": "Largo 9.820 mm / Ancho 3.150 mm / Alto 3.240 mm",
+      "Trocha": "2.600 mm"
+    }
+  },
+  {
+    "id": 218,
+    "nombre": "Esparcidor de Estiércol y Orgánicos Sólidos SYRA EA 22.000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2024/07/Portada-EA-22000.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2024/07/Portada-EA-22000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/07/20240604_104738-scaled.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/07/20240604_104624-scaled.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/07/20240604_104728-scaled.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/09/estercolera-orgnica-syra-ea2000.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/09/EA22000.-Dorso.jpg",
+      "https://syra.com.ar/wp-content/uploads/2024/09/EA22000.-Frente.jpg"
+    ],
+    "descripcionCorta": "Esparcidor de estiércol y orgánicos sólidos de 22 m³ (22 Tn) con 4 cadenas, reductores italianos y rotores con platos inferiores.",
+    "descripcionLarga": "Esparcidor de estiércol y orgánicos sólidos SYRA EA 22.000 de máxima capacidad (22 m³ / 22 Tn) con ancho de labor de hasta 14 metros. Distribución a través de rotores verticales y platos inferiores que acondicionan cualquier tipo de material. Equipado con acarreador de 4 cadenas y reductores hidráulicos de alto torque de origen italiano, compuerta trasera con levante hidráulico, chasis reforzado con suspensión a elásticos, lanza articulada con suspensión elástica y 2 ejes para rodados de alta flotación.",
+    "especificaciones": {
+      "Capacidad": "22 m³ – 22 Tn",
+      "Ancho de Labor": "Hasta 14 mts",
+      "Distribución": "Rotores verticales y platos inferiores (Cajas y reductores italianos)",
+      "Acarreador": "4 cadenas con reductores hidráulicos de alto torque",
+      "Compuerta Trasera": "Con levante hidráulico",
+      "Rodados": "2 ejes con 4 llantas para cubiertas AF 550/60 x 22.5",
+      "Potencia Mínima": "230 HP"
+    }
+  },
+  {
+    "id": 219,
+    "nombre": "Fertilizadora Neumática de Arrastre SYRA Motion Air FN6000",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2024/07/Portada-Motion-Air.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2024/07/Portada-Motion-Air.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora neumática de arrastre de 6.000 Lts con botalón de 30 metros, 4 cortes por sección y sensores ópticos de flujo.",
+    "descripcionLarga": "Fertilizadora neumática de arrastre SYRA Motion Air FN6000 con tolva de acero inoxidable sin presurizar de 6.000 litros (6 m³) y botalón de 30 metros de ancho de labor con apertura y cierre hidráulico desde cabina y 4 cortes por sección. Distribución neumática con 2 turbinas de alto caudal, 18 picos difusores y tubos conductores de fácil recambio con sensores ópticos de flujo. Apta para dosis variable manual o georreferenciada de granulados, fertilizantes, semillas, mezclas y polvos.",
+    "especificaciones": {
+      "Capacidad": "6.000 Lts (6 m³) en Acero Inoxidable sin presurizar",
+      "Ancho de Labor": "30 metros (Botalón con 4 cortes por sección)",
+      "Distribución": "Neumática con 2 turbinas de alto caudal y 18 picos difusores",
+      "Monitoreo": "Sensores ópticos de flujo en tubos conductores",
+      "Dosis Aplicable": "De 6 kg a 700 kg/ha aprox. (Manual o georreferenciada)",
+      "Rodados": "14.9 x 46 (380/90 x 46)"
+    }
+  },
+  {
+    "id": 220,
+    "nombre": "Desparramador de Paja SYRA para Cosechadoras",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/10/desparramadode-de-paja-syra-new-holland-1.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/10/desparramadode-de-paja-syra-new-holland-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Desparramador-Syra-768x512-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/10/desparramador.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/10/desparramador-de-paja-syra-maseey-ferguson.jpg"
+    ],
+    "descripcionCorta": "Desparramador de paja adaptable a todas las marcas y modelos de cosechadoras con cobertura de hasta 45 pies.",
+    "descripcionLarga": "Desparramador de Paja SYRA adaptable a todas las marcas y modelos de cosechadoras (incluyendo diseño exclusivo para New Holland con hidráulica independiente). Alcanza un ancho de labor de hasta 45 pies y permite reemplazar al triturador tanto en la trilla de maíz como en distintos tipos de cereales, logrando un importante ahorro de potencia y combustible y una mejor cobertura del lote. Platos con paletas regulables en apertura, inclinación y posicionamiento del difusor trasero.",
+    "especificaciones": {
+      "Compatibilidad": "Adaptable a todas las marcas y modelos de cosechadoras",
+      "Ancho de Labor": "Hasta 45 pies",
+      "Accionamiento": "Hidráulico (disponible con circuito independiente)",
+      "Regulación": "Paletas regulables en apertura, inclinación y difusor trasero"
+    }
+  },
+  {
+    "id": 221,
+    "nombre": "Esparcidor de Granza Frontal SYRA para Cosechadoras",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/10/D1-Desparramador-Granza-amarillo-.png",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/10/D1-Desparramador-Granza-amarillo-.png",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Dm4-Cosechadora-verde-.png",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Dm6-Cosechadora-roja.png",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Desparramador_1.png",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Desparramador_2.png",
+      "https://syra.com.ar/wp-content/uploads/2022/10/Desparramador_3.png"
+    ],
+    "descripcionCorta": "Esparcidor de granza frontal con sistema vertical anti-atascamientos y rebatimiento por resortes a gas.",
+    "descripcionLarga": "Esparcidor de Granza Frontal SYRA diseñado con sistema vertical que no produce atascamientos. Mediante dos resortes a gas, una sola persona puede colocar el equipo en posición de trabajo o rebatirlo para la extracción de la zaranda. Mejora la distribución de cobertura para reducir la erosión, conservar la humedad en el suelo, aumentar la infiltración, favorecer el control de malezas y aportar mayor materia orgánica en el perfil del suelo.",
+    "especificaciones": {
+      "Sistema": "Vertical libre de atascamientos",
+      "Apertura": "Rebatible por una sola persona mediante 2 resortes a gas",
+      "Beneficios Agronómicos": "Control de malezas, retención de humedad y distribución uniforme"
+    }
+  },
+  {
+    "id": 222,
+    "nombre": "Fertilizadora Montada SYRA F1500 / F2000 (Alimentación por Gravedad)",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2021/11/F2-1500.png",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2021/11/F2-1500.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadoras-Montadas-Syra-Portadas.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/F7-2000-rojo.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/F8-2000-anaranjado.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadora-SYRA-montada-sobre-Case.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/FERTILIZADORA-SYRA-SOBRE-ROGATOR-854.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora montada 3 puntos de 1.500 / 2.000 Lts con alimentación por gravedad y distribución bidisco hasta 36 m.",
+    "descripcionLarga": "Fertilizadora montada SYRA F1500 / F2000 con alimentación por gravedad y acople de 3 puntos o montaje sobre chasis. Capacidad de hasta 2.000 litros / 2.000 kg y ancho de labor de hasta 36 metros. Cuenta con distribución bidisco con discos y ejes en acero inoxidable AISI, cajas reforzadas en baño de aceite, accionamiento hidráulico, removedor interno y rejilla antiaglomerado. Tolva en chapa con pintura epoxi-poliuretánica u opcional en acero inoxidable AISI.",
+    "especificaciones": {
+      "Capacidad": "1.500 / 2.000 Lts – 2.000 Kg",
+      "Montaje": "3 Puntos / Montada",
+      "Alimentación": "Por gravedad con removedor interno y rejilla",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Distribución": "Bidisco con discos y ejes en Acero Inoxidable AISI",
+      "Material Tolva": "Chapa epoxi-poliuretánica (Opcional Acero Inox AISI)"
+    }
+  },
+  {
+    "id": 223,
+    "nombre": "Fertilizadora Montada SYRA Intense 4000 (Alimentación por Cinta)",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/05/Syra-Montada-Intense-Hydro-4tt-Acero-e1652191849104.png",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/05/Syra-Montada-Intense-Hydro-4tt-Acero-e1652191849104.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadoras-Montadas-Syra-Portadas.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/FERTILIZADORA-SYRA-SOBRE-JACTO.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadora-SYRA-montada-sobre-Montana.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora montada de 4.000 Lts con alimentación por cinta, motores hidráulicos y ancho de labor de 24 a 45 m.",
+    "descripcionLarga": "Fertilizadora montada SYRA Intense 4000 con alimentación por cinta y capacidad de 4.000 litros, ideal para montar sobre pulverizadoras autopropulsadas o tractores. Alcanza un ancho de labor de 24 a 45 metros mediante distribución bidisco con ejes, platos y paletas en acero inoxidable AISI 304 accionados por motores hidráulicos. Incluye sistema de regulación de cinta electrónico, cuenta RPM en platos distribuidores, rejilla antiaglomerados, visor de nivel y bulonería en acero inoxidable.",
+    "especificaciones": {
+      "Capacidad": "4.000 Lts",
+      "Alimentación": "Por cinta con control hidráulico y regulación electrónica",
+      "Ancho de Labor": "24 a 45 mts",
+      "Distribución": "Bidisco en Acero Inoxidable AISI 304 con cuenta RPM",
+      "Accionamiento": "Motores hidráulicos con apertura y cierre desde cabina",
+      "Construcción": "Tolva en acero SAE 1010 con epoxi-poliuretano y bulonería Inox"
+    }
+  },
+  {
+    "id": 224,
+    "nombre": "Fertilizadora Montada SYRA Extreme 4250 (Alimentación por Cinta)",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/05/Syra-Montada-F4250lts-e1652192458621.png",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/05/Syra-Montada-F4250lts-e1652192458621.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadoras-Montadas-Syra-Portadas.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Fertilizadora-SYRA-montada-sobre-Case.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/FERTILIZADORA-SYRA-SOBRE-ROGATOR-854.jpg"
+    ],
+    "descripcionCorta": "Fertilizadora montada de 4.250 Lts con tolva en Acero Inoxidable, alimentación por cinta y regulación electrónica.",
+    "descripcionLarga": "Fertilizadora montada SYRA Extreme 4250 con tolva íntegramente en acero inoxidable de 4.250 litros de capacidad y ancho de labor de hasta 36 metros. Dosificación por cinta transportadora y regulación de compuerta trasera, con accionamientos hidráulicos de cinta, platos distribuidores y compuerta. Incluye lona enrollable, rejilla interna, sistema de regulación de cinta electrónico y cuenta RPM en platos distribuidores.",
+    "especificaciones": {
+      "Capacidad": "4.250 Lts",
+      "Tolva y Platos": "Acero Inoxidable (INOX)",
+      "Ancho de Labor": "Hasta 36 mts",
+      "Dosificación": "Cinta transportadora con regulación electrónica",
+      "Accionamientos": "Hidráulicos en cinta, platos y compuerta trasera",
+      "Incluye": "Lona enrollable, rejilla y cuenta RPM en platos"
+    }
+  },
+  {
+    "id": 225,
+    "nombre": "Guinches Agrícolas SYRA Fijo y Giratorio 2.000 Kg",
+    "categoria": "Herramientas",
+    "marca": "SYRA",
+    "estado": "Nuevo",
+    "imagen": "https://syra.com.ar/wp-content/uploads/2022/04/guinches_Mesa-de-trabajo-1.jpg",
+    "imagenes": [
+      "https://syra.com.ar/wp-content/uploads/2022/04/guinches_Mesa-de-trabajo-1.jpg",
+      "https://syra.com.ar/wp-content/uploads/2022/04/Productos-Web-18.png",
+      "https://syra.com.ar/wp-content/uploads/2022/04/ginche-abierto_6qjgxpzw.jpg"
+    ],
+    "descripcionCorta": "Guinches agrícolas en versiones Fijo y Giratorio (90°) con capacidad de 2.000 kg y 6,80 m de altura de elevación.",
+    "descripcionLarga": "Guinches Agrícolas SYRA disponibles en modelos Fijo y Giratorio (con 90° de rotación), diseñados para el movimiento seguro de bolsones Big Bag e insumos en el campo. Ambos cuentan con capacidad de carga de 2.000 kg, altura máxima de elevación de 6,8 metros, trocha de 2,2 metros, llantas de 18 pulgadas, anclaje de cilindro en 2 posiciones y cruz de izaje para bolsones. Opcionales para elevación de personas, carga de pallets y rollos.",
+    "especificaciones": {
+      "Versiones": "Guinche Fijo / Guinche Giratorio (90° de rotación)",
+      "Capacidad de Carga": "2.000 Kg",
+      "Altura de Elevación": "6,80 mts",
+      "Trocha y Rodado": "Trocha 2,20 mts / Llantas 18\"",
+      "Equipamiento": "Cruz de izaje para bolsones y anclaje de cilindro en 2 posiciones",
+      "Opcionales": "Accesorios para elevación de personas, carga de pallets y rollos"
+    }
+  },
+  {
+    "id": 226,
+    "nombre": "Tolva Autodescargable COMOFRA Línea TA Innova 1 Eje (17.500 / 21.500 L)",
+    "categoria": "Acoplados",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-01.webp",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-03.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-04.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-05.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-06.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/06/TOLVA-COMOFRA-BUHO-EXTREME.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-01.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-02.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-03.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-04.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-05.jpg"
+    ],
+    "descripcionCorta": "Tolva autodescargable de 1 eje en modelos de 17.500 y 21.500 litros con tubo de descarga de 450 mm y lona de destape rápido.",
+    "descripcionLarga": "Tolva Autodescargable COMOFRA Línea TA Innova de 1 Eje, disponible en capacidades de 17.500 L y 21.500 L. Su estructura abulonada logra una óptima absorción de esfuerzos y excelente terminación. Equipada con tubo de descarga de 450 mm, sinfín barredor y de descarga cementados, cuchilla de descarga con mando hidráulico, sistema de limpieza inferior con puertas de apertura independiente, enganche con amortiguador de impacto, lona con sistema de destape rápido, depósito lavamanos, cajón portaherramientas rotomoldeado, luces LED y pintura poliuretánica.",
+    "especificaciones": {
+      "Modelos": "TA Innova 17500 L (1 Eje) / TA Innova 21500 L (1 Eje)",
+      "Tubo de Descarga": "450 mm con sinfines cementados y luz de descarga",
+      "Guillotina": "Cuchilla de descarga con mando hidráulico",
+      "Limpieza Inferior": "Puertas independientes con manijas individuales y traba",
+      "Equipamiento": "Lona destape rápido, tanque lavamanos, cajón portaherramientas y luces LED"
+    }
+  },
+  {
+    "id": 227,
+    "nombre": "Tolva Autodescargable COMOFRA Línea TA Innova Extreme 2 Ejes (26.000 a 35.000 L)",
+    "categoria": "Acoplados",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-02.webp",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-06.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-04.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-03.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-05.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/06/TOLVA-COMOFRA-BUHO-EXTREME.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-01.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-02.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-03.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-04.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-05.jpg"
+    ],
+    "descripcionCorta": "Tolva autodescargable de 2 ejes (26.000, 30.000 y 35.000 L) con caja compacta de 5.900 mm y eje delantero basculante.",
+    "descripcionLarga": "Tolva Autodescargable COMOFRA Línea TA Innova Extreme de 2 Ejes, disponible en modelos de 26.000 L, 30.000 L y 35.000 L. Posee una caja de cereal de 5.900 mm de longitud que facilita el transporte en carretones y disminuye el radio de giro. Cuenta con sistema basculante en el eje delantero para copiar las irregularidades del terreno, aro giratorio a bolitas, neumáticos de igual dimensión para menor compactación, tubo de descarga de 450 mm con sinfines cementados, lanza regulable con punta rebatible y lona de destape rápido.",
+    "especificaciones": {
+      "Modelos": "TA Innova Extreme 26000 L / 30000 L / 35000 L (2 Ejes)",
+      "Largo Caja Cereal": "5.900 mm (apto para carretones y menor radio de giro)",
+      "Tubo de Descarga": "450 mm con sinfín barredor y elevador cementados",
+      "Tren Rodante": "Eje delantero basculante con aro giratorio a bolitas",
+      "Neumáticos": "23.1.30 / 28L26 / 24.5.32 de igual dimensión",
+      "Equipamiento": "Lona destape rápido, luces LED, paragolpe rebatible y pintura poliuretánica"
+    }
+  },
+  {
+    "id": 228,
+    "nombre": "Tolva Autodescargable COMOFRA Línea TA Buho Extreme (35.000 a 45.000 L)",
+    "categoria": "Acoplados",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2025/06/TOLVA-COMOFRA-BUHO-EXTREME.jpg",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/06/TOLVA-COMOFRA-BUHO-EXTREME.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-06.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-03.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-04.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/autod-comofra-05.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-01.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-02.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-03.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-04.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/atudoesc-comofra-05.jpg"
+    ],
+    "descripcionCorta": "Tolva autodescargable de alta capacidad (35.000, 38.000 y 45.000 L) para máxima eficiencia en logística de cosecha.",
+    "descripcionLarga": "Tolva Autodescargable COMOFRA Línea TA Buho Extreme de alta capacidad, disponible en versiones de 35.000 L, 38.000 L y 45.000 L. Construida con estructura abulonada de alta absorción de esfuerzos, sistema basculante delantero para óptima estabilidad y transitabilidad, mazas en fundición nodular con rodamientos gemelos y puntas de eje desmontables. Incorpora tubo de descarga rápida con cuchilla hidráulica, limpieza inferior completa por compuertas individuales, sinfines cementados y lona con destape rápido.",
+    "especificaciones": {
+      "Modelos": "TA Buho Extreme 35000 L / 38000 L / 45000 L",
+      "Construcción": "Estructura abulonada con pintura poliuretánica",
+      "Descarga": "Tubo de gran caudal con cuchilla hidráulica y sinfines cementados",
+      "Mazas y Ejes": "Fundición nodular con rodamientos gemelos HM518 445-410 y punta desmontable",
+      "Equipamiento": "Lona destape rápido, escalera interna/externa, luces LED y depósito lavamanos"
+    }
+  },
+  {
+    "id": 229,
+    "nombre": "Embolsadora de Granos COMOFRA Roble Max E/09",
+    "categoria": "Herramientas",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2026/05/embolsadora_granos_comofra_roblemax.jpg",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2026/05/embolsadora_granos_comofra_roblemax.jpg",
+      "https://comofrasrl.com.ar/wp-content/uploads/2026/05/Embolsadora.jpg"
+    ],
+    "descripcionCorta": "Embolsadora de granos para bolsas de 9 pies con tolva de 3,2 m³, tubo de 450 mm y sistema de doble lanza.",
+    "descripcionLarga": "Embolsadora de Granos COMOFRA Roble Max E/09 para bolsas de 9 pies de diámetro. Construida con chasis de perfil tubular de gran resistencia y túnel de llenado tipo oblongo. Posee tolva de recepción de 3,2 m³ con destape rápido y reducción de polvo, tubo de 450 mm con sinfín cementado de gran diámetro y baja velocidad de rotación para cuidar el grano, regulación de altura por cilindro hidráulico, frenos a disco con regulación de presión mediante bomba manual y sistema de doble lanza que agiliza el pasaje de transporte a trabajo.",
+    "especificaciones": {
+      "Modelo": "Roble Max E/09 (para bolsas de 9 pies)",
+      "Capacidad Tolva": "3,2 m³ con destape rápido",
+      "Tubo y Sinfín": "Tubo de 450 mm con sinfín cementado de baja rotación",
+      "Frenos": "A disco con regulación de presión mediante bomba manual",
+      "Lanza": "Doble lanza (transporte/trabajo) + lanza secundaria para tiro posterior",
+      "Regulación": "Altura regulable por cilindro hidráulico y barra cardánica con fusible"
+    }
+  },
+  {
+    "id": 230,
+    "nombre": "Tolva para Semillas y Fertilizantes COMOFRA Línea Quantum (ATF 12000 / 17500 / 26000)",
+    "categoria": "Acoplados",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2025/04/Tolva-semillera.-Comofra-26000.-Isometrica.-con-CALCO-web1.png",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/04/Tolva-semillera.-Comofra-26000.-Isometrica.-con-CALCO-web1.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-03.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-04.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-05.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-06.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-26k-07.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-03.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-04.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-05.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-06.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-17500-07.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-comofra-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-comofra-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/fert-comofra-03.webp"
+    ],
+    "descripcionCorta": "Tolva semillera y fertilizadora Línea Quantum en modelos ATF 12000, ATF 17500 y ATF 26000 abulonada en su totalidad.",
+    "descripcionLarga": "Tolva para Semillas y Fertilizantes COMOFRA Línea Quantum disponible en modelos ATF 12000, ATF 17500 y ATF 26000. Diseñada para agilizar las tareas de siembra facilitando la carga, traslado y descarga de semillas y fertilizantes a granel. Construida completamente en chapa de acero al carbono y abulonada en su totalidad sobre un chasis reforzado de chapa estampada de gran robustez y rigidez, ofreciendo bajo costo de mantenimiento, fácil operación y larga vida útil.",
+    "especificaciones": {
+      "Modelos": "ATF 12000 / ATF 17500 / ATF 26000",
+      "Aplicación": "Transporte y abastecimiento de semillas y fertilizantes a granel",
+      "Construcción": "Chapa de acero al carbono totalmente abulonada",
+      "Chasis": "Reforzado en chapa estampada de alta rigidez"
+    }
+  },
+  {
+    "id": 231,
+    "nombre": "Mixer Horizontal COMOFRA RE FeedMax 16 m³",
+    "categoria": "Herramientas",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2026/05/MIxer_horizontal_Comofra_16m3_Lateral_web.png",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2026/05/MIxer_horizontal_Comofra_16m3_Lateral_web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2026/05/MIxer_horizontal_Comofra_16m3_web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image018.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image016.webp"
+    ],
+    "descripcionCorta": "Mixer horizontal de 16 m³ con transmisión por caja reductora, sistema de mezclado por paletas y pisos abulonados.",
+    "descripcionLarga": "Mixer Horizontal COMOFRA Línea RE FeedMax de 16 m³ de capacidad, disponible en configuraciones de 1 Eje o 2 Ejes con transmisión por caja reductora. Cuenta con sistema de mezclado por paletas que permite una mejor aireación de la ración y pisos totalmente abulonados e intercambiables ante el desgaste. Equipado con puntas de eje abulonadas, celdas de balanza incorporadas, chasis en perfil Grey (180 en 1 eje / 160 en 2 ejes con plato a bolas y enganche amortiguado) y gato hidráulico.",
+    "especificaciones": {
+      "Capacidad": "16 m³",
+      "Versiones": "1 Eje o 2 Ejes (con plato giratorio a bolas)",
+      "Transmisión": "Por caja reductora",
+      "Sistema de Mezclado": "Por paletas (óptima aireación) con pisos abulonados intercambiables",
+      "Pesaje": "Balanza en puntas de eje y enganche delantero"
+    }
+  },
+  {
+    "id": 232,
+    "nombre": "Mixer Horizontal COMOFRA RE FeedMax 14 m³",
+    "categoria": "Herramientas",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2024/10/mixerh-16-prod.webp",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/mixerh-16-prod.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image018.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image016.webp"
+    ],
+    "descripcionCorta": "Mixer horizontal de 14 m³ con opciones de transmisión por cadena o caja reductora en 1 eje o eje balancín.",
+    "descripcionLarga": "Mixer Horizontal COMOFRA Línea RE FeedMax de 14 m³ de capacidad, disponible en 4 configuraciones: 1 Eje o Eje Balancín con transmisión a cadena o por caja reductora. Incorpora sistema de mezclado por paletas para una mezcla homogénea y aireada, pisos totalmente abulonados para fácil recambio, puntas de ejes abulonadas, sistema de balanza incorporado, chasis en perfil Grey y gato hidráulico.",
+    "especificaciones": {
+      "Capacidad": "14 m³",
+      "Tren Rodante": "1 Eje o Eje Balancín",
+      "Transmisión": "A cadena o por caja reductora",
+      "Sistema de Mezclado": "Por paletas con pisos totalmente abulonados intercambiables",
+      "Pesaje": "Celdas de carga incorporadas"
+    }
+  },
+  {
+    "id": 233,
+    "nombre": "Mixer Horizontal COMOFRA RE FeedMax 10 m³",
+    "categoria": "Herramientas",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2026/05/MIxer_horizontal_Comofra_10m3_web.png",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2026/05/MIxer_horizontal_Comofra_10m3_web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image018.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/image016.webp"
+    ],
+    "descripcionCorta": "Mixer horizontal de 10 m³ ágil para espacios reducidos, con ejes intercambiables (1 eje / balancín) y balanza cilíndrica.",
+    "descripcionLarga": "Mixer Horizontal COMOFRA Línea RE FeedMax de 10 m³ de capacidad, ideal para circular en espacios reducidos y terrenos ondulados. Disponible con transmisión a cadena o por caja reductora y diseño con intercambiabilidad entre configuración de 1 eje y eje balancín. Posee sistema de mezclado por paletas, pisos totalmente abulonados intercambiables, eje de palanquilla de 3\" en acero SAE 1045 y balanza tipo cilíndrica ubicada entre la caja y el chasis.",
+    "especificaciones": {
+      "Capacidad": "10 m³",
+      "Tren Rodante": "Intercambiable entre 1 Eje y Eje Balancín (Eje 3\" SAE 1045)",
+      "Transmisión": "A cadena o por caja reductora",
+      "Sistema de Mezclado": "Por paletas con pisos abulonados intercambiables",
+      "Pesaje": "Balanza tipo cilíndrica entre caja y chasis"
+    }
+  },
+  {
+    "id": 234,
+    "nombre": "Mixer Vertical COMOFRA Línea SF (10 a 25 m³)",
+    "categoria": "Herramientas",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2025/04/mixer-vertical-comofra-web.png",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/04/mixer-vertical-comofra-web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/comofra-mixers-1.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/comofra-mixers-2.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/comofra-mixers-3.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/comofra-mixers-4.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/mixv-detalle1.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/mixv-detalle2.webp"
+    ],
+    "descripcionCorta": "Mixer vertical procesador de rollos y megafardos en modelos de 10, 14, 21 y 25 m³ con sinfín de 11 cuchillas y batea a sinfín.",
+    "descripcionLarga": "Mixer Vertical COMOFRA Línea SF disponible en modelos SF/V1B, SF/V1 10 m³, SF/V1 14 m³, SF/V2 21 m³ y SF/V2 25 m³. Diseñado para desmenuzar silaje picado largo, rollos enteros de heno de hasta 1,80 m de diámetro y fardos prismáticos de hasta 2,60 m de largo, además de mezclar y distribuir raciones húmedas o secas. Cuenta con sinfín vertical de desarrollo propio equipado con 11 cuchillas y batea de descarga a sinfín de bajo mantenimiento y entrega uniforme.",
+    "especificaciones": {
+      "Modelos": "SF/V1B / SF/V1 10 m³ / SF/V1 14 m³ / SF/V2 21 m³ / SF/V2 25 m³",
+      "Sinfín Mezclador": "Vertical con 11 cuchillas (desarrollo propio COMOFRA)",
+      "Descarga": "Batea de descarga a sinfín de entrega uniforme y bajo mantenimiento",
+      "Capacidad de Procesado": "Rollos enteros hasta 1,80 m Ø, megafardos hasta 2,60 m, silajes y granos"
+    }
+  },
+  {
+    "id": 235,
+    "nombre": "Batea Volcadora COMOFRA Línea BV (4 a 18 Tn)",
+    "categoria": "Acoplados",
+    "marca": "COMOFRA",
+    "estado": "Nuevo",
+    "imagen": "https://comofrasrl.com.ar/wp-content/uploads/2025/04/Batea-Volcadora-7.5-Comofra-web.png",
+    "imagenes": [
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/04/Batea-Volcadora-7.5-Comofra-web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2025/04/Batea-Comofra-Isometrica-Calco-web.png",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/batea-comofra-01.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/batea-comofra-02.webp",
+      "https://comofrasrl.com.ar/wp-content/uploads/2024/10/batea-comofra-03.webp"
+    ],
+    "descripcionCorta": "Batea volcadora trasera con caja semi-monocasco, portón de apertura doble (rebatible y tipo libro) y cilindro telescópico (>45°).",
+    "descripcionLarga": "Batea Volcadora COMOFRA Línea BV disponible en 5 modelos: BV-4 (4 m³ / 4 Tn), BV-5 (5 m³ / 6 Tn), BV-7.5 (7,5 m³ / 8 Tn), BV-9.5 (9,5 m³ / 12 Tn) y BV-15 (15 m³ / 18 Tn). Construida íntegramente en chapa de acero al carbono con caja de carga tipo semi-monocasco reforzada con laterales envolventes y chasis de chapa estampada. Cuenta con cilindro hidráulico telescópico de 4 o 5 etapas que eleva la batea a un ángulo superior a 45°, portón trasero también con apertura tipo libro y enganche con rótula oscilante.",
+    "especificaciones": {
+      "Modelos": "BV-4 (4 Tn) / BV-5 (6 Tn) / BV-7.5 (8 Tn) / BV-9.5 (12 Tn) / BV-15 (18 Tn)",
+      "Caja de Carga": "Tipo semi-monocasco con laterales envolventes y portón apertura tipo libro",
+      "Sistema Hidráulico": "Cilindro telescópico de 4 o 5 etapas (ángulo de vuelco > 45°)",
+      "Enganche": "Con rótula oscilante de alta seguridad",
+      "Opciones de Rodado": "11L16 / 750x16 dual / 275/80x22,5 / 385/65x22,5 / 400/60x22,5"
+    }
   }
 ];
